@@ -1279,61 +1279,44 @@ body:has(.party) .dial-bounds {
   pointer-events: none;
 }
 
-/* the half circle of pills: flat like the cards, the current section filled in */
-.dial__fan {
+/* the half ring: four flat slices clipped to their exact shape, so the fill and the tap target are
+   the slice itself. Flat like the cards: solid white, the current section solid green, one soft
+   shadow for the whole ring because it floats. */
+.dial__arc {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 0;
-  height: 0;
   z-index: 1;
+  filter: drop-shadow(0 6px 18px rgba(23, 32, 27, 0.14));
 }
-.dial__guide {
+.dial__slice {
   position: absolute;
-  left: -146px;
-  top: -146px;
-  overflow: visible;
-  pointer-events: none;
-}
-.dial__guide path {
-  fill: none;
-  stroke: var(--line-strong);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 1 7;
-}
-.dial__pill {
-  position: absolute;
-  left: -52px;
-  top: -29px;
-  width: 104px;
-  height: 58px;
-  padding: 0 10px;
-  border: 1.5px solid var(--line-strong);
-  border-radius: 999px;
+  inset: 0;
+  padding: 0;
+  border: 0;
   background: var(--surface);
   color: var(--ink);
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(23, 32, 27, 0.08);
+  transition: background-color var(--t-fast);
 }
-.dial__pill:hover,
-.dial__pill:focus-visible {
-  border-color: var(--ink);
+.dial__slice:hover,
+.dial__slice:focus-visible {
+  background: var(--surface-2);
   outline: none;
 }
-.dial__pill--current {
-  border-color: var(--accent);
+.dial__slice--current,
+.dial__slice--current:hover,
+.dial__slice--current:focus-visible {
   background: var(--accent);
   color: #fff;
 }
-.dial__pill--current:hover,
-.dial__pill--current:focus-visible {
-  border-color: var(--accent-ink);
+.dial__word {
+  position: absolute;
+  translate: -50% -50%;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 /* a goal Kip is hovering over, mid-drag */
