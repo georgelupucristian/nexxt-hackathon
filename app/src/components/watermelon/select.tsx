@@ -86,7 +86,7 @@ export function Select<T extends string = string>({
   options,
   label,
   hideLabel = false,
-  placeholder = 'Choose…',
+  placeholder = 'Alege…',
   disabled = false,
   size = 'md',
   id,
@@ -448,7 +448,8 @@ export function Select<T extends string = string>({
                   const isSelected = i === selectedIndex;
                   const isActive = i === active;
                   return (
-                    <motion.li
+                    // A plain <li>: motion's whileTap would add tabindex=0 and make every row a tab stop.
+                    <li
                       key={o.value}
                       id={optId(i)}
                       role="option"
@@ -456,12 +457,12 @@ export function Select<T extends string = string>({
                       aria-disabled={o.disabled || undefined}
                       onPointerMove={() => !o.disabled && i !== active && setActive(i)}
                       onClick={() => commit(i)}
-                      whileTap={o.disabled || reduced ? undefined : { scale: 0.98 }}
                       className={cn(
-                        'flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 select-none',
+                        'flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-[background-color,scale] duration-100 select-none',
                         sm ? 'min-h-10 text-[14px]' : 'min-h-11 text-[15px]',
                         isActive && !o.disabled && 'bg-surface-2',
                         !o.disabled && 'active:bg-[color:var(--surface-3)]',
+                        !o.disabled && !reduced && 'active:scale-[0.98]',
                         o.disabled && 'cursor-not-allowed opacity-45',
                       )}
                     >
@@ -484,7 +485,7 @@ export function Select<T extends string = string>({
                           )}
                         </AnimatePresence>
                       </span>
-                    </motion.li>
+                    </li>
                   );
                 })}
               </ul>

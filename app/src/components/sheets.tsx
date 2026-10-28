@@ -8,6 +8,7 @@ import { formatDate, ordinal, todayKey } from '../lib/dates';
 import { formatLei, parseLei } from '../lib/money';
 import { plural } from '../lib/ro';
 import { planLabel } from './domain';
+import { Select } from './watermelon/select';
 import { Banner, Button, DayPicker, Field, ProgressBar, Segmented, Sheet, TextField, useToast } from './ui';
 
 // ---------- Add / withdraw / edit money ----------
@@ -164,16 +165,22 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
         </div>
 
         <Field label={type === 'contribution' ? 'Pune banii la' : 'Ia banii din'} htmlFor="bucket">
-          <select id="bucket" className="select" value={target} onChange={(e) => setTarget(e.target.value)}>
-            {buckets.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-                {type === 'withdrawal' ? ` (disponibil: ${formatLei(available(data.transactions, g.id, editing?.id))})` : ''}
-                {g.status === 'paused' ? ' (în pauză)' : ''}
-              </option>
-            ))}
-            <option value="none">Nealocat{type === 'withdrawal' ? ` (disponibil: ${formatLei(available(data.transactions, null, editing?.id))})` : ''}</option>
-          </select>
+          <Select
+            id="bucket"
+            name="bucket"
+            label={type === 'contribution' ? 'Pune banii la' : 'Ia banii din'}
+            hideLabel
+            value={target}
+            onChange={setTarget}
+            options={[
+              ...buckets.map((g) => ({
+                value: g.id,
+                label: g.status === 'paused' ? `${g.name} (în pauză)` : g.name,
+                hint: type === 'withdrawal' ? `Disponibil: ${formatLei(available(data.transactions, g.id, editing?.id))}` : undefined,
+              })),
+              { value: 'none', label: 'Nealocat', hint: type === 'withdrawal' ? `Disponibil: ${formatLei(available(data.transactions, null, editing?.id))}` : undefined },
+            ]}
+          />
         </Field>
 
         <div className="btn-row" style={{ alignItems: 'flex-start' }}>
@@ -252,13 +259,14 @@ export function PlanForm({
       )}
       {plan.frequency === 'monthly' && (
         <Field label="Ziua din lună" htmlFor="dom" hint="Între 1 și 28, ca data să existe în fiecare lună.">
-          <select id="dom" className="select" value={plan.day ?? 1} onChange={(e) => onChange({ ...plan, day: Number(e.target.value) })}>
-            {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-              <option key={d} value={d}>
-                {ordinal(d)}
-              </option>
-            ))}
-          </select>
+          <Select
+            id="dom"
+            label="Ziua din lună"
+            hideLabel
+            value={String(plan.day ?? 1)}
+            onChange={(v) => onChange({ ...plan, day: Number(v) })}
+            options={Array.from({ length: 28 }, (_, i) => ({ value: String(i + 1), label: ordinal(i + 1) }))}
+          />
         </Field>
       )}
       {pace && (

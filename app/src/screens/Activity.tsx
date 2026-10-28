@@ -2,6 +2,7 @@ import { ListOrdered, Plus } from '@/lib/icons';
 import { useMemo, useState } from 'react';
 import { TxRow } from '../components/domain';
 import { MoneySheet } from '../components/sheets';
+import { Select } from '../components/watermelon/select';
 import { Button, EmptyState } from '../components/ui';
 import { sortTx } from '../data/selectors';
 import { useData } from '../data/store';
@@ -63,18 +64,13 @@ export function Activity() {
           ))}
         </div>
         {data.goals.length > 0 && (
-          <label className="row small" style={{ gap: 8 }}>
-            <span className="muted">Obiectiv</span>
-            <select className="select" style={{ minHeight: 40, width: 'auto', maxWidth: '100%', fontSize: 'var(--fs-sm)' }} value={goalFilter} onChange={(e) => setGoalFilter(e.target.value)}>
-              <option value="all">Toate obiectivele</option>
-              {data.goals.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name}
-                </option>
-              ))}
-              <option value="none">Nealocat</option>
-            </select>
-          </label>
+          <Select
+            size="sm"
+            label="Obiectiv"
+            value={goalFilter}
+            onChange={setGoalFilter}
+            options={[{ value: 'all', label: 'Toate obiectivele' }, ...data.goals.map((g) => ({ value: g.id, label: g.name })), { value: 'none', label: 'Nealocat' }]}
+          />
         )}
       </div>
 
