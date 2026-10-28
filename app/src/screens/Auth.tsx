@@ -28,7 +28,7 @@ export function Welcome() {
       </div>
       <motion.div className="stack-lg" variants={stagger} initial="hidden" animate="shown">
         <motion.h1 variants={item} className="welcome__title">
-          Saving, but make it a habit.
+          Saving, but make it a <span className="brush welcome__brush">habit</span>
         </motion.h1>
         <motion.p variants={item} className="muted welcome__sub">
           Pick a goal, set a plan that fits your week, and watch it add up. No bank details needed.

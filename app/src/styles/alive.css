@@ -2325,3 +2325,16 @@ img.goal-glyph--kip.goal-glyph--lg {
   font-size: var(--fs-sm);
   color: var(--ink-2);
 }
+/* welcome headline: same heavy caps + one brush word as home */
+.welcome__title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+.welcome__brush {
+  display: inline-block;
+  color: var(--accent);
+  font-size: 1.15em;
+  transform: rotate(-2deg);
+}
