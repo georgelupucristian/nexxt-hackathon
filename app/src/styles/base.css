@@ -8,6 +8,8 @@ html {
   text-size-adjust: 100%;
   /* Young Serif has one weight; never let the browser fake a bold version of it */
   font-synthesis-weight: none;
+  /* sheets lock scrolling; reserving the scrollbar's space stops the page from widening then */
+  scrollbar-gutter: stable;
 }
 body {
   margin: 0;

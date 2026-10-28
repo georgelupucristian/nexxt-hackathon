@@ -285,7 +285,7 @@ h2 {
 }
 .panel .screen {
   padding-top: var(--s-4);
-  padding-bottom: calc(128px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
+  padding-bottom: calc(170px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
 }
 /* the panel header already names the section */
 .panel .page-head h1 {
@@ -750,7 +750,7 @@ p {
   width: 100%;
   max-width: var(--content-wide);
   margin: 0 auto;
-  padding: calc(var(--s-6) + env(safe-area-inset-top)) var(--gutter) calc(140px + env(safe-area-inset-bottom));
+  padding: calc(var(--s-6) + env(safe-area-inset-top)) var(--gutter) calc(170px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--s-5);
@@ -1187,10 +1187,10 @@ body:has(.party) .dial-bounds {
 .dial {
   position: absolute;
   left: 50%;
-  margin-left: -36px;
-  bottom: calc(22px + env(safe-area-inset-bottom));
-  width: 72px;
-  height: 72px;
+  margin-left: -44px;
+  bottom: calc(44px + env(safe-area-inset-bottom));
+  width: 88px;
+  height: 88px;
   pointer-events: auto;
   touch-action: none;
 }
@@ -1249,8 +1249,8 @@ body:has(.party) .dial-bounds {
 }
 .dial__face {
   position: relative;
-  width: 58px;
-  height: 58px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   overflow: hidden;
   background: var(--accent-soft);
@@ -1267,9 +1267,9 @@ body:has(.party) .dial-bounds {
   position: absolute;
   z-index: 3;
   left: 50%;
-  top: calc(100% - 9px);
+  top: calc(100% - 10px);
   translate: -50% 0;
-  padding: 2px 9px;
+  padding: 3px 11px;
   border-radius: var(--r-pill);
   background: var(--ink);
   color: #fff;
@@ -1279,59 +1279,61 @@ body:has(.party) .dial-bounds {
   pointer-events: none;
 }
 
-/* the half ring: liquid glass slices clipped to their exact shape, so the blur, the tint and the
-   tap target are all the slice itself */
-.dial__arc {
+/* the half circle of pills: flat like the cards, the current section filled in */
+.dial__fan {
   position: absolute;
   left: 50%;
   top: 50%;
+  width: 0;
+  height: 0;
   z-index: 1;
 }
-.dial__glass {
+.dial__guide {
   position: absolute;
-  inset: 0;
-  padding: 0;
-  border: 0;
-  cursor: pointer;
+  left: -146px;
+  top: -146px;
+  overflow: visible;
+  pointer-events: none;
+}
+.dial__guide path {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1 7;
+}
+.dial__pill {
+  position: absolute;
+  left: -52px;
+  top: -29px;
+  width: 104px;
+  height: 58px;
+  padding: 0 10px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--ink);
-  background:
-    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.22));
-  -webkit-backdrop-filter: blur(16px) saturate(1.9) brightness(1.06);
-  backdrop-filter: blur(16px) saturate(1.9) brightness(1.06);
-  transition: background-color var(--t-fast);
-}
-.dial__glass--hover {
-  background-color: rgba(255, 255, 255, 0.28);
-}
-.dial__glass--current {
-  color: #fff;
-  background:
-    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.28), transparent 55%),
-    linear-gradient(180deg, color-mix(in oklab, var(--accent) 88%, transparent), color-mix(in oklab, var(--accent) 70%, transparent));
-}
-.dial__glass:focus-visible {
-  outline: none;
-  background-color: rgba(255, 255, 255, 0.4);
-}
-.dial__word {
-  position: absolute;
-  translate: -50% -50%;
-  font-size: 0.9375rem;
+  font: inherit;
+  font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   white-space: nowrap;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(23, 32, 27, 0.08);
 }
-.dial__glass--current .dial__word {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+.dial__pill:hover,
+.dial__pill:focus-visible {
+  border-color: var(--ink);
+  outline: none;
 }
-.dial__rims {
-  position: absolute;
-  inset: 0;
-  overflow: visible;
-  pointer-events: none;
-  filter: drop-shadow(0 8px 18px rgba(23, 32, 27, 0.14));
+.dial__pill--current {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.dial__pill--current:hover,
+.dial__pill--current:focus-visible {
+  border-color: var(--accent-ink);
 }
 
 /* a goal Kip is hovering over, mid-drag */
@@ -1356,9 +1358,12 @@ body:has(.party) .dial-bounds {
   color: var(--ink-2);
   text-decoration: none;
 }
-.home2__out:hover {
+/* each link underlines on its own hover, not the pair together */
+.home2__out a:hover,
+.home2__tour:hover {
   color: var(--ink);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ---------- round 2: no boxed callouts, more direct manipulation ---------- */

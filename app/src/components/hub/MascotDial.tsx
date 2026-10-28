@@ -13,36 +13,22 @@ export interface DialSection {
 
 // Left to right along the arc, like a tab bar read in a curve.
 export const DIAL_SECTIONS: DialSection[] = [
-  { id: 'home', label: 'Home', path: '/home', mood: 'happy' },
-  { id: 'goals', label: 'Goals', path: '/goals', mood: 'wave' },
-  { id: 'activity', label: 'Activity', path: '/activity', mood: 'think' },
-  { id: 'profile', label: 'Profile', path: '/profile', mood: 'point' },
+  { id: 'home', label: 'Acasă', path: '/home', mood: 'happy' },
+  { id: 'goals', label: 'Obiective', path: '/goals', mood: 'wave' },
+  { id: 'activity', label: 'Activitate', path: '/activity', mood: 'think' },
+  { id: 'profile', label: 'Profil', path: '/profile', mood: 'point' },
 ];
 
 export function sectionForPath(pathname: string): DialSection {
   return DIAL_SECTIONS.find((s) => pathname === s.path || pathname.startsWith(`${s.path}/`)) ?? DIAL_SECTIONS[0];
 }
 
-const R_OUT = 136; // arc outer radius (px)
-const R_IN = 60; // arc inner radius: just outside the open mascot disc
-const LIFT = 8; // how far the current segment grows outwards
-const GAP = 6; // px between segments, the same width from the inner edge to the outer one
-const BOX = R_OUT + LIFT; // half-width of the arc's box; Kip's centre sits at (BOX, BOX)
-
-const rad = (deg: number) => ((deg - 90) * Math.PI) / 180;
-const pt = (r: number, deg: number) => ({ x: BOX + r * Math.cos(rad(deg)), y: BOX + r * Math.sin(rad(deg)) });
-// A fixed angle gap is wider at the rim than at the hub. Offsetting each edge by the angle that
-// equals GAP/2 at that radius keeps both sides of every gap parallel, so all gaps look the same.
-const inset = (r: number) => (Math.asin(GAP / 2 / r) * 180) / Math.PI;
-function segment(a0: number, a1: number, rOut: number): string {
-  const p0 = pt(rOut, a0 + inset(rOut));
-  const p1 = pt(rOut, a1 - inset(rOut));
-  const p2 = pt(R_IN, a1 - inset(R_IN));
-  const p3 = pt(R_IN, a0 + inset(R_IN));
-  return `M ${p0.x} ${p0.y} A ${rOut} ${rOut} 0 0 1 ${p1.x} ${p1.y} L ${p2.x} ${p2.y} A ${R_IN} ${R_IN} 0 0 0 ${p3.x} ${p3.y} Z`;
-}
-// the top half only: four 45° slices from 9 o'clock to 3 o'clock
-const slice = (i: number) => ({ a0: -90 + i * 45, a1: -45 + i * 45, mid: -67.5 + i * 45 });
+// The four sections sit as flat pills on a half circle above Kip, like a tab bar bent around him.
+const R = 142; // radius of the arc the pill centres sit on (px); keeps the outer pills on a 360px phone
+const ANGLES = [-64, -24, 24, 64]; // degrees from straight up, left to right
+const at = (deg: number) => ({ x: R * Math.sin((deg * Math.PI) / 180), y: -R * Math.cos((deg * Math.PI) / 180) });
+// the guide line through the pills: a half circle from 9 to 3 o'clock
+const ARC = `M ${-R} 0 A ${R} ${R} 0 0 1 ${R} 0`;
 
 interface Props {
   /** Kip's face while the dial is closed: follows the latest real money event */
@@ -52,9 +38,9 @@ interface Props {
 }
 
 /**
- * The app's navigation. Kip sits at the bottom centre of every screen. Tap him and a half ring of
- * liquid glass fans out above him, one slice per section, the current one grown outwards; the
- * screen behind softens. Hovering a slice changes Kip's face, so he reacts to where you're heading.
+ * The app's navigation. Kip sits at the bottom centre of every screen. Tap him and four flat pills
+ * spring out of him onto a half circle, one per section, the current one filled in; the screen
+ * behind softens. Hovering a pill changes Kip's face, so he reacts to where you're heading.
  *
  * Drag him instead and he becomes an action: drop him on any goal (anything marked
  * data-feed-goal) and the app asks how much to put in it. He swims back to the middle on release.
@@ -99,7 +85,7 @@ export function MascotDial({ restingMood, progress }: Props) {
     if (el) {
       el.classList.add('is-feed-target');
       navigator.vibrate?.(6);
-      setFeeding({ id: el.dataset.feedGoal!, name: el.dataset.feedName ?? 'this goal' });
+      setFeeding({ id: el.dataset.feedGoal!, name: el.dataset.feedName ?? 'acest obiectiv' });
     } else setFeeding(null);
   };
 
@@ -111,7 +97,7 @@ export function MascotDial({ restingMood, progress }: Props) {
   const mood: SealState =
     feeding !== false ? (feeding ? 'celebrate' : 'idle') : (hover?.mood ?? (open ? (poked ? 'happy' : here.mood) : restingMood));
   const circ = 2 * Math.PI * 35;
-  const tag = feeding !== false ? (feeding ? `Into ${feeding.name}` : 'Drop me on a goal') : here.label;
+  const tag = feeding !== false ? (feeding ? `În ${feeding.name}` : 'Lasă-mă pe un obiectiv') : here.label;
 
   return (
     <>
@@ -145,24 +131,29 @@ export function MascotDial({ restingMood, progress }: Props) {
         >
           <AnimatePresence>
             {open && (
-              <motion.nav className="dial__arc" aria-label="Main navigation" initial="closed" animate="open" exit="closed" style={{ width: BOX * 2, height: BOX + 4, marginLeft: -BOX, marginTop: -BOX }}>
+              <motion.nav className="dial__fan" aria-label="Navigare principală" initial="closed" animate="open" exit="closed">
+                <svg className="dial__guide" viewBox={`${-R - 4} ${-R - 4} ${2 * R + 8} ${R + 8}`} width={2 * R + 8} height={R + 8} aria-hidden>
+                  <motion.path
+                    d={ARC}
+                    variants={{ closed: { pathLength: 0, opacity: 0 }, open: { pathLength: 1, opacity: 1, transition: { duration: 0.35, ease: 'easeOut' } } }}
+                  />
+                </svg>
                 {DIAL_SECTIONS.map((s, i) => {
-                  const { a0, a1, mid } = slice(i);
+                  const p = at(ANGLES[i]);
                   const current = s.id === here.id;
-                  const d = segment(a0, a1, current ? R_OUT + LIFT : R_OUT);
-                  const label = pt((R_IN + R_OUT + (current ? LIFT : 0)) / 2, mid);
-                  // fan out from the middle: the two inner slices first
+                  // fan out from the middle: the two inner pills first
                   const order = Math.abs(i - 1.5);
                   return (
                     <motion.button
                       key={s.id}
                       type="button"
-                      className={`dial__glass ${current ? 'dial__glass--current' : ''} ${hover?.id === s.id ? 'dial__glass--hover' : ''}`}
-                      style={{ clipPath: `path('${d}')`, transformOrigin: `${BOX}px ${BOX}px` }}
+                      className={`dial__pill ${current ? 'dial__pill--current' : ''}`}
                       variants={{
-                        closed: { scale: 0.35, opacity: 0, transition: { duration: 0.14 } },
-                        open: { scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 460, damping: 30, delay: 0.035 * order } },
+                        closed: { x: 0, y: 0, scale: 0.3, opacity: 0, transition: { duration: 0.14 } },
+                        open: { x: p.x, y: p.y, scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 420, damping: 24, delay: 0.04 * order } },
                       }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onMouseEnter={() => setHover(s)}
                       onMouseLeave={() => setHover(null)}
                       onFocus={() => setHover(s)}
@@ -171,39 +162,10 @@ export function MascotDial({ restingMood, progress }: Props) {
                       aria-current={current ? 'page' : undefined}
                       autoFocus={i === 0}
                     >
-                      <span className="dial__word" style={{ left: label.x, top: label.y }}>
-                        {s.label}
-                      </span>
+                      {s.label}
                     </motion.button>
                   );
                 })}
-                {/* the glass edge: a bright rim on top, a faint dark line underneath for definition */}
-                <svg className="dial__rims" width={BOX * 2} height={BOX + 4} aria-hidden>
-                  <defs>
-                    <linearGradient id="dial-rim" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0" stopColor="#fff" stopOpacity="0.95" />
-                      <stop offset="1" stopColor="#fff" stopOpacity="0.15" />
-                    </linearGradient>
-                  </defs>
-                  {DIAL_SECTIONS.map((s, i) => {
-                    const { a0, a1 } = slice(i);
-                    const d = segment(a0, a1, s.id === here.id ? R_OUT + LIFT : R_OUT);
-                    const order = Math.abs(i - 1.5);
-                    return (
-                      <motion.g
-                        key={s.id}
-                        style={{ transformOrigin: `${BOX}px ${BOX}px` }}
-                        variants={{
-                          closed: { scale: 0.35, opacity: 0, transition: { duration: 0.14 } },
-                          open: { scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 460, damping: 30, delay: 0.035 * order } },
-                        }}
-                      >
-                        <path d={d} fill="none" stroke="rgba(23,32,27,0.12)" strokeWidth="1" />
-                        <path d={d} fill="none" stroke="url(#dial-rim)" strokeWidth="1.5" transform={`translate(0 0.75)`} />
-                      </motion.g>
-                    );
-                  })}
-                </svg>
               </motion.nav>
             )}
           </AnimatePresence>
@@ -215,7 +177,7 @@ export function MascotDial({ restingMood, progress }: Props) {
             animate={{ scale: open ? 1.3 : 1 }}
             transition={{ type: 'spring', stiffness: 420, damping: 24 }}
             aria-expanded={open}
-            aria-label={open ? 'Close menu' : `Menu. You’re in ${here.label}. Drag onto a goal to save into it.`}
+            aria-label={open ? 'Închide meniul' : `Meniu. Secțiunea curentă: ${here.label}. Trage-mă pe un obiectiv ca să pui bani în el.`}
           >
             <svg viewBox="0 0 80 80" className="dial__progress" aria-hidden>
               <circle cx="40" cy="40" r="35" className="dial__track" />
