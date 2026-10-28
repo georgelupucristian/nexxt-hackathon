@@ -1,0 +1,75 @@
+/* Avansul seal mascot. Every selector is scoped under .seal so the generic
+   part names (head, body, mouth...) can't clash with app styles. */
+
+.seal {
+  --seal-body: #9aa6b4;
+  --seal-body-shade: #7c8896;
+  --seal-body-light: #aeb8c5;
+  --seal-spot: #5e6a79;
+  --seal-belly: #f4efe6;
+  --seal-belly-shade: #e3dacb;
+  --seal-eye: #2b1e1a;
+  --seal-eye-shine: #ffffff;
+  --seal-nose: #2a2a2e;
+  --seal-blush: #f2b8b5;
+  --seal-ground: rgba(30, 40, 60, 0.15);
+
+  display: inline-block;
+  overflow: visible;
+}
+
+.seal .seal-c-body { fill: var(--seal-body); }
+.seal .seal-c-shade { fill: var(--seal-body-shade); }
+.seal .seal-c-light { fill: var(--seal-body-light); }
+.seal .seal-c-spot { fill: var(--seal-spot); }
+.seal .seal-c-belly { fill: var(--seal-belly); }
+.seal .seal-c-belly-shade { fill: var(--seal-belly-shade); }
+.seal .seal-c-eye { fill: var(--seal-eye); }
+.seal .seal-c-shine { fill: var(--seal-eye-shine); }
+.seal .seal-c-nose { fill: var(--seal-nose); }
+.seal .seal-c-blush { fill: var(--seal-blush); opacity: 0.45; }
+.seal .seal-c-ground { fill: var(--seal-ground); }
+
+.seal .seal-whisker {
+  fill: none;
+  stroke: var(--seal-spot);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.seal .seal-line {
+  fill: none;
+  stroke: var(--seal-nose);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- pivots ----------------------------------------------------------
+   fill-box makes percentages relative to each group's own bounding box,
+   so the pivots stay right no matter where the group sits in the viewBox.
+   Not applied to every shape: spots use a transform="rotate(a cx cy)"
+   attribute, which fill-box would re-anchor to the wrong point. */
+.seal g,
+.seal .seal-eyelid-left,
+.seal .seal-eyelid-right {
+  transform-box: fill-box;
+}
+.seal .seal-shadow { transform-origin: 50% 50%; }
+.seal .seal-figure { transform-origin: 50% 100%; }   /* feet: squash/stretch from the ground */
+.seal .seal-torso { transform-origin: 50% 100%; }    /* breathing grows upward */
+.seal .seal-tail { transform-origin: 5% 70%; }       /* where the tail meets the body */
+.seal .seal-head { transform-origin: 50% 92%; }      /* neck */
+.seal .seal-flipper-left { transform-origin: 87% 5%; }  /* shoulder at (60,120) */
+.seal .seal-flipper-right { transform-origin: 13% 5%; } /* shoulder at (140,120) */
+.seal .seal-eye-left,
+.seal .seal-eye-right,
+.seal .seal-pupil-left,
+.seal .seal-pupil-right { transform-origin: 50% 50%; }
+.seal .seal-eyelid-left,
+.seal .seal-eyelid-right { transform-origin: 50% 0%; transform: scaleY(0); } /* lids drop from the top */
+.seal .seal-whiskers-left { transform-origin: 100% 30%; }  /* roots sit on the muzzle */
+.seal .seal-whiskers-right { transform-origin: 0% 30%; }
+.seal .seal-nose,
+.seal .seal-mouth,
+.seal .seal-muzzle,
+.seal .seal-blush { transform-origin: 50% 50%; }

@@ -1,0 +1,106 @@
+.demo {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+.demo-header h1 {
+  margin: 0 0 4px;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+.demo-header p {
+  margin: 0 0 24px;
+  color: #5e6a79;
+}
+
+.demo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.demo-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demo-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7c8896;
+}
+
+.demo-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.demo-buttons button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid #d9dfe6;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f2733;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.demo-buttons button:hover {
+  border-color: #9aa6b4;
+}
+.demo-buttons button[aria-pressed="true"] {
+  background: #1f2733;
+  border-color: #1f2733;
+  color: #fff;
+}
+
+.demo-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.demo-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding-bottom: 8px;
+  cursor: pointer;
+}
+
+.demo-stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 48px;
+  padding: 48px 24px;
+  border: 1px solid #e3e8ee;
+  border-radius: 24px;
+  transition: background-color 0.2s;
+}
+
+.demo-cell {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.demo-cell figcaption {
+  font-size: 12px;
+  color: #7c8896;
+  font-variant-numeric: tabular-nums;
+}
