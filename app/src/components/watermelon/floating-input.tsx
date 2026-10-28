@@ -50,7 +50,7 @@ export function FloatingInput({ label, error, hint, className, type = 'text', id
           <button
             type="button"
             onClick={() => setReveal((r) => !r)}
-            aria-label={reveal ? 'Hide password' : 'Show password'}
+            aria-label={reveal ? 'Ascunde parola' : 'Arată parola'}
             className="absolute top-1/2 right-2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-ink-3 hover:bg-surface-2 hover:text-ink"
           >
             {reveal ? <EyeOff size={20} aria-hidden /> : <Eye size={20} aria-hidden />}

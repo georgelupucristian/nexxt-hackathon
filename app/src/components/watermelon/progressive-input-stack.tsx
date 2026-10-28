@@ -32,7 +32,7 @@ interface Props {
 
 const spring = { type: 'spring' as const, stiffness: 800, damping: 45, mass: 2 };
 
-export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onStepChange, busy, doneLabel = 'Done', error }: Props) {
+export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onStepChange, busy, doneLabel = 'Gata', error }: Props) {
   const [current, setCurrent] = useState(0);
   const [stepError, setStepError] = useState<string | null>(null);
   const [reveal, setReveal] = useState(false);
@@ -108,7 +108,7 @@ export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onSte
                       <button
                         type="button"
                         onClick={() => setReveal((r) => !r)}
-                        aria-label={reveal ? 'Hide password' : 'Show password'}
+                        aria-label={reveal ? 'Ascunde parola' : 'Arată parola'}
                         className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-ink-3 hover:bg-surface-2 hover:text-ink"
                       >
                         {reveal ? <EyeOff size={20} aria-hidden /> : <Eye size={20} aria-hidden />}
@@ -148,7 +148,7 @@ export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onSte
               exit={{ opacity: 0, scale: 0.9 }}
               onClick={() => go(current - 1)}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              aria-label="Back to the previous field"
+              aria-label="Înapoi la câmpul anterior"
               className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-surface-2 text-ink transition hover:bg-[#e4e0d7]"
             >
               <ArrowLeft size={22} aria-hidden />
@@ -158,7 +158,7 @@ export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onSte
         <motion.button type="submit" disabled={busy} whileTap={{ scale: 0.96 }} className="btn btn--primary ml-auto overflow-hidden" style={{ minWidth: 150 }}>
           <AnimatePresence mode="popLayout" initial={false}>
             {busy ? (
-              <motion.span key="busy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="spinner" aria-label="Creating your account" />
+              <motion.span key="busy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="spinner" aria-label="Îți creăm contul" />
             ) : last ? (
               <motion.span key="done" initial={{ y: 20, opacity: 0, filter: 'blur(4px)' }} animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }} exit={{ y: -20, opacity: 0, filter: 'blur(4px)' }} transition={{ duration: 0.2, ease: 'easeOut' }} className="flex items-center gap-2">
                 <Check size={18} aria-hidden />
@@ -166,7 +166,7 @@ export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onSte
               </motion.span>
             ) : (
               <motion.span key="next" initial={{ y: 20, opacity: 0, filter: 'blur(4px)' }} animate={{ y: 0, opacity: 1, filter: 'blur(0px)' }} exit={{ y: -20, opacity: 0, filter: 'blur(4px)' }} transition={{ duration: 0.2, ease: 'easeOut' }} className="flex items-center gap-2">
-                Next
+                Înainte
                 <ArrowRight size={18} aria-hidden />
               </motion.span>
             )}

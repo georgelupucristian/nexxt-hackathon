@@ -4,8 +4,9 @@ import { available, bestStreak, currentStreak, goalSaved, primaryGoal, progress,
 import { ActionError, useData, useStore } from '../data/store';
 import { useCelebrate } from './mascot/Celebration';
 import type { Frequency, Goal, Plan, Transaction } from '../data/types';
-import { formatDate, formatDay, ordinal, todayKey } from '../lib/dates';
+import { formatDate, ordinal, todayKey } from '../lib/dates';
 import { formatLei, parseLei } from '../lib/money';
+import { plural } from '../lib/ro';
 import { planLabel } from './domain';
 import { Banner, Button, DayPicker, Field, ProgressBar, Segmented, Sheet, TextField, useToast } from './ui';
 
@@ -57,11 +58,11 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
   const amountError = !touched
     ? null
     : amount === null
-      ? 'Enter an amount, like 50 or 50,50.'
+      ? 'Scrie o sumă, de exemplu 50 sau 50,50.'
       : amount <= 0
-        ? 'Enter an amount greater than 0.'
+        ? 'Scrie o sumă mai mare de 0.'
         : max !== null && amount > max
-          ? `Only ${formatLei(max)} available in ${bucketId ? 'this goal' : 'unallocated savings'}.`
+          ? `Poți retrage cel mult ${formatLei(max)} din ${bucketId ? 'acest obiectiv' : 'economiile nealocate'}.`
           : null;
 
   async function submit(e: FormEvent) {
@@ -74,26 +75,26 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
       const input = { type, amount, goalId: bucketId, date, note };
       if (editing) {
         store.editTransaction(editing.id, input);
-        toast('Entry updated');
+        toast('Intrare actualizată');
       } else {
         store.addTransaction(input);
         if (!isDemo && type === 'contribution') {
           // the moment the app exists for: make it feel like something happened
           const g = bucketId ? data.goals.find((x) => x.id === bucketId) : null;
-          celebrate({ title: `+${formatLei(amount)} saved`, sub: g ? `Towards ${g.name}. Nice and steady.` : 'Added to your unallocated savings.' });
+          celebrate({ title: `+${formatLei(amount)} puși deoparte`, sub: g ? `Pentru ${g.name}. Încet, dar sigur.` : 'Intră în economiile tale nealocate.' });
         } else {
-          toast(isDemo ? 'Transfer started. It stays pending until the next sync.' : `${formatLei(amount)} withdrawal recorded`);
+          toast(isDemo ? 'Transfer pornit. Rămâne în așteptare până la următoarea sincronizare.' : `Retragere de ${formatLei(amount)} adăugată`);
         }
       }
       onClose();
     } catch (err) {
-      setError(err instanceof ActionError ? err.message : 'Something went wrong. Nothing was saved.');
+      setError(err instanceof ActionError ? err.message : 'Ceva n-a mers. Nu s-a salvat nimic.');
     } finally {
       setBusy(false);
     }
   }
 
-  const title = editing ? 'Edit entry' : type === 'contribution' ? (isDemo ? 'Add money' : 'Record savings') : 'Record withdrawal';
+  const title = editing ? 'Editează intrarea' : type === 'contribution' ? (isDemo ? 'Adaugă bani' : 'Adaugă economii') : 'Adaugă o retragere';
   const quick = [25_00, 50_00, 100_00];
   const plannedGoal = bucketId ? data.goals.find((g) => g.id === bucketId) : null;
   if (plannedGoal && plannedGoal.plan.amount > 0 && !quick.includes(plannedGoal.plan.amount)) quick.unshift(plannedGoal.plan.amount);
@@ -103,22 +104,22 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
       <form className="stack-lg" onSubmit={submit} noValidate>
         {!editing && (
           <Segmented
-            label="Type"
+            label="Tip"
             value={type}
             onChange={(v) => {
               setType(v);
               setTouched(false);
             }}
             options={[
-              { value: 'contribution', label: 'Add' },
-              { value: 'withdrawal', label: 'Withdraw' },
+              { value: 'contribution', label: 'Adaugă' },
+              { value: 'withdrawal', label: 'Retrage' },
             ]}
           />
         )}
 
         <div className="amount-entry">
           <label htmlFor={amountId} className="small muted">
-            {type === 'contribution' ? 'Amount saved' : 'Amount taken out'}
+            {type === 'contribution' ? 'Suma economisită' : 'Suma retrasă'}
           </label>
           <div className="row" style={{ gap: 8, justifyContent: 'center', width: '100%' }}>
             <input
@@ -147,7 +148,7 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
             />
             <span style={{ fontSize: 'var(--fs-xl)', fontWeight: 650, color: 'var(--ink-3)' }}>lei</span>
           </div>
-          {max !== null && <p className="small subtle">{formatLei(max)} available</p>}
+          {max !== null && <p className="small subtle">Disponibil: {formatLei(max)}</p>}
           {amountError && (
             <p className="field-error" role="alert">
               <AlertCircle size={16} aria-hidden /> {amountError}
@@ -162,37 +163,37 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
           </div>
         </div>
 
-        <Field label={type === 'contribution' ? 'Put it towards' : 'Take it from'} htmlFor="bucket">
+        <Field label={type === 'contribution' ? 'Pune banii la' : 'Ia banii din'} htmlFor="bucket">
           <select id="bucket" className="select" value={target} onChange={(e) => setTarget(e.target.value)}>
             {buckets.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.name}
-                {type === 'withdrawal' ? ` (${formatLei(available(data.transactions, g.id, editing?.id))} free)` : ''}
-                {g.status === 'paused' ? ' (paused)' : ''}
+                {type === 'withdrawal' ? ` (disponibil: ${formatLei(available(data.transactions, g.id, editing?.id))})` : ''}
+                {g.status === 'paused' ? ' (în pauză)' : ''}
               </option>
             ))}
-            <option value="none">Unallocated{type === 'withdrawal' ? ` (${formatLei(available(data.transactions, null, editing?.id))} free)` : ''}</option>
+            <option value="none">Nealocat{type === 'withdrawal' ? ` (disponibil: ${formatLei(available(data.transactions, null, editing?.id))})` : ''}</option>
           </select>
         </Field>
 
         <div className="btn-row" style={{ alignItems: 'flex-start' }}>
-          <TextField label="Date" type="date" value={date} max={todayKey()} onChange={(e) => setDate(e.target.value || todayKey())} />
+          <TextField label="Data" type="date" value={date} max={todayKey()} onChange={(e) => setDate(e.target.value || todayKey())} />
         </div>
-        <TextField label={<>Note <span className="subtle">(optional)</span></>} placeholder={type === 'contribution' ? 'e.g. Part of my tutoring pay' : 'e.g. Train ticket home'} value={note} maxLength={60} onChange={(e) => setNote(e.target.value)} />
+        <TextField label={<>Notă <span className="subtle">(opțional)</span></>} placeholder={type === 'contribution' ? 'ex. O parte din banii de la meditații' : 'ex. Bilet de tren spre casă'} value={note} maxLength={60} onChange={(e) => setNote(e.target.value)} />
 
         {isDemo && (
           <Banner tone="demo" icon={FlaskConical}>
-            Demo connection: this creates a <strong>simulated</strong> transfer. No real money moves. It stays pending until the next sync.
+            Conexiune demo: asta creează un transfer <strong>simulat</strong>. Nu se mișcă bani reali. Rămâne în așteptare până la următoarea sincronizare.
           </Banner>
         )}
-        {!isDemo && !editing && <p className="small subtle">You’re recording money you already set aside yourself. Kept doesn’t move money.</p>}
+        {!isDemo && !editing && <p className="small subtle">Adaugi bani pe care i-ai pus deja deoparte. Kept nu mută niciodată bani.</p>}
         {error && (
           <div className="form-error" role="alert">
             <AlertCircle size={18} aria-hidden /> {error}
           </div>
         )}
         <Button type="submit" variant="primary" block loading={busy}>
-          {editing ? 'Save changes' : type === 'contribution' ? (isDemo ? 'Start simulated transfer' : 'Record contribution') : 'Record withdrawal'}
+          {editing ? 'Salvează modificările' : type === 'contribution' ? (isDemo ? 'Pornește transferul simulat' : 'Adaugă depunerea') : 'Adaugă retragerea'}
         </Button>
       </form>
     </Sheet>
@@ -224,20 +225,20 @@ export function PlanForm({
       : null;
   return (
     <div className="stack-lg">
-      <Field label="How often?">
+      <Field label="Cât de des?">
         <Segmented
-          label="Frequency"
+          label="Frecvență"
           value={plan.frequency}
           onChange={(f) => onChange({ ...plan, frequency: f, day: f === 'weekly' ? (plan.day !== null && plan.day <= 6 ? plan.day : 4) : f === 'monthly' ? 1 : null })}
           options={[
-            { value: 'weekly', label: 'Weekly' },
-            { value: 'monthly', label: 'Monthly' },
-            { value: 'flexible', label: 'Flexible' },
+            { value: 'weekly', label: 'Săptămânal' },
+            { value: 'monthly', label: 'Lunar' },
+            { value: 'flexible', label: 'Flexibil' },
           ]}
         />
       </Field>
       <TextField
-        label={plan.frequency === 'flexible' ? <>Rough amount each time <span className="subtle">(optional)</span></> : plan.frequency === 'weekly' ? 'Amount each week' : 'Amount each month'}
+        label={plan.frequency === 'flexible' ? <>Cam cât de fiecare dată <span className="subtle">(opțional)</span></> : plan.frequency === 'weekly' ? 'Suma pe săptămână' : 'Suma pe lună'}
         inputMode="decimal"
         suffix="lei"
         placeholder={pace ? String(Math.ceil((plan.frequency === 'monthly' ? pace.perMonth : pace.perWeek) / 100)) : '50'}
@@ -245,12 +246,12 @@ export function PlanForm({
         onChange={(e) => onChange({ ...plan, amount: e.target.value.replace(/[^\d.,]/g, '').slice(0, 10) })}
       />
       {plan.frequency === 'weekly' && (
-        <Field label="Preferred day">
+        <Field label="Ziua preferată">
           <DayPicker value={plan.day} onChange={(d) => onChange({ ...plan, day: d })} />
         </Field>
       )}
       {plan.frequency === 'monthly' && (
-        <Field label="Day of the month" htmlFor="dom" hint="Days 1–28 so the date exists in every month.">
+        <Field label="Ziua din lună" htmlFor="dom" hint="Între 1 și 28, ca data să existe în fiecare lună.">
           <select id="dom" className="select" value={plan.day ?? 1} onChange={(e) => onChange({ ...plan, day: Number(e.target.value) })}>
             {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
               <option key={d} value={d}>
@@ -262,26 +263,26 @@ export function PlanForm({
       )}
       {pace && (
         <div className="stack" style={{ gap: 8 }}>
-          <p className="label">To reach {formatLei(target!)} by {formatDate(targetDate!)} you’d need about</p>
+          <p className="label">Ca să ajungi la {formatLei(target!)} până pe {formatDate(targetDate!)}, ai nevoie de cam</p>
           <div className="calc">
             <div>
               <strong>{formatLei(pace.perWeek)}</strong>
-              <span className="small muted">a week</span>
+              <span className="small muted">pe săptămână</span>
             </div>
             <div>
               <strong>{formatLei(pace.perMonth)}</strong>
-              <span className="small muted">a month</span>
+              <span className="small muted">pe lună</span>
             </div>
           </div>
         </div>
       )}
       {finish && (
         <p className="small muted">
-          At this pace you’d reach {goal ? 'the' : 'your'} target around <strong>{formatDate(finish)}</strong>
-          {targetDate && finish > targetDate ? ', after your target date. That’s fine, you can change either one later.' : '.'}
+          În ritmul ăsta ajungi {goal ? 'la țintă' : 'la ținta ta'} pe la <strong>{formatDate(finish)}</strong>
+          {targetDate && finish > targetDate ? ', după data țintă. E în regulă, poți schimba oricând planul sau data.' : '.'}
         </p>
       )}
-      <p className="small subtle">Estimates assume every planned contribution happens and nothing is withdrawn. A plan is a guide, not a promise. Change it whenever your budget changes.</p>
+      <p className="small subtle">Estimările pornesc de la ideea că faci fiecare depunere plănuită și nu retragi nimic. Un plan e un ghid, nu o promisiune. Schimbă-l oricând se schimbă bugetul tău.</p>
     </div>
   );
 }
@@ -305,37 +306,37 @@ export function PlanSheet({ open, onClose, goal, onSaved }: { open: boolean; onC
     e.preventDefault();
     const amount = plan.amount ? parseLei(plan.amount) : 0;
     if (amount === null || (plan.frequency !== 'flexible' && (!amount || amount <= 0))) {
-      setError('Enter a contribution amount greater than 0, or choose Flexible.');
+      setError('Scrie o sumă mai mare de 0 sau alege Flexibil.');
       return;
     }
     if (targetDate && targetDate <= todayKey()) {
-      setError('Pick a target date in the future, or clear it.');
+      setError('Alege o dată țintă din viitor sau șterge-o.');
       return;
     }
     try {
       const next: Plan = { amount, frequency: plan.frequency, day: plan.frequency === 'flexible' ? null : plan.day };
       updatePlan(goal.id, next);
       if ((goal.targetDate ?? '') !== targetDate) updateGoal(goal.id, { targetDate: targetDate || null });
-      toast('Plan updated');
+      toast('Plan actualizat');
       onSaved?.();
       onClose();
     } catch (err) {
-      setError(err instanceof ActionError ? err.message : 'Could not save the plan.');
+      setError(err instanceof ActionError ? err.message : 'Nu am putut salva planul.');
     }
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title="Adjust plan">
+    <Sheet open={open} onClose={onClose} title="Ajustează planul">
       <form className="stack-lg" onSubmit={save} noValidate>
         <PlanForm goal={goal} plan={plan} onChange={setPlan} saved={saved} target={goal.target} targetDate={targetDate || null} />
-        <TextField label={<>Target date <span className="subtle">(optional)</span></>} type="date" min={todayKey()} value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
+        <TextField label={<>Data țintă <span className="subtle">(opțional)</span></>} type="date" min={todayKey()} value={targetDate} onChange={(e) => setTargetDate(e.target.value)} />
         {error && (
           <div className="form-error" role="alert">
             <AlertCircle size={18} aria-hidden /> {error}
           </div>
         )}
         <Button type="submit" variant="primary" block>
-          Save plan
+          Salvează planul
         </Button>
       </form>
     </Sheet>
@@ -355,19 +356,19 @@ export function CheckInSheet({ open, onClose }: { open: boolean; onClose: () => 
   const finish = projectedFinish(goal.plan, saved, goal.target);
   return (
     <>
-      <Sheet open={open && !adjust} onClose={onClose} title="Review your plan">
+      <Sheet open={open && !adjust} onClose={onClose} title="Verifică-ți planul">
         <div className="stack-lg">
           <div className="card stack">
             <div className="row row--between">
               <h3 className="truncate">{goal.name}</h3>
               <span className="small muted money">{Math.round(progress(saved, goal.target) * 100)}%</span>
             </div>
-            <ProgressBar value={progress(saved, goal.target)} label="Progress" />
+            <ProgressBar value={progress(saved, goal.target)} label="Progres" />
             <dl style={{ margin: 0 }}>
               <div className="kv">
-                <dt>Saved</dt>
+                <dt>Economisit</dt>
                 <dd className="money">
-                  {formatLei(saved)} of {formatLei(goal.target)}
+                  {formatLei(saved)} din {formatLei(goal.target)}
                 </dd>
               </div>
               <div className="kv">
@@ -376,33 +377,33 @@ export function CheckInSheet({ open, onClose }: { open: boolean; onClose: () => 
               </div>
               {finish && (
                 <div className="kv">
-                  <dt>Estimated finish</dt>
+                  <dt>Final estimat</dt>
                   <dd>{formatDate(finish)}</dd>
                 </div>
               )}
               {goal.targetDate && (
                 <div className="kv">
-                  <dt>Target date</dt>
+                  <dt>Data țintă</dt>
                   <dd>{formatDate(goal.targetDate)}</dd>
                 </div>
               )}
             </dl>
           </div>
-          <p className="muted">Does this plan still fit your budget this week? Either answer counts as today’s check-in.</p>
+          <p className="muted">Planul ăsta încă se potrivește cu bugetul tău săptămâna asta? Orice răspuns bifează ziua de azi.</p>
           <div className="stack">
             <Button
               variant="primary"
               block
               onClick={() => {
                 checkIn();
-                toast('Checked in. Plan confirmed.');
+                toast('Ziua de azi e bifată. Plan confirmat.');
                 onClose();
               }}
             >
-              Yes, it still works
+              Da, încă merge
             </Button>
             <Button block onClick={() => setAdjust(true)}>
-              Adjust my plan
+              Ajustează-mi planul
             </Button>
           </div>
         </div>
@@ -429,35 +430,35 @@ export function StreakSheet({ open, onClose }: { open: boolean; onClose: () => v
   const paused = data.pausedDays.includes(today);
   const doneToday = data.actions.some((a) => a.date === today);
   return (
-    <Sheet open={open} onClose={onClose} title="How streaks work">
+    <Sheet open={open} onClose={onClose} title="Cum funcționează seria">
       <div className="stack-lg">
         <div className="row" style={{ gap: 'var(--s-6)' }}>
           <div className="stat">
-            <span className="small muted">Current</span>
+            <span className="small muted">Actuală</span>
             <strong className="money" style={{ fontSize: 'var(--fs-xl)' }}>
-              {currentStreak(data)} days
+              {plural(currentStreak(data), 'zi', 'zile')}
             </strong>
           </div>
           <div className="stat">
-            <span className="small muted">Best</span>
+            <span className="small muted">Record</span>
             <strong className="money" style={{ fontSize: 'var(--fs-xl)' }}>
-              {bestStreak(data)} days
+              {plural(bestStreak(data), 'zi', 'zile')}
             </strong>
           </div>
         </div>
         <StreakRules />
         <div className="card card--tint stack">
-          <h3>Need an ice floe?</h3>
-          <p className="small muted">Seals rest on ice floes. Put today on one: Kip floats, your streak stays, your savings don’t change.</p>
+          <h3>Ai nevoie de un sloi de gheață?</h3>
+          <p className="small muted">Focile se odihnesc pe sloiuri de gheață. Pune ziua de azi pe unul: Kip plutește, seria rămâne, economiile nu se schimbă.</p>
           <Button
             size="sm"
             disabled={doneToday && !paused}
             onClick={() => togglePause(today)}
             style={{ alignSelf: 'flex-start' }}
           >
-            {paused ? 'Back to a normal day' : 'Float today'}
+            {paused ? 'Înapoi la o zi normală' : 'Pune ziua de azi pe un sloi'}
           </Button>
-          {doneToday && !paused && <p className="xs subtle">You already did a savings action today ({formatDay(today)}).</p>}
+          {doneToday && !paused && <p className="xs subtle">Azi ai făcut deja ceva pentru economii.</p>}
         </div>
       </div>
     </Sheet>
@@ -469,33 +470,33 @@ export function StreakRules() {
     <div className="stack">
       <ul className="check-list small">
         <li>
-          <strong>A day is complete</strong> when you record a contribution or do a plan check-in. Just opening the app doesn’t count.
+          <strong>O zi e completă</strong> când adaugi o depunere sau îți verifici planul. Doar să deschizi aplicația nu contează.
         </li>
         <li>
-          <strong>Streaks measure consistency, not money.</strong> A streak never adds to your balance, and missing a day never removes savings.
+          <strong>Seria măsoară constanța, nu banii.</strong> O serie nu-ți adaugă nimic la sold, iar o zi ratată nu-ți ia nimic din economii.
         </li>
         <li>
-          <strong>Missed a day?</strong> Your streak starts again from your next action. Your best streak and all your savings stay.
+          <strong>Ai ratat o zi?</strong> Seria o ia de la capăt de la următoarea acțiune. Recordul tău și toate economiile rămân.
         </li>
         <li>
-          <strong>Ice floes</strong> are rest days. The streak waits on them. Use them for exams, holidays or tight weeks.
+          <strong>Sloiurile de gheață</strong> sunt zile de odihnă. Seria te așteaptă pe ele. Folosește-le în sesiune, în vacanțe sau în săptămânile cu bani puțini.
         </li>
       </ul>
-      <div className="legend" aria-label="Legend">
+      <div className="legend" aria-label="Legendă">
         <span>
-          <i style={{ background: 'var(--accent)' }} /> Done
+          <i style={{ background: 'var(--accent)' }} /> Bifat
         </span>
         <span>
-          <i style={{ border: '2px solid var(--ink)' }} /> Today
+          <i style={{ border: '2px solid var(--ink)' }} /> Azi
         </span>
         <span>
-          <i style={{ background: 'var(--surface-2)', border: '1.5px solid var(--line-strong)' }} /> Missed
+          <i style={{ background: 'var(--surface-2)', border: '1.5px solid var(--line-strong)' }} /> Ratat
         </span>
         <span>
-          <i style={{ background: 'var(--info-soft)', border: '1.5px solid var(--info)' }} /> Ice floe
+          <i style={{ background: 'var(--info-soft)', border: '1.5px solid var(--info)' }} /> Sloi de gheață
         </span>
         <span>
-          <i style={{ border: '1.5px dashed var(--line-strong)' }} /> Upcoming
+          <i style={{ border: '1.5px dashed var(--line-strong)' }} /> Urmează
         </span>
       </div>
     </div>

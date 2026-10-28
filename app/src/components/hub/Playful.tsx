@@ -9,6 +9,10 @@ import { useData, useStore } from '../../data/store';
 import type { Goal } from '../../data/types';
 import { daysBetween, formatDate, todayKey } from '../../lib/dates';
 import { formatLei, parseLei } from '../../lib/money';
+import { plural } from '../../lib/ro';
+
+/** Just the noun of a Romanian count, agreeing with n: "săptămână", "săptămâni", "de săptămâni". */
+const unit = (n: number, one: string, other: string) => plural(n, one, other).replace(/^\S+ /, '');
 
 const spring = { type: 'spring', stiffness: 240, damping: 20, mass: 1.05 } as const;
 
@@ -42,12 +46,12 @@ export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boo
 
   function save(amount: number | null) {
     if (!amount || amount <= 0) {
-      toast('Type an amount, like 50.', 'error');
+      toast('Scrie o sumă, de exemplu 50.', 'error');
       return;
     }
     try {
       addTransaction({ type: 'contribution', amount, goalId: chosen?.id ?? null, date: todayKey(), note: '' });
-      celebrate({ title: `+${formatLei(amount)} saved`, sub: chosen ? `Towards ${chosen.name}.` : 'Kept as savings without a goal.' });
+      celebrate({ title: `+${formatLei(amount)} economisiți`, sub: chosen ? `Adăugați la ${chosen.name}.` : 'Puși deoparte, fără obiectiv.' });
       setRaw('');
       setOpen(false);
     } catch (e) {
@@ -66,7 +70,7 @@ export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boo
                 inputMode="decimal"
                 placeholder="0"
                 value={raw}
-                aria-label="Amount you set aside, in lei"
+                aria-label="Suma pusă deoparte, în lei"
                 onChange={(e) => setRaw(e.target.value.replace(/[^\d.,]/g, '').slice(0, 9))}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') save(parseLei(raw));
@@ -75,14 +79,14 @@ export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boo
               />
               <span>lei</span>
             </div>
-            <div className="qr__goals" role="radiogroup" aria-label="Save towards">
+            <div className="qr__goals" role="radiogroup" aria-label="Unde merg banii">
               {choices.map((g) => (
                 <button key={g.id} type="button" role="radio" aria-checked={target === g.id} className="qr__goal" onClick={() => setTarget(g.id)}>
                   {g.name}
                 </button>
               ))}
               <button type="button" role="radio" aria-checked={target === null} className="qr__goal" onClick={() => setTarget(null)}>
-                No goal
+                Fără obiectiv
               </button>
             </div>
             <div className="qr__picks">
@@ -109,7 +113,7 @@ export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boo
             {open ? <Check size={18} aria-hidden /> : <Plus size={18} aria-hidden />}
           </motion.span>
         </AnimatePresence>
-        <motion.span layout="position">{open ? 'Save' : 'Record savings'}</motion.span>
+        <motion.span layout="position">{open ? 'Salvează' : 'Adaugă economii'}</motion.span>
       </motion.button>
     </motion.div>
   );
@@ -147,7 +151,7 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
     <section className="card sim" aria-labelledby="sim-title">
       <div className="card-head">
         <h2 id="sim-title" className="h3">
-          What if you saved…
+          Și dacă ai pune deoparte…
         </h2>
         <span className="small muted">{goal.name}</span>
       </div>
@@ -158,20 +162,20 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
         </svg>
         <dl className="sim__out">
           <div>
-            <dt>You’d finish</dt>
-            <dd className="sim__big">{finish ? formatDate(finish) : 'Not yet'}</dd>
+            <dt>Ajungi la țintă</dt>
+            <dd className="sim__big">{finish ? formatDate(finish) : 'Încă nu se știe'}</dd>
           </div>
           <div>
-            <dt>Time to go</dt>
+            <dt>Timp rămas</dt>
             <dd>
-              <NumberFlow value={periods} /> {weekly ? (periods === 1 ? 'week' : 'weeks') : periods === 1 ? 'month' : 'months'}
+              <NumberFlow value={periods} /> {weekly ? unit(periods, 'săptămână', 'săptămâni') : unit(periods, 'lună', 'luni')}
             </dd>
           </div>
           {nowFinish && shift !== 0 && (
             <div>
-              <dt>Compared to now</dt>
+              <dt>Față de acum</dt>
               <dd className={shift > 0 ? 'good' : 'warn'}>
-                <NumberFlow value={Math.abs(shift)} /> week{Math.abs(shift) === 1 ? '' : 's'} {shift > 0 ? 'sooner' : 'later'}
+                <NumberFlow value={Math.abs(shift)} /> {unit(Math.abs(shift), 'săptămână', 'săptămâni')} {shift > 0 ? 'mai devreme' : 'mai târziu'}
               </dd>
             </div>
           )}
@@ -179,14 +183,14 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
       </div>
       <div className="sim__slider">
         <div className="sim__row">
-          <span className="small muted">{weekly ? 'Each week' : 'Each month'}</span>
+          <span className="small muted">{weekly ? 'Pe săptămână' : 'Pe lună'}</span>
           <strong className="money">
             <NumberFlow value={amount / 100} locales="ro-RO" format={{ maximumFractionDigits: 0 }} suffix=" lei" />
           </strong>
         </div>
-        <input type="range" min={min} max={max} step={step} value={amount} onChange={(e) => setAmount(+e.target.value)} aria-label={weekly ? 'Amount each week' : 'Amount each month'} style={{ ['--p' as string]: `${((amount - min) / (max - min)) * 100}%` }} />
+        <input type="range" min={min} max={max} step={step} value={amount} onChange={(e) => setAmount(+e.target.value)} aria-label={weekly ? 'Suma pe săptămână' : 'Suma pe lună'} style={{ ['--p' as string]: `${((amount - min) / (max - min)) * 100}%` }} />
       </div>
-      {lateBy !== null && lateBy > 0 && <p className="small warn-text">Still {lateBy} week{lateBy === 1 ? '' : 's'} after your target date.</p>}
+      {lateBy !== null && lateBy > 0 && <p className="small warn-text">Tot ajungi la {plural(lateBy, 'săptămână', 'săptămâni')} după data țintă.</p>}
       <AnimatePresence>
         {amount !== goal.plan.amount && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
@@ -195,10 +199,10 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
               className="btn btn--secondary btn--sm"
               onClick={() => {
                 updatePlan(goal.id, plan);
-                toast(`Plan updated: ${formatLei(amount)} ${weekly ? 'a week' : 'a month'}.`);
+                toast(`Plan actualizat: ${formatLei(amount)} ${weekly ? 'pe săptămână' : 'pe lună'}.`);
               }}
             >
-              Use {formatLei(amount)} {weekly ? 'a week' : 'a month'}
+              Alege {formatLei(amount)} {weekly ? 'pe săptămână' : 'pe lună'}
             </button>
           </motion.div>
         )}
@@ -226,7 +230,7 @@ export function GoalStack({ goals, render }: { goals: Goal[]; render: (g: Goal) 
   };
 
   return (
-    <div className="stack3" aria-roledescription="carousel" aria-label="Your goals">
+    <div className="stack3" aria-roledescription="carousel" aria-label="Obiectivele tale">
       <div className="stack3__deck">
         <div className="stack3__under" aria-hidden>
           {render(next)}
@@ -251,9 +255,9 @@ export function GoalStack({ goals, render }: { goals: Goal[]; render: (g: Goal) 
       </div>
       <div className="stack3__dots">
         {ordered.map((g, k) => (
-          <button key={g.id} type="button" aria-label={`Show ${g.name}`} aria-current={k === i % n || undefined} onClick={() => setI(k)} />
+          <button key={g.id} type="button" aria-label={`Arată ${g.name}`} aria-current={k === i % n || undefined} onClick={() => setI(k)} />
         ))}
-        <span className="small muted">Swipe for your other goals</span>
+        <span className="small muted">Glisează pentru celelalte obiective</span>
       </div>
     </div>
   );

@@ -25,8 +25,9 @@ import {
 } from '../../data/selectors';
 import { useData, useStore } from '../../data/store';
 import type { Goal } from '../../data/types';
-import { daysBetween, formatDate, todayKey, toKey, WEEKDAY_SHORT } from '../../lib/dates';
+import { daysBetween, formatDate, todayKey, toKey, WEEKDAY_NAME } from '../../lib/dates';
 import { formatLei } from '../../lib/money';
+import { plural } from '../../lib/ro';
 
 interface HubProps {
   onAdd: (goalId?: string | null, amount?: number) => void;
@@ -38,9 +39,11 @@ const enter = (i: number) => ({ initial: { opacity: 0, y: 12 }, animate: { opaci
 
 function greeting(): string {
   const h = new Date().getHours();
-  return h < 5 ? 'Good evening' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  return h < 5 ? 'Bună seara' : h < 12 ? 'Bună dimineața' : h < 18 ? 'Bună ziua' : 'Bună seara';
 }
 const titleCase = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+/** Just the noun of a Romanian count, agreeing with n: "zi", "zile", "de zile". */
+const unit = (n: number, one: string, other: string) => plural(n, one, other).replace(/^\S+ /, '');
 
 /**
  * Home, in reading order: what you've saved, the one thing to do today, how your goal is going,
@@ -61,13 +64,13 @@ export function Hub({ onAdd, onDetails }: HubProps) {
       <motion.header className="home2__head home3__head" {...enter(0)}>
         <span className="home2__out">
           <button type="button" className="home2__tour" onClick={() => window.dispatchEvent(new Event(TOUR_EVENT))}>
-            How it works
+            Cum funcționează
           </button>
-          <Link to="/logout">Sign out</Link>
+          <Link to="/logout">Ieși din cont</Link>
         </span>
         <h1 className="home3__title">
           {greeting()},<br />
-          <span className="brush home3__name">{name || 'friend'}</span>
+          <span className="brush home3__name">{name || 'prietene'}</span>
         </h1>
       </motion.header>
 
@@ -124,9 +127,9 @@ function Vault({ goal, onDetails, primaryElsewhere }: { goal: Goal | null; onDet
     <section className="vault" data-tour="vault" aria-labelledby="vault-title">
       <div className="vault__top">
         <h2 id="vault-title" className="vault__label">
-          Saved
+          Economisit
         </h2>
-        <button type="button" className="vault__eye" onClick={() => setPrefs({ hideBalance: !hidden })} aria-label={hidden ? 'Show amounts' : 'Hide amounts'}>
+        <button type="button" className="vault__eye" onClick={() => setPrefs({ hideBalance: !hidden })} aria-label={hidden ? 'Arată sumele' : 'Ascunde sumele'}>
           {hidden ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
         </button>
       </div>
@@ -135,14 +138,14 @@ function Vault({ goal, onDetails, primaryElsewhere }: { goal: Goal | null; onDet
         <span>lei</span>
       </p>
       <p className="vault__split">
-        <span>{money(b.allocated)} in goals</span>
-        <span>{money(b.unallocated)} free</span>
-        {b.pendingIn > 0 && <span className="vault__pending">{money(b.pendingIn)} on the way</span>}
+        <span>{money(b.allocated)} în obiective</span>
+        <span>{money(b.unallocated)} nealocat</span>
+        {b.pendingIn > 0 && <span className="vault__pending">{money(b.pendingIn)} în așteptare</span>}
       </p>
       <div className="vault__actions">
         <QuickRecord goal={goal} primary={!primaryElsewhere} />
         <button type="button" className="vault__more" onClick={onDetails}>
-          How it adds up
+          Cum se adună
         </button>
       </div>
     </section>
@@ -166,31 +169,31 @@ function NextStep({ action, onAdd }: { action: TodayAction; onAdd: (goalId?: str
 
   switch (action.kind) {
     case 'create-goal':
-      title = 'Pick something to save for';
-      body = 'A laptop, Erasmus, an emergency fund, anything. You’ll get a plan that fits your week.';
-      primary = { label: 'Create a goal', run: () => nav('/goals/new') };
+      title = 'Alege pentru ce economisești';
+      body = 'Un laptop, Erasmus, un fond de urgență, orice. Primești un plan pe măsura săptămânii tale.';
+      primary = { label: 'Creează un obiectiv', run: () => nav('/goals/new') };
       break;
     case 'set-plan':
-      title = `Give ${action.goal.name} a plan`;
-      body = 'Choose how much and how often. You can lower or pause it any time.';
-      primary = { label: 'Set a plan', run: () => nav(`/goals/${action.goal.id}`) };
+      title = `${action.goal.name} are nevoie de un plan`;
+      body = 'Alege cât și cât de des. Îl poți micșora sau pune pe pauză oricând.';
+      primary = { label: 'Fă un plan', run: () => nav(`/goals/${action.goal.id}`) };
       break;
     case 'planned-contribution':
-      title = 'Today is one of your savings days';
-      body = `Your plan for ${action.goal.name} is ${planLabel(action.goal.plan).toLowerCase()}. Put the money aside wherever you keep it, then record it here so it counts. If this week is tight, record less or skip; your plan isn’t an obligation.`;
-      primary = { label: `Record ${formatLei(action.amount)} I set aside`, run: () => onAdd(action.goal.id, action.amount) };
-      secondary = { label: 'Record a different amount', run: () => onAdd(action.goal.id) };
+      title = 'Azi e una dintre zilele tale de economisit';
+      body = `Planul tău pentru ${action.goal.name} e ${planLabel(action.goal.plan).toLowerCase()}. Pune banii deoparte unde îi ții de obicei, apoi adaugă-i aici ca să conteze. Dacă săptămâna asta e mai grea, pune mai puțin sau sari peste: planul nu e o obligație.`;
+      primary = { label: `Am pus deoparte ${formatLei(action.amount)}`, run: () => onAdd(action.goal.id, action.amount) };
+      secondary = { label: 'Adaugă altă sumă', run: () => onAdd(action.goal.id) };
       break;
     case 'fix-connection':
-      title = 'The demo sync didn’t go through';
-      body = 'Your last known figures are kept. Nothing was lost.';
+      title = 'Sincronizarea demo n-a mers';
+      body = 'Ultimele cifre cunoscute rămân aici. Nu s-a pierdut nimic.';
       primary = {
-        label: 'Retry sync',
+        label: 'Reîncearcă sincronizarea',
         run: async () => {
           setBusy(true);
           try {
             await sync();
-            toast('Synced');
+            toast('Sincronizat');
           } catch (e) {
             toast((e as Error).message, 'error');
           } finally {
@@ -200,29 +203,29 @@ function NextStep({ action, onAdd }: { action: TodayAction; onAdd: (goalId?: str
       };
       break;
     case 'goal-reached':
-      title = `You reached ${action.goal.name}`;
-      body = 'Decide what’s next: archive it, raise the target, or start a new goal.';
-      primary = { label: 'Open goal', run: () => nav(`/goals/${action.goal.id}`) };
+      title = `Obiectiv atins: ${action.goal.name}`;
+      body = 'Alege ce urmează: îl arhivezi, mărești ținta sau începi un obiectiv nou.';
+      primary = { label: 'Deschide obiectivul', run: () => nav(`/goals/${action.goal.id}`) };
       break;
     case 'review-week':
-      title = 'Look back at your week';
-      body = 'See what came in and out, then decide if next week’s plan still fits.';
-      secondary = { label: 'See this week', run: () => nav('/activity') };
+      title = 'Aruncă o privire la săptămâna ta';
+      body = 'Vezi ce a intrat și ce a ieșit, apoi decide dacă planul încă se potrivește pentru săptămâna viitoare.';
+      secondary = { label: 'Vezi săptămâna asta', run: () => nav('/activity') };
       break;
     case 'review-plan':
-      title = 'Does your plan still fit this week?';
-      body = `A ten-second check on ${action.goal.name}. Confirming counts as today’s check-in.`;
+      title = 'Planul tău încă merge săptămâna asta?';
+      body = `O verificare de zece secunde pentru ${action.goal.name}. Dacă confirmi, ziua de azi e bifată.`;
       secondary = {
-        label: 'Yes, still fits',
+        label: 'Da, încă merge',
         run: () => {
           checkIn();
-          toast('Checked in. Plan confirmed.');
+          toast('Zi bifată. Plan confirmat.');
         },
       };
       break;
     case 'done-today':
-      title = 'Nothing else to do today';
-      body = 'Today is already recorded. See you on your next savings day.';
+      title = 'Nimic altceva de făcut azi';
+      body = 'Ziua de azi e deja bifată. Ne vedem în următoarea ta zi de economisit.';
       break;
   }
 
@@ -252,7 +255,7 @@ function NextStep({ action, onAdd }: { action: TodayAction; onAdd: (goalId?: str
           )}
         </div>
       )}
-      {data.transactions.length === 0 && action.kind !== 'create-goal' && <p className="small muted">Kept never moves money. It records what you set aside.</p>}
+      {data.transactions.length === 0 && action.kind !== 'create-goal' && <p className="small muted">Kept nu mută niciodată bani. Doar ține evidența a ce pui deoparte.</p>}
     </section>
   );
 }
@@ -269,27 +272,27 @@ function GoalTile({ goal, wide }: { goal: Goal; wide?: boolean }) {
 
   // one sentence that says something you couldn't see from the numbers
   let insight = '';
-  if (saved >= goal.target) insight = 'Done. Time to decide what’s next.';
-  else if (goal.plan.frequency === 'flexible') insight = 'No fixed plan, so no finish date yet.';
+  if (saved >= goal.target) insight = 'Gata! E momentul să alegi ce urmează.';
+  else if (goal.plan.frequency === 'flexible') insight = 'Fără plan fix, deci încă fără dată de final.';
   else if (finish && goal.targetDate) {
     const weeks = Math.round(Math.abs(daysBetween(goal.targetDate, finish)) / 7);
     insight =
       finish > goal.targetDate
-        ? `${weeks} week${weeks === 1 ? '' : 's'} late at this pace.${pace ? ` ${formatLei(Math.ceil(pace.perWeek / 100) * 100)} a week gets you there on time.` : ''}`
+        ? `În ritmul ăsta, ajungi cu ${plural(weeks, 'săptămână', 'săptămâni')} mai târziu.${pace ? ` Cu ${formatLei(Math.ceil(pace.perWeek / 100) * 100)} pe săptămână ajungi la timp.` : ''}`
         : weeks === 0
-          ? 'Lands right on your date.'
-          : `${weeks} week${weeks === 1 ? '' : 's'} early at this pace.`;
-  } else if (finish) insight = `Around ${formatDate(finish)} at this pace.`;
+          ? 'Ajungi fix la data aleasă.'
+          : `În ritmul ăsta, ajungi cu ${plural(weeks, 'săptămână', 'săptămâni')} mai devreme.`;
+  } else if (finish) insight = `În ritmul ăsta, pe la ${formatDate(finish)}.`;
 
   return (
-    <Link to={`/goals/${goal.id}`} className={`tile ${wide ? 'tile--wide' : ''}`} data-tour={wide ? 'goal' : undefined} data-feed-goal={goal.id} data-feed-name={goal.name} aria-label={`${goal.name}: ${formatLei(saved)} of ${formatLei(goal.target)}`}>
+    <Link to={`/goals/${goal.id}`} className={`tile ${wide ? 'tile--wide' : ''}`} data-tour={wide ? 'goal' : undefined} data-feed-goal={goal.id} data-feed-name={goal.name} aria-label={`${goal.name}: ${formatLei(saved)} din ${formatLei(goal.target)}`}>
       <span className="tile__label">
         {goal.name}
         {wide && <ChevronRight size={16} aria-hidden />}
       </span>
       <span className="tile__amount money">{formatLei(saved)}</span>
       <span className="tile__sub">
-        {Math.round(pct * 100)}% of {formatLei(goal.target)}
+        {Math.round(pct * 100)}% din {formatLei(goal.target)}
       </span>
       <span className="tile__bar" aria-hidden>
         <motion.i initial={{ width: 0 }} animate={{ width: `${Math.max(pct * 100, pct > 0 ? 2 : 0)}%` }} transition={{ type: 'spring', stiffness: 60, damping: 18 }} />
@@ -318,23 +321,23 @@ function StreakTile() {
       onClick={() => {
         if (todayDone) return;
         checkIn();
-        toast('Checked in for today.');
+        toast('Ziua de azi e bifată.');
       }}
-      aria-label={`${streak} day streak. ${todayDone ? 'Today is counted.' : 'Tap to check in for today.'}`}
+      aria-label={`Serie: ${plural(streak, 'zi', 'zile')} la rând. ${todayDone ? 'Azi contează.' : 'Apasă ca să bifezi ziua.'}`}
     >
       <span className="tile__label">
-        <Flame size={16} aria-hidden /> Streak
+        <Flame size={16} aria-hidden /> Serie
       </span>
       <span className="tile__amount">
         {streak}
-        <small> {streak === 1 ? 'day' : 'days'}</small>
+        <small> {unit(streak, 'zi', 'zile')}</small>
       </span>
       <span className="tile__week" aria-hidden>
         {days.map((d, i) => (
-          <i key={d.key} className={`wk wk--${d.state}`} title={WEEKDAY_SHORT[i]} />
+          <i key={d.key} className={`wk wk--${d.state}`} title={WEEKDAY_NAME[i]} />
         ))}
       </span>
-      <span className="tile__sub">{todayDone ? 'Today counts' : 'Tap to check in'}</span>
+      <span className="tile__sub">{todayDone ? 'Azi contează' : 'Apasă ca să bifezi ziua'}</span>
     </button>
   );
 }
@@ -348,11 +351,11 @@ function Recent({ onAdd }: { onAdd: () => void }) {
     <section className="card card--flush" aria-labelledby="recent-title">
       <div className="card-head card-head--pad">
         <h2 id="recent-title" className="h3">
-          Recent activity
+          Activitate recentă
         </h2>
         {recent.length > 0 && (
           <Link to="/activity" className="link-btn">
-            See all <ArrowRight size={14} aria-hidden />
+            Vezi tot <ArrowRight size={14} aria-hidden />
           </Link>
         )}
       </div>
@@ -366,10 +369,10 @@ function Recent({ onAdd }: { onAdd: () => void }) {
         </ul>
       ) : (
         <div className="empty2">
-          <p className="h3">No entries yet</p>
-          <p className="muted small">When you set money aside, tap “Record savings” and enter the amount. Each entry shows here with its date, goal and status.</p>
+          <p className="h3">Încă nimic aici</p>
+          <p className="muted small">Când pui bani deoparte, apasă „Adaugă economii” și scrie suma. Fiecare intrare apare aici cu data, obiectivul și starea ei.</p>
           <button type="button" className="btn btn--secondary btn--sm" onClick={onAdd}>
-            Record savings
+            Adaugă economii
           </button>
         </div>
       )}
@@ -384,10 +387,10 @@ function FirstUse({ goal, onAdd }: { goal: Goal | null; onAdd: (goalId?: string 
   const nav = useNavigate();
   const finish = goal && goal.plan.frequency !== 'flexible' ? projectedFinish(goal.plan, 0, goal.target) : null;
   const steps = [
-    { title: 'Set a goal', done: data.goals.length > 0 },
-    { title: 'Record your first savings', done: data.transactions.length > 0 },
-    { title: 'Pick a reminder day', done: data.reminder.enabled },
-    { title: 'Check in on a second day', done: currentStreak(data) >= 2 },
+    { title: 'Alege un obiectiv', done: data.goals.length > 0 },
+    { title: 'Adaugă primele economii', done: data.transactions.length > 0 },
+    { title: 'Alege o zi pentru memento', done: data.reminder.enabled },
+    { title: 'Bifează și a doua zi', done: currentStreak(data) >= 2 },
   ];
   const doneCount = steps.filter((s) => s.done).length;
 
@@ -397,42 +400,42 @@ function FirstUse({ goal, onAdd }: { goal: Goal | null; onAdd: (goalId?: string 
         <img src="/mascot/wave-face.webp" alt="" />
       </div>
       <h2 id="first-title" className="h2">
-        {goal ? `Let’s start ${goal.name}` : 'Let’s set your first goal'}
+        {goal ? `Hai să începem: ${goal.name}` : 'Hai să-ți alegem primul obiectiv'}
       </h2>
       {goal && (
         <p className="muted">
-          You chose {planLabel(goal.plan).toLowerCase()} towards {formatLei(goal.target)}
-          {finish ? `, which gets you there around ${formatDate(finish)}` : ''}. Here’s how Kept works:
+          Ai ales {planLabel(goal.plan).toLowerCase()}, cu ținta de {formatLei(goal.target)}
+          {finish ? `, deci ajungi la ea pe la ${formatDate(finish)}` : ''}. Uite cum funcționează Kept:
         </p>
       )}
       <ol className="how">
         <li>
-          <strong>Put money aside where you already keep it.</strong> A savings account, a vault in your banking app, even cash.
+          <strong>Pune bani deoparte unde îi ții deja.</strong> Un cont de economii, o pușculiță în aplicația băncii, chiar și cash.
         </li>
         <li>
-          <strong>Record the amount in Kept.</strong> It’s counted towards your goal straight away.
+          <strong>Adaugă suma în Kept.</strong> Se adună imediat la obiectivul tău.
         </li>
         <li>
-          <strong>Kept tells you if you’re on track,</strong> and you can lower or pause the plan any time.
+          <strong>Kept îți spune dacă ești pe drumul cel bun,</strong> iar planul îl poți micșora sau pune pe pauză oricând.
         </li>
       </ol>
-      <div className="setup" aria-label={`Setup: ${doneCount} of ${steps.length} done`}>
+      <div className="setup" aria-label={`Primii pași: ${doneCount} din ${steps.length} gata`}>
         <div className="setup__bar" aria-hidden>
           {steps.map((s) => (
             <span key={s.title} data-done={s.done || undefined} />
           ))}
         </div>
         <span className="small muted">
-          Setup: {doneCount} of {steps.length} done
+          Primii pași: {doneCount} din {steps.length} gata
         </span>
       </div>
       {goal ? (
         <button type="button" className="btn btn--primary btn--lg" onClick={() => onAdd(goal.id, goal.plan.amount || undefined)}>
-          Record my first savings
+          Adaugă primele economii
         </button>
       ) : (
         <button type="button" className="btn btn--primary btn--lg" onClick={() => nav('/goals/new')}>
-          Create a goal
+          Creează un obiectiv
         </button>
       )}
     </section>

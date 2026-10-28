@@ -68,7 +68,7 @@ export function Seal({
   appear = "pop",
   reducedMotion = false,
   onCelebrateEnd,
-  title = "Kip the seal",
+  title = "Kip, foca",
 }: SealProps) {
   // celebrate is one-shot: play it once, then fall back to idle on our own so
   // callers can just set state="celebrate" when a deposit lands.

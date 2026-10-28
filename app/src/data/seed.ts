@@ -10,10 +10,10 @@ export function sampleData(today = todayKey()): UserData {
   const laptop: Goal = {
     id: uid('g_'),
     kind: 'tech',
-    name: 'Laptop for uni',
+    name: 'Laptop pentru facultate',
     target: 4500_00,
     targetDate: addDays(today, 7 * 30),
-    motivation: 'My current one dies before the end of a lecture.',
+    motivation: 'Cel de acum moare înainte să se termine cursul.',
     plan: { amount: 100_00, frequency: 'weekly', day: 4 },
     status: 'active',
     createdAt: now,
@@ -22,10 +22,10 @@ export function sampleData(today = todayKey()): UserData {
   const emergency: Goal = {
     id: uid('g_'),
     kind: 'emergency',
-    name: 'Emergency fund',
+    name: 'Fond de urgență',
     target: 2000_00,
     targetDate: null,
-    motivation: 'A cushion for rent surprises.',
+    motivation: 'O plasă de siguranță pentru surprizele de la chirie.',
     plan: { amount: 150_00, frequency: 'monthly', day: 1 },
     status: 'active',
     createdAt: now,
@@ -49,13 +49,13 @@ export function sampleData(today = todayKey()): UserData {
     });
   };
   // Eight weeks of mostly-kept plans, one withdrawal, one failed transfer and one pending.
-  for (let w = 8; w >= 1; w--) add(w * 7 - 1, 'contribution', w === 5 ? 60_00 : 100_00, laptop, w === 5 ? 'Smaller week, exams' : 'Weekly plan');
-  add(52, 'contribution', 150_00, emergency, 'Monthly plan');
-  add(22, 'contribution', 150_00, emergency, 'Monthly plan');
-  add(30, 'contribution', 250_00, null, 'Birthday money');
-  add(18, 'withdrawal', 80_00, emergency, 'Train ticket home');
-  add(9, 'contribution', 120_00, null, 'Tutoring', 'failed');
-  add(1, 'contribution', 40_00, laptop, 'Extra from tutoring', 'pending');
+  for (let w = 8; w >= 1; w--) add(w * 7 - 1, 'contribution', w === 5 ? 60_00 : 100_00, laptop, w === 5 ? 'Săptămână mai mică, sesiune' : 'Plan săptămânal');
+  add(52, 'contribution', 150_00, emergency, 'Plan lunar');
+  add(22, 'contribution', 150_00, emergency, 'Plan lunar');
+  add(30, 'contribution', 250_00, null, 'Bani de ziua mea');
+  add(18, 'withdrawal', 80_00, emergency, 'Bilet de tren spre casă');
+  add(9, 'contribution', 120_00, null, 'Meditații', 'failed');
+  add(1, 'contribution', 40_00, laptop, 'Bani în plus din meditații', 'pending');
 
   const actions: StreakAction[] = [];
   for (let d = 12; d >= 1; d--) {
@@ -72,7 +72,7 @@ export function sampleData(today = todayKey()): UserData {
     tracking: 'demo',
     connection: {
       status: 'connected',
-      institution: 'Demo Bank (simulated)',
+      institution: 'Banca Demo (simulată)',
       lastSyncAt: new Date(Date.now() - 1000 * 60 * 42).toISOString(),
       lastError: null,
       simulateFailure: false,

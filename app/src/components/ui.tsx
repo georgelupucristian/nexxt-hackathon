@@ -24,6 +24,7 @@ import {
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import type { GoalKind, GoalStatus, Transaction } from '../data/types';
+import { WEEKDAY_NAME } from '../lib/dates';
 import { splitLei } from '../lib/money';
 import { Emoji3D, GOAL_EMOJI } from './Emoji3D';
 
@@ -65,7 +66,7 @@ export function TopBar({ title, back = true, end, onBack }: { title?: string; ba
   const nav = useNavigate();
   return (
     <header className="topbar">
-      <div>{back && <IconButton label="Back" icon={ArrowLeft} onClick={onBack ?? (() => (window.history.length > 1 ? nav(-1) : nav('/home')))} />}</div>
+      <div>{back && <IconButton label="Înapoi" icon={ArrowLeft} onClick={onBack ?? (() => (window.history.length > 1 ? nav(-1) : nav('/home')))} />}</div>
       <div className="topbar__title truncate">{title}</div>
       <div className="topbar__end">{end}</div>
     </header>
@@ -134,9 +135,10 @@ export function Segmented<T extends string>({ value, options, onChange, label }:
 }
 
 export function DayPicker({ value, onChange }: { value: number | null; onChange: (d: number) => void }) {
-  const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // "Lun", "Mar"… cut from the localized weekday names.
+  const names = WEEKDAY_NAME.map((n) => n.charAt(0).toUpperCase() + n.slice(1, 3));
   return (
-    <div className="day-picker" role="group" aria-label="Day of the week">
+    <div className="day-picker" role="group" aria-label="Ziua săptămânii">
       {names.map((n, i) => (
         <button key={n} type="button" aria-pressed={value === i} onClick={() => onChange(i)}>
           {n}
@@ -152,7 +154,7 @@ export function BigAmount({ value, size = 'lg', hidden }: { value: number; size?
   const { int, dec } = splitLei(value);
   if (hidden) {
     return (
-      <div className={`big-amount ${size === 'md' ? 'big-amount--md' : ''}`} aria-label="Balance hidden">
+      <div className={`big-amount ${size === 'md' ? 'big-amount--md' : ''}`} aria-label="Sold ascuns">
         <span className="big-amount__int">••••</span>
         <span className="big-amount__cur">lei</span>
       </div>
@@ -236,16 +238,16 @@ export function GoalGlyph({ kind, size, status }: { kind: GoalKind; size?: 'lg';
 /** One pill per transaction that says both where it came from and whether it counts. */
 export function TxStatusPill({ tx }: { tx: Transaction }) {
   // plain coloured words, no badges; a normal manual entry needs no label at all
-  if (tx.status === 'failed') return <span className="status status--danger">Failed</span>;
-  if (tx.status === 'pending') return <span className="status status--warn">Pending</span>;
-  if (tx.source === 'demo') return <span className="status">Simulated</span>;
+  if (tx.status === 'failed') return <span className="status status--danger">Eșuat</span>;
+  if (tx.status === 'pending') return <span className="status status--warn">În așteptare</span>;
+  if (tx.source === 'demo') return <span className="status">Simulat</span>;
   return null;
 }
 
 export function txStatusText(tx: Transaction): string {
-  if (tx.status === 'failed') return 'Failed, not counted in your savings';
-  if (tx.status === 'pending') return tx.source === 'demo' ? 'Transfer pending. Counts once confirmed.' : 'Pending';
-  return tx.source === 'demo' ? 'Confirmed (simulated, demo connection)' : 'Recorded manually by you';
+  if (tx.status === 'failed') return 'Eșuat, nu intră în economiile tale';
+  if (tx.status === 'pending') return tx.source === 'demo' ? 'Transfer în așteptare. Contează după confirmare.' : 'În așteptare';
+  return tx.source === 'demo' ? 'Confirmat (simulat, conexiune demo)' : 'Adăugat manual de tine';
 }
 
 // ---------- Sheet / dialog ----------
@@ -303,7 +305,7 @@ export function Sheet({ open, onClose, title, children, dialog }: { open: boolea
         {!dialog && <div className="sheet__handle" aria-hidden />}
         <div className="sheet__head">
           <h2 id={tid}>{title}</h2>
-          <IconButton label="Close" icon={X} onClick={onClose} />
+          <IconButton label="Închide" icon={X} onClick={onClose} />
         </div>
         {children}
       </div>
@@ -334,7 +336,7 @@ export function ConfirmDialog({
       <div className="stack-lg">
         <div className="muted">{body}</div>
         <div className="btn-row">
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>Anulează</Button>
           <Button variant={danger ? 'danger-solid' : 'primary'} onClick={onConfirm}>
             {confirmLabel}
           </Button>

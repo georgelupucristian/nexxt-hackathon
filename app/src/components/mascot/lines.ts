@@ -1,5 +1,6 @@
 import type { TodayAction } from '../../data/selectors';
 import { formatLei } from '../../lib/money';
+import { plural } from '../../lib/ro';
 import type { SealState } from './Seal';
 
 export interface Line {
@@ -13,34 +14,35 @@ export interface Line {
  */
 export function hubLine(action: TodayAction, name: string, streak: number, hour = new Date().getHours()): Line {
   const late = hour >= 22 || hour < 5;
+  const hi = name ? `, ${name}` : '';
   switch (action.kind) {
     case 'create-goal':
-      return { state: 'wave', text: `Hi ${name}! Let’s pick something to save for. Tap Goals.` };
+      return { state: 'wave', text: `Salut${hi}! Hai să alegem pentru ce strângem bani. Apasă pe Obiective.` };
     case 'set-plan':
-      return { state: 'think', text: `${action.goal.name} needs a plan. Want to set one in Goals?` };
+      return { state: 'think', text: `${action.goal.name} are nevoie de un plan. Îi facem unul în Obiective?` };
     case 'planned-contribution':
-      return { state: 'think', text: `Psst, ${name}, you haven’t added savings today. ${formatLei(action.amount)} for ${action.goal.name}?` };
+      return { state: 'think', text: `Psst${hi}, azi e zi de economisit. Pui ${formatLei(action.amount)} în ${action.goal.name}?` };
     case 'fix-connection':
-      return { state: 'sad', text: 'The demo sync didn’t go through. Your numbers are safe. Retry from Today.' };
+      return { state: 'sad', text: 'Sincronizarea demo n-a mers, dar cifrele tale sunt în siguranță. Mai încercăm o dată?' };
     case 'goal-reached':
-      return { state: 'celebrate', text: `You did it, ${action.goal.name} is fully saved!` };
+      return { state: 'celebrate', text: `Ai reușit! Obiectivul ${action.goal.name} e atins!` };
     case 'review-week':
-      return { state: 'think', text: 'New week! Want to look back at the last one? It’s in Today.' };
+      return { state: 'think', text: 'Săptămână nouă! Arunci o privire la cea trecută? O găsești în Activitate.' };
     case 'review-plan':
-      return { state: 'think', text: `Quick check: does the plan for ${action.goal.name} still fit this week?` };
+      return { state: 'think', text: `O întrebare rapidă: planul pentru ${action.goal.name} încă merge săptămâna asta?` };
     case 'done-today':
-      if (late) return { state: 'sleep', text: 'All done for today. See you tomorrow.' };
+      if (late) return { state: 'sleep', text: 'Gata pe azi. Ne vedem mâine.' };
       return streak >= 3
-        ? { state: 'happy', text: `${streak} days in a row. Steady wins this.` }
-        : { state: 'happy', text: 'That’s today done. Nothing else needed.' };
+        ? { state: 'happy', text: `${plural(streak, 'zi', 'zile')} la rând. Pas cu pas, așa se câștigă.` }
+        : { state: 'happy', text: 'Ziua de azi e bifată. Restul e timp liber.' };
   }
 }
 
 /** Little extras when you tap Kip, so the mascot feels like it's listening. */
 export const POKES: Line[] = [
-  { state: 'happy', text: 'Hehe. Small amounts add up, I promise.' },
-  { state: 'wave', text: 'Hi again!' },
-  { state: 'think', text: 'Tip: lowering your plan is fine. A plan you keep beats a big one you skip.' },
-  { state: 'happy', text: 'Your money stays where you keep it. I just help you track it.' },
-  { state: 'think', text: 'Tip: a weekly reminder helps more than willpower.' },
+  { state: 'happy', text: 'Hihi. Sumele mici se adună, promit.' },
+  { state: 'wave', text: 'Salut din nou!' },
+  { state: 'think', text: 'Pont: e ok să-ți micșorezi planul. Un plan mic pe care îl ții bate unul mare pe care îl sari.' },
+  { state: 'happy', text: 'Banii tăi stau unde îi ții tu. Eu doar te ajut să ții evidența.' },
+  { state: 'think', text: 'Pont: un memento săptămânal ajută mai mult decât voința.' },
 ];

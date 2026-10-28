@@ -5,17 +5,21 @@ import { Check } from '@/lib/icons';
 import { currentStreak, weekStates } from '../../data/selectors';
 import { useData, useStore } from '../../data/store';
 import { todayKey, toKey, WEEKDAY_SHORT } from '../../lib/dates';
+import { plural } from '../../lib/ro';
 import { Fire } from './Fire';
 import { Seal } from './Seal';
 
 /** What Kip says when the run grows. Encouraging, never "don't lose it". */
 function cheer(n: number): string {
-  if (n === 1) return 'Day one. Every run starts like this.';
-  if (n === 2) return 'Two days in a row. You’re building a habit.';
-  if (n < 7) return `${n} days in a row. Small amounts really do add up.`;
-  if (n === 7) return 'A whole week. That’s how saving becomes normal.';
-  return `${n} days. Steady beats big, every time.`;
+  if (n === 1) return 'Prima zi. Orice serie începe așa.';
+  if (n === 2) return 'Două zile la rând. Se prinde obiceiul.';
+  if (n < 7) return `${plural(n, 'zi', 'zile')} la rând. Sumele mici chiar se adună.`;
+  if (n === 7) return 'O săptămână întreagă. Așa devine economisitul ceva firesc.';
+  return `${plural(n, 'zi', 'zile')} la rând. Puțin și des bate mult și rar, mereu.`;
 }
+
+/** The words under the big number, agreeing with it: "zi la rând", "zile la rând", "de zile la rând". */
+const streakWords = (n: number) => `${plural(n, 'zi', 'zile').replace(/^\S+ /, '')} la rând`;
 
 /**
  * The Duolingo-style streak moment: Kip comes in and cheers, the flame lights up while the number
@@ -62,7 +66,7 @@ export function StreakMoment() {
   return (
     <AnimatePresence>
       {moment && (
-        <motion.div className="streak-moment" role="dialog" aria-modal="true" aria-label={`${moment.to} day streak`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <motion.div className="streak-moment" role="dialog" aria-modal="true" aria-label={`${plural(moment.to, 'zi', 'zile')} la rând`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="streak-moment__inner">
             <motion.p className="streak-moment__bubble" initial={{ scale: 0.6, opacity: 0, y: 8 }} animate={{ scale: 1, opacity: 1, y: 0 }} transition={{ delay: 0.35, type: 'spring', stiffness: 420, damping: 24 }}>
               {cheer(moment.to)}
@@ -81,7 +85,7 @@ export function StreakMoment() {
             <span className={`streak-moment__num ${lit ? 'is-lit' : ''}`}>
               <NumberFlow value={lit ? moment.to : moment.from} />
             </span>
-            <span className={`streak-moment__label ${lit ? 'is-lit' : ''}`}>day streak</span>
+            <span className={`streak-moment__label ${lit ? 'is-lit' : ''}`}>{streakWords(lit ? moment.to : moment.from)}</span>
 
             <motion.div className="streak-week" initial={{ y: 24, opacity: 0 }} animate={lit ? { y: 0, opacity: 1 } : {}} transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}>
               <ol className="streak-week__days">
@@ -121,11 +125,11 @@ export function StreakMoment() {
                 })}
               </div>
             </motion.div>
-            <p className="streak-moment__fine">A day counts when you save or check in. Ice floe days keep it going.</p>
+            <p className="streak-moment__fine">O zi contează când economisești sau o bifezi. Zilele pe sloi de gheață nu rup seria.</p>
           </div>
 
           <motion.button type="button" className="btn btn--primary btn--lg streak-moment__go" initial={{ opacity: 0, y: 12 }} animate={{ opacity: lit ? 1 : 0, y: lit ? 0 : 12 }} transition={{ delay: 1.1 }} onClick={() => setMoment(null)}>
-            Continue
+            Continuă
           </motion.button>
         </motion.div>
       )}

@@ -20,9 +20,9 @@ export function Goals() {
   return (
     <div className="screen screen--wide">
       <header className="page-head">
-        <h1>Goals</h1>
+        <h1>Obiective</h1>
         <Button variant="primary" size="sm" icon={Plus} onClick={() => nav('/goals/new')}>
-          New goal
+          Obiectiv nou
         </Button>
       </header>
 
@@ -30,11 +30,11 @@ export function Goals() {
         <div className="card">
           <EmptyState
             icon={Target}
-            title="Save with goals"
-            body="A goal gives your savings a purpose and a plan. Start with one. You can add more anytime."
+            title="Economisește cu obiective"
+            body="Un obiectiv dă economiilor tale un scop și un plan. Începe cu unul. Poți adăuga altele oricând."
             action={
               <Button variant="primary" onClick={() => nav('/goals/new')}>
-                Create a goal
+                Creează un obiectiv
               </Button>
             }
           />
@@ -43,21 +43,21 @@ export function Goals() {
         <>
           <div className="card card--tint row" style={{ flexWrap: 'wrap', gap: 'var(--s-6)' }}>
             <div className="stat">
-              <span>Total savings</span>
+              <span>Economii totale</span>
               <strong>{formatLei(b.total)}</strong>
             </div>
             <div className="stat">
-              <span>In goals</span>
+              <span>În obiective</span>
               <strong>{formatLei(b.allocated)}</strong>
             </div>
             <div className="stat">
-              <span>Unallocated</span>
+              <span>Nealocat</span>
               <strong>{formatLei(b.unallocated)}</strong>
             </div>
           </div>
 
           {active.length > 0 && (
-            <section className="section" aria-label="Active goals">
+            <section className="section" aria-label="Obiective active">
               <h2 className="group-label">Active · {active.length}</h2>
               <div className="goals-grid">
                 {active.map((g) => (
@@ -67,11 +67,11 @@ export function Goals() {
             </section>
           )}
           {active.length === 0 && (
-            <p className="muted">No active goals. Resume a paused goal or create a new one.</p>
+            <p className="muted">Niciun obiectiv activ. Reia unul pus pe pauză sau creează unul nou.</p>
           )}
           {paused.length > 0 && (
-            <section className="section" aria-label="Paused goals">
-              <h2 className="group-label">Paused · {paused.length}</h2>
+            <section className="section" aria-label="Obiective pe pauză">
+              <h2 className="group-label">Pe pauză · {paused.length}</h2>
               <div className="goals-grid">
                 {paused.map((g) => (
                   <GoalCard key={g.id} goal={g} compact />
@@ -82,7 +82,7 @@ export function Goals() {
           {archived.length > 0 && (
             <section className="section">
               <button type="button" className="link-btn row" aria-expanded={showArchived} onClick={() => setShowArchived((v) => !v)} style={{ textDecoration: 'none', gap: 6 }}>
-                Archived · {archived.length}
+                Arhivate · {archived.length}
                 <ChevronDown size={16} aria-hidden style={{ transform: showArchived ? 'rotate(180deg)' : undefined }} />
               </button>
               {showArchived && (

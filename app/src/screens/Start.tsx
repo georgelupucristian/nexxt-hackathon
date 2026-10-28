@@ -18,6 +18,7 @@ import { useStore } from '../data/store';
 import type { Frequency, GoalKind, TrackingMethod } from '../data/types';
 import { addDays, formatDate, todayKey, weekday, WEEKDAY_NAME } from '../lib/dates';
 import { formatLei } from '../lib/money';
+import { plural } from '../lib/ro';
 
 // Duolingo-style setup: Kip asks one thing per screen, answers are kept in sessionStorage so a
 // refresh doesn't lose them, and the account is only created at the end, once you've already
@@ -72,18 +73,21 @@ function load(): Draft {
 }
 
 const KINDS: { kind: GoalKind; title: string; desc: string; name: string; tint: string }[] = [
-  { kind: 'emergency', title: 'Emergency fund', desc: 'A cushion for surprises', name: 'Emergency fund', tint: 'today' },
-  { kind: 'tech', title: 'Laptop or tech', desc: 'New laptop, phone, gear', name: 'New laptop', tint: 'activity' },
-  { kind: 'travel', title: 'Travel or exchange', desc: 'Erasmus, trips, flights', name: 'Exchange semester', tint: 'goals' },
-  { kind: 'custom', title: 'Something else', desc: 'Name your own goal', name: '', tint: 'profile' },
+  { kind: 'emergency', title: 'Fond de urgență', desc: 'O rezervă pentru neprevăzute', name: 'Fond de urgență', tint: 'today' },
+  { kind: 'tech', title: 'Laptop sau gadgeturi', desc: 'Laptop nou, telefon, accesorii', name: 'Laptop nou', tint: 'activity' },
+  { kind: 'travel', title: 'Călătorie sau Erasmus', desc: 'Mobilități, excursii, zboruri', name: 'Semestru Erasmus', tint: 'goals' },
+  { kind: 'custom', title: 'Altceva', desc: 'Pune-i tu un nume', name: '', tint: 'profile' },
 ];
 
 const DEADLINES = [
-  { label: 'No deadline', days: 0 },
-  { label: 'In 3 months', days: 91 },
-  { label: 'In 6 months', days: 182 },
-  { label: 'In a year', days: 365 },
+  { label: 'Fără termen', days: 0 },
+  { label: 'În 3 luni', days: 91 },
+  { label: 'În 6 luni', days: 182 },
+  { label: 'Într-un an', days: 365 },
 ];
+
+// plural() returns "20 de săptămâni"; NumberFlow draws the number itself, so keep only the words
+const unit = (n: number, one: string, other: string) => plural(n, one, other).slice(String(n).length + 1);
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -93,7 +97,7 @@ function strength(pw: string): { score: number; label: string } {
   if (pw.length >= 12) s++;
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++;
   if (/\d/.test(pw) || /[^A-Za-z0-9]/.test(pw)) s++;
-  return { score: s, label: ['Too short', 'Okay', 'Good', 'Strong', 'Very strong'][s] };
+  return { score: s, label: ['Prea scurtă', 'Merge', 'Bună', 'Puternică', 'Foarte puternică'][s] };
 }
 
 export function Start() {
@@ -125,7 +129,7 @@ export function Start() {
   };
   const back = () => (d.step === 0 ? nav('/welcome') : go(d.step - 1));
 
-  const name = d.name.trim() || 'friend';
+  const name = d.name.trim() || 'prietene';
   const plan = { amount: d.frequency === 'flexible' ? 0 : d.amount, frequency: d.frequency, day: d.frequency === 'weekly' ? weekday(todayKey()) : d.frequency === 'monthly' ? Math.min(28, new Date().getDate()) : null };
   const finish = projectedFinish(plan, 0, d.target);
   const lateForDeadline = !!(finish && d.deadline && finish > d.deadline);
@@ -138,14 +142,14 @@ export function Start() {
       signedUpHere.current = true;
       await signUp(name, d.email.trim(), d.password);
       finishOnboarding(
-        { kind: d.kind ?? 'custom', name: d.goalName.trim() || 'My goal', target: d.target, targetDate: d.deadline || null, motivation: '', plan },
+        { kind: d.kind ?? 'custom', name: d.goalName.trim() || 'Obiectivul meu', target: d.target, targetDate: d.deadline || null, motivation: '', plan },
         { tracking: d.tracking, reminder: { enabled: d.reminderOn, day: d.reminderDay, time: d.reminderTime } },
       );
       sessionStorage.removeItem(KEY);
       setPhase('building');
     } catch (err) {
       signedUpHere.current = false;
-      setAuthError(err instanceof AuthError ? err.message : 'We couldn’t create your account. Please try again.');
+      setAuthError(err instanceof AuthError ? err.message : 'Nu am putut crea contul. Mai încearcă o dată.');
       if (err instanceof AuthError && err.field === 'email') setAccountStep(0);
     } finally {
       setBusy(false);
@@ -155,42 +159,42 @@ export function Start() {
   // ---- what Kip says and whether Continue is allowed, per step ----
   let say: { state: SealState; text: string };
   let canGo = true;
-  let cta = 'Continue';
+  let cta = 'Continuă';
   switch (id) {
     case 'hello':
-      say = { state: 'wave', text: `Hi! I’m ${MASCOT_NAME}. I’ll help you save for the things you want, one small step at a time.` };
-      cta = 'Let’s go';
+      say = { state: 'wave', text: `Salut! Sunt ${MASCOT_NAME}. Te ajut să strângi bani pentru ce-ți dorești, câte un pas mic pe rând.` };
+      cta = 'Hai';
       break;
     case 'name':
-      say = d.name.trim() ? { state: 'happy', text: `${d.name.trim()}! Love it.` } : { state: 'think', text: 'First things first: what should I call you?' };
+      say = d.name.trim() ? { state: 'happy', text: `${d.name.trim()}! Îmi place.` } : { state: 'think', text: 'Mai întâi: cum să-ți spun?' };
       canGo = d.name.trim().length > 0;
       break;
     case 'kind':
-      say = { state: d.kind ? 'happy' : 'wave', text: d.kind ? 'Great pick. Let’s make it real.' : `Nice to meet you, ${name}! What are you saving for?` };
+      say = { state: d.kind ? 'happy' : 'wave', text: d.kind ? 'Bună alegere. Hai să prindă contur.' : `Mă bucur să te cunosc, ${name}! Pentru ce strângi bani?` };
       canGo = !!d.kind && d.goalName.trim().length > 0;
       break;
     case 'target':
-      say = { state: 'think', text: `How much do you need for ${d.goalName.trim() || 'it'}?` };
+      say = { state: 'think', text: `De cât ai nevoie pentru ${d.goalName.trim() || 'asta'}?` };
       canGo = d.target > 0;
       break;
     case 'plan':
       say =
         d.frequency === 'flexible'
-          ? { state: 'happy', text: 'Flexible works. Save whenever it fits, I’ll keep count.' }
+          ? { state: 'happy', text: 'Flexibil merge. Pui deoparte când poți, eu țin socoteala.' }
           : lateForDeadline
-            ? { state: 'think', text: 'That lands after your deadline. A bit more would help, or keep it. Plans can change anytime.' }
-            : { state: 'point', text: `How much can you put aside each ${d.frequency === 'weekly' ? 'week' : 'month'}? Drag the ruler.` };
+            ? { state: 'think', text: 'Așa termini după data țintă. Un pic mai mult ar ajuta, dar poți rămâne și așa. Planul se poate schimba oricând.' }
+            : { state: 'point', text: `Cât poți pune deoparte ${d.frequency === 'weekly' ? 'pe săptămână' : 'pe lună'}? Trage de riglă.` };
       canGo = d.frequency === 'flexible' || d.amount > 0;
       break;
     case 'tracking':
-      say = { state: 'idle', text: 'How do you want to track it? I never touch your money, I just keep count.' };
+      say = { state: 'idle', text: 'Cum vrei să ții evidența? Nu mă ating niciodată de banii tăi, doar țin socoteala.' };
       break;
     case 'reminder':
-      say = { state: 'wave', text: 'Want a gentle nudge once a week? People who get one save more often.' };
-      cta = d.reminderOn ? 'Remind me' : 'Continue';
+      say = { state: 'wave', text: 'Vrei un memento o dată pe săptămână? Cine primește unul economisește mai des.' };
+      cta = d.reminderOn ? 'Amintește-mi' : 'Continuă';
       break;
     case 'account':
-      say = { state: 'happy', text: `Last step, ${name}! Let’s save your plan so it’s here next time.` };
+      say = { state: 'happy', text: `Ultimul pas, ${name}! Hai să-ți salvăm planul, ca să-l găsești și data viitoare.` };
       break;
   }
 
@@ -199,27 +203,27 @@ export function Start() {
       <div className="start start--center">
         {phase === 'building' ? (
           <motion.div className="start__building" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <MascotSays state="think" message="Give me a second…" size={170} layout="stack" appear="none" />
+            <MascotSays state="think" message="Stai o secundă…" size={170} layout="stack" appear="none" />
             <LabeledProgressIndicator
-              labels={[`Setting up ${d.goalName.trim() || 'your goal'}…`, 'Planning your weeks…', 'Warming up your streak…', 'All set!']}
+              labels={[`Pregătesc ${d.goalName.trim() || 'obiectivul tău'}…`, 'Îți planific săptămânile…', 'Îți încălzesc seria…', 'Gata!']}
               durationMs={2600}
               onDone={() => {
                 setPhase('done');
-                celebrate({ title: `You’re all set, ${name}!`, sub: 'Your first goal is ready.' });
+                celebrate({ title: `Totul e pregătit, ${name}!`, sub: 'Primul tău obiectiv te așteaptă.' });
               }}
             />
           </motion.div>
         ) : (
           <motion.div className="start__done" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2.4, type: 'spring', stiffness: 300, damping: 26 }}>
-            <MascotSays state="happy" message={`Here’s the plan, ${name}.`} size={150} layout="stack" appear="none" />
+            <MascotSays state="happy" message={`Uite planul, ${name}.`} size={150} layout="stack" appear="none" />
             <div className="start__summary">
-              <SummaryRow label="Goal" value={d.goalName.trim() || 'My goal'} />
-              <SummaryRow label="Target" value={`${formatLei(d.target)}${d.deadline ? ` by ${formatDate(d.deadline)}` : ''}`} />
-              <SummaryRow label="Plan" value={d.frequency === 'flexible' ? 'Flexible' : `${formatLei(d.amount)} each ${d.frequency === 'weekly' ? 'week' : 'month'}`} />
-              {finish && <SummaryRow label="Done around" value={formatDate(finish)} />}
+              <SummaryRow label="Obiectiv" value={d.goalName.trim() || 'Obiectivul meu'} />
+              <SummaryRow label="Țintă" value={`${formatLei(d.target)}${d.deadline ? ` până la ${formatDate(d.deadline)}` : ''}`} />
+              <SummaryRow label="Plan" value={d.frequency === 'flexible' ? 'Flexibil' : `${formatLei(d.amount)} ${d.frequency === 'weekly' ? 'pe săptămână' : 'pe lună'}`} />
+              {finish && <SummaryRow label="Gata pe la" value={formatDate(finish)} />}
             </div>
             <button type="button" className="btn btn--primary btn--block btn--xl" onClick={() => nav('/home', { replace: true })}>
-              Take me to my savings
+              Du-mă la economiile mele
             </button>
           </motion.div>
         )}
@@ -230,10 +234,10 @@ export function Start() {
   return (
     <div className="start">
       <header className="start__bar">
-        <button type="button" className="icon-btn" onClick={back} aria-label={d.step === 0 ? 'Back to welcome' : 'Previous question'}>
+        <button type="button" className="icon-btn" onClick={back} aria-label={d.step === 0 ? 'Înapoi la început' : 'Întrebarea anterioară'}>
           <ArrowLeft size={22} aria-hidden />
         </button>
-        <div className="start__progress" role="progressbar" aria-label="Setup progress" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={d.step + 1}>
+        <div className="start__progress" role="progressbar" aria-label="Progresul configurării" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={d.step + 1}>
           <motion.span animate={{ width: `${((d.step + 1) / STEPS.length) * 100}%` }} transition={{ type: 'spring', stiffness: 200, damping: 26 }} />
         </div>
       </header>
@@ -262,13 +266,13 @@ export function Start() {
                 if (canGo) go(d.step + 1);
               }}
             >
-              <FloatingInput label="Your first name" autoComplete="given-name" autoFocus maxLength={40} value={d.name} onChange={(e) => set({ name: e.target.value })} />
+              <FloatingInput label="Prenumele tău" autoComplete="given-name" autoFocus maxLength={40} value={d.name} onChange={(e) => set({ name: e.target.value })} />
             </form>
           )}
 
           {id === 'kind' && (
             <div className="stack-lg">
-              <div className="choice-list" role="radiogroup" aria-label="What you’re saving for">
+              <div className="choice-list" role="radiogroup" aria-label="Pentru ce strângi bani">
                 {KINDS.map((k, i) => (
                   <Choice
                     key={k.kind}
@@ -288,7 +292,7 @@ export function Start() {
               <AnimatePresence>
                 {d.kind && (
                   <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                    <FloatingInput label="Name your goal" maxLength={48} value={d.goalName} onChange={(e) => set({ goalName: e.target.value })} autoFocus={d.kind === 'custom'} />
+                    <FloatingInput label="Numele obiectivului" maxLength={48} value={d.goalName} onChange={(e) => set({ goalName: e.target.value })} autoFocus={d.kind === 'custom'} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -297,8 +301,8 @@ export function Start() {
 
           {id === 'target' && (
             <div className="stack-lg">
-              <AmountRuler label="Target amount" value={d.target} onChange={(v) => set({ target: v })} step={10_00} min={1_00} max={30_000_00} />
-              <div className="chip-row" role="group" aria-label="Quick amounts">
+              <AmountRuler label="Suma țintă" value={d.target} onChange={(v) => set({ target: v })} step={10_00} min={1_00} max={30_000_00} />
+              <div className="chip-row" role="group" aria-label="Sume rapide">
                 {[1_000_00, 2_500_00, 5_000_00, 10_000_00].map((v) => (
                   <motion.button key={v} type="button" className="chip" aria-pressed={d.target === v} whileTap={{ scale: 0.92 }} onClick={() => set({ target: v })}>
                     {formatLei(v)}
@@ -306,8 +310,8 @@ export function Start() {
                 ))}
               </div>
               <div className="stack" style={{ gap: 8 }}>
-                <p className="small subtle strong">By when?</p>
-                <div className="chip-row" role="radiogroup" aria-label="Deadline">
+                <p className="small subtle strong">Până când?</p>
+                <div className="chip-row" role="radiogroup" aria-label="Termen">
                   {DEADLINES.map((o) => {
                     const val = o.days ? addDays(todayKey(), o.days) : '';
                     const on = o.days ? !!d.deadline && Math.abs(new Date(d.deadline).getTime() - new Date(val).getTime()) < 864e5 * 3 : !d.deadline;
@@ -325,63 +329,63 @@ export function Start() {
           {id === 'plan' && (
             <div className="stack-lg">
               <FluidTabs
-                label="How often"
+                label="Cât de des"
                 value={d.frequency}
                 onChange={(f) => set({ frequency: f, amount: f === 'monthly' && d.frequency === 'weekly' ? Math.round((d.amount * 4.3) / 5_00) * 5_00 : f === 'weekly' && d.frequency === 'monthly' ? Math.max(5_00, Math.round(d.amount / 4.3 / 5_00) * 5_00) : d.amount })}
                 tabs={[
-                  { id: 'weekly', label: 'Weekly' },
-                  { id: 'monthly', label: 'Monthly' },
-                  { id: 'flexible', label: 'Flexible' },
+                  { id: 'weekly', label: 'Săptămânal' },
+                  { id: 'monthly', label: 'Lunar' },
+                  { id: 'flexible', label: 'Flexibil' },
                 ]}
               />
               {d.frequency !== 'flexible' ? (
                 <>
-                  <AmountRuler label={d.frequency === 'weekly' ? 'Amount each week' : 'Amount each month'} value={d.amount} onChange={(v) => set({ amount: v })} step={1_00} min={1_00} max={d.frequency === 'weekly' ? 1_500_00 : 5_000_00} />
+                  <AmountRuler label={d.frequency === 'weekly' ? 'Suma pe săptămână' : 'Suma pe lună'} value={d.amount} onChange={(v) => set({ amount: v })} step={1_00} min={1_00} max={d.frequency === 'weekly' ? 1_500_00 : 5_000_00} />
                   <motion.div layout className={`estimate ${lateForDeadline ? 'estimate--late' : ''}`}>
                     {periods > 0 ? (
                       <>
                         <span>
-                          About <NumberFlow value={periods} className="estimate__num" /> {d.frequency === 'weekly' ? (periods === 1 ? 'week' : 'weeks') : periods === 1 ? 'month' : 'months'}
+                          Cam <NumberFlow value={periods} className="estimate__num" /> {d.frequency === 'weekly' ? unit(periods, 'săptămână', 'săptămâni') : unit(periods, 'lună', 'luni')}
                         </span>
-                        {finish && <span className="estimate__date">done around {formatDate(finish)}</span>}
+                        {finish && <span className="estimate__date">gata pe la {formatDate(finish)}</span>}
                       </>
                     ) : (
-                      <span>Drag to pick an amount</span>
+                      <span>Trage ca să alegi o sumă</span>
                     )}
                   </motion.div>
                 </>
               ) : (
                 <div className="estimate">
-                  <span>No fixed amount. Record savings whenever it fits.</span>
+                  <span>Fără sumă fixă. Adaugă economii când îți permiți.</span>
                 </div>
               )}
             </div>
           )}
 
           {id === 'tracking' && (
-            <div className="choice-list" role="radiogroup" aria-label="How you’ll track savings">
-              <Choice index={0} selected={d.tracking === 'manual'} tint="today" icon={<Emoji3D name="pencil" size={34} />} title="I’ll record what I save" desc="Put money aside anywhere, then tap + in Kept. Recommended." onSelect={() => set({ tracking: 'manual' })} />
-              <Choice index={1} selected={d.tracking === 'demo'} tint="profile" icon={<Emoji3D name="testtube" size={34} />} title="Try a demo connection" desc="See how a linked account would behave. Everything is simulated." onSelect={() => set({ tracking: 'demo' })} />
+            <div className="choice-list" role="radiogroup" aria-label="Cum ții evidența economiilor">
+              <Choice index={0} selected={d.tracking === 'manual'} tint="today" icon={<Emoji3D name="pencil" size={34} />} title="Notez eu ce economisesc" desc="Pui bani deoparte oriunde, apoi apeși + în Kept. Recomandat." onSelect={() => set({ tracking: 'manual' })} />
+              <Choice index={1} selected={d.tracking === 'demo'} tint="profile" icon={<Emoji3D name="testtube" size={34} />} title="Încearcă o conexiune demo" desc="Vezi cum s-ar comporta un cont conectat. Totul e simulat." onSelect={() => set({ tracking: 'demo' })} />
             </div>
           )}
 
           {id === 'reminder' && (
             <div className="stack-lg">
-              <div className="choice-list" role="radiogroup" aria-label="Weekly reminder">
-                <Choice index={0} selected={d.reminderOn} tint="activity" icon={<Emoji3D name="bell" size={34} />} title="Yes, nudge me weekly" desc="Shows up in Kept on the day you pick." onSelect={() => set({ reminderOn: true })} />
-                <Choice index={1} selected={!d.reminderOn} tint="goals" icon={<Emoji3D name="sleep" size={34} />} title="No thanks" desc="You can turn it on later in Profile." onSelect={() => set({ reminderOn: false })} />
+              <div className="choice-list" role="radiogroup" aria-label="Memento săptămânal">
+                <Choice index={0} selected={d.reminderOn} tint="activity" icon={<Emoji3D name="bell" size={34} />} title="Da, amintește-mi săptămânal" desc="Apare în Kept în ziua pe care o alegi." onSelect={() => set({ reminderOn: true })} />
+                <Choice index={1} selected={!d.reminderOn} tint="goals" icon={<Emoji3D name="sleep" size={34} />} title="Nu, mersi" desc="Îl poți porni mai târziu din Profil." onSelect={() => set({ reminderOn: false })} />
               </div>
               <AnimatePresence>
                 {d.reminderOn && (
                   <motion.div className="stack" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
-                    <div className="chip-row chip-row--days" role="radiogroup" aria-label="Reminder day">
+                    <div className="chip-row chip-row--days" role="radiogroup" aria-label="Ziua pentru memento">
                       {WEEKDAY_NAME.map((n, i) => (
                         <motion.button key={n} type="button" role="radio" aria-checked={d.reminderDay === i} aria-label={n} className="chip chip--day" whileTap={{ scale: 0.9 }} onClick={() => set({ reminderDay: i })}>
                           {n.slice(0, 2)}
                         </motion.button>
                       ))}
                     </div>
-                    <FloatingInput label="At" type="time" value={d.reminderTime} onChange={(e) => set({ reminderTime: e.target.value || '19:00' })} />
+                    <FloatingInput label="La ora" type="time" value={d.reminderTime} onChange={(e) => set({ reminderTime: e.target.value || '19:00' })} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -393,14 +397,14 @@ export function Start() {
               <ProgressiveInputStack
                 key={accountStep}
                 steps={[
-                  { id: 'email', label: 'Email', type: 'email', placeholder: 'Your email', autoComplete: 'email', validate: (v) => (EMAIL_RE.test(v.trim()) ? null : 'That doesn’t look like an email yet, like name@example.com.') },
+                  { id: 'email', label: 'Email', type: 'email', placeholder: 'Emailul tău', autoComplete: 'email', validate: (v) => (EMAIL_RE.test(v.trim()) ? null : 'Încă nu arată a email. Ceva de genul nume@example.com.') },
                   {
                     id: 'password',
-                    label: 'Password',
+                    label: 'Parolă',
                     type: 'password',
-                    placeholder: 'Pick a password',
+                    placeholder: 'Alege o parolă',
                     autoComplete: 'new-password',
-                    validate: (v) => (v.length >= 8 ? null : 'Use at least 8 characters.'),
+                    validate: (v) => (v.length >= 8 ? null : 'Folosește cel puțin 8 caractere.'),
                     helper: (v) => <StrengthMeter pw={v} />,
                   },
                 ]}
@@ -412,13 +416,13 @@ export function Start() {
                 onSubmit={createAccount}
                 busy={busy}
                 error={authError}
-                doneLabel="Create account"
+                doneLabel="Creează cont"
               />
               <p className="start__fine">
-                <HardDrive size={14} aria-hidden /> Stored only in this browser. No bank details, ever.
+                <HardDrive size={14} aria-hidden /> Salvat doar în acest browser. Fără date bancare, niciodată.
               </p>
               <p className="start__fine">
-                Already have an account? <Link to="/signin">Sign in</Link>
+                Ai deja cont? <Link to="/signin">Intră în cont</Link>
               </p>
             </div>
           )}
@@ -432,7 +436,7 @@ export function Start() {
           </motion.button>
           {id === 'hello' && (
             <Link to="/signin" className="start__alt">
-              I already have an account
+              Am deja cont
             </Link>
           )}
         </footer>
@@ -474,7 +478,7 @@ function StrengthMeter({ pw }: { pw: string }) {
           <motion.span key={i} animate={{ scaleX: i < score ? 1 : 0.15, opacity: i < score ? 1 : 0.35 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} data-level={score} />
         ))}
       </div>
-      <span className="strength__label">{pw ? label : 'At least 8 characters'}</span>
+      <span className="strength__label">{pw ? label : 'Cel puțin 8 caractere'}</span>
     </div>
   );
 }

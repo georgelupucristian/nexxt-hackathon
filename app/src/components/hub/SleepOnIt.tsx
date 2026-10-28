@@ -5,6 +5,7 @@ import { Sheet, useToast } from '../ui';
 import { useData, useStore } from '../../data/store';
 import { todayKey } from '../../lib/dates';
 import { formatLei, parseLei } from '../../lib/money';
+import { plural } from '../../lib/ro';
 
 /**
  * "Sleep on it": a cooling-off period for impulse buys, framed as Kip doing you a favour.
@@ -71,11 +72,11 @@ function useWishes(accountId: string | undefined) {
 
 function wakesIn(ms: number): string {
   const h = Math.ceil(ms / 3_600_000);
-  if (h <= 1) return 'within the hour';
-  if (h < 24) return `in ${h} hours`;
+  if (h <= 1) return 'în mai puțin de o oră';
+  if (h < 24) return `în ${plural(h, 'oră', 'ore')}`;
   const d = Math.floor(h / 24);
   const r = h % 24;
-  return r ? `in ${d} day${d === 1 ? '' : 's'} ${r} h` : `in ${d} day${d === 1 ? '' : 's'}`;
+  return r ? `în ${plural(d, 'zi', 'zile')} și ${r} h` : `în ${plural(d, 'zi', 'zile')}`;
 }
 
 /** The home tile: how many wishes Kip is sleeping on, or an invitation when there are none. */
@@ -91,21 +92,21 @@ export function SleepTile() {
     <>
       <button type="button" className={`tile tile--sleep ${awake.length ? 'is-awake' : ''}`} data-tour="sleep" onClick={() => setOpen(true)}>
         <span className="tile__head">
-          <span className="tile__label">Sleep on it</span>
+          <span className="tile__label">Dorm pe idee</span>
           <img className="tile__kip" src={`/mascot/${awake.length ? 'think' : 'sleep'}-face.webp`} alt="" />
         </span>
         {awake.length ? (
           <span className="tile__amount">
-            {awake.length} <small>to decide</small>
+            {awake.length} <small>de decis</small>
           </span>
         ) : asleep.length ? (
           <span className="tile__amount">
-            {asleep.length} <small>asleep</small>
+            {asleep.length} <small>la somn</small>
           </span>
         ) : (
-          <span className="tile__amount tile__amount--text">Want something?</span>
+          <span className="tile__amount tile__amount--text">Vrei ceva?</span>
         )}
-        <span className="tile__sub">{kept > 0 ? `${formatLei(kept)} not spent so far` : 'Kip waits 48 h with you'}</span>
+        <span className="tile__sub">{kept > 0 ? `${formatLei(kept)} necheltuiți până acum` : 'Kip așteaptă 48 h cu tine'}</span>
       </button>
       <SleepSheet open={open} onClose={() => setOpen(false)} />
     </>
@@ -130,45 +131,45 @@ function SleepSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
 
   const add = () => {
     const amount = parseLei(raw);
-    if (!name.trim()) return toast('What is it you want? A name is enough.', 'error');
-    if (!amount || amount <= 0) return toast('Add its price, like 129.', 'error');
+    if (!name.trim()) return toast('Ce vrei să-ți iei? Ajunge un nume.', 'error');
+    if (!amount || amount <= 0) return toast('Adaugă prețul, de exemplu 129.', 'error');
     const t = Date.now();
     save([...wishes, { id: crypto.randomUUID(), name: name.trim().slice(0, 40), amount, createdAt: t, wakeAt: t + NAP_MS, status: 'sleeping' }]);
     setName('');
     setRaw('');
-    toast(`Kip is sleeping on ${name.trim()}. Back in 48 hours.`);
+    toast(`Kip doarme pe idee: ${name.trim()}. Revine în 48 de ore.`);
   };
 
   const set = (id: string, patch: Partial<Wish>) => save(wishes.map((w) => (w.id === id ? { ...w, ...patch } : w)));
 
   const keep = (w: Wish) => {
     try {
-      addTransaction({ type: 'contribution', amount: w.amount, goalId, date: todayKey(), note: `Slept on it: ${w.name}` });
+      addTransaction({ type: 'contribution', amount: w.amount, goalId, date: todayKey(), note: `Dorm pe idee: ${w.name}` });
       set(w.id, { status: 'kept' });
       setDeciding(null);
       const g = goals.find((x) => x.id === goalId);
       onClose();
-      celebrate({ title: `+${formatLei(w.amount)} kept`, sub: g ? `You didn’t buy ${w.name}. It went to ${g.name}.` : `You didn’t buy ${w.name}.` });
+      celebrate({ title: `+${formatLei(w.amount)} păstrați`, sub: g ? `Nu ți-ai luat ${w.name}. Banii au ajuns la ${g.name}.` : `Nu ți-ai luat ${w.name}.` });
     } catch (e) {
       toast((e as Error).message, 'error');
     }
   };
 
   return (
-    <Sheet open={open} onClose={onClose} title="Sleep on it">
+    <Sheet open={open} onClose={onClose} title="Dorm pe idee">
       <div className="sleep">
         <p className="sleep__intro">
-          Want something that isn’t in your plan? Tell Kip. He sleeps on it for 48 hours, then asks if you still want it. If you don’t, the money goes to a goal.
+          Vrei ceva ce nu era în plan? Spune-i lui Kip. Doarme pe idee 48 de ore, apoi te întreabă dacă încă îl vrei. Dacă nu, banii merg la un obiectiv.
         </p>
 
         <div className="sleep__form">
-          <input className="input" placeholder="What is it? e.g. AirPods" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} aria-label="What you want" />
+          <input className="input" placeholder="Ce e? De ex. AirPods" value={name} maxLength={40} onChange={(e) => setName(e.target.value)} aria-label="Ce vrei" />
           <div className="input-affix sleep__price">
-            <input className="input" inputMode="decimal" placeholder="Price" value={raw} onChange={(e) => setRaw(e.target.value.replace(/[^\d.,]/g, '').slice(0, 9))} onKeyDown={(e) => e.key === 'Enter' && add()} aria-label="Price in lei" />
+            <input className="input" inputMode="decimal" placeholder="Preț" value={raw} onChange={(e) => setRaw(e.target.value.replace(/[^\d.,]/g, '').slice(0, 9))} onKeyDown={(e) => e.key === 'Enter' && add()} aria-label="Prețul în lei" />
             <span className="input-affix__suffix">lei</span>
           </div>
           <button type="button" className="btn btn--primary" onClick={add}>
-            Let Kip sleep on it
+            Lasă-l pe Kip să doarmă pe idee
           </button>
         </div>
 
@@ -185,10 +186,10 @@ function SleepSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
                         {w.name} <span className="money">{formatLei(w.amount)}</span>
                       </p>
                       {awake ? (
-                        <p className="wish__ask">Kip’s awake. Do you still want it?</p>
+                        <p className="wish__ask">Kip s-a trezit. Îl mai vrei?</p>
                       ) : (
                         <p className="wish__when">
-                          Wakes {wakesIn(w.wakeAt - now)}
+                          Se trezește {wakesIn(w.wakeAt - now)}
                           {account?.isDemo && (
                             <button
                               type="button"
@@ -198,7 +199,7 @@ function SleepSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
                                 refreshNow();
                               }}
                             >
-                              Skip 48 h (demo)
+                              Sari 48 h (demo)
                             </button>
                           )}
                         </p>
@@ -206,34 +207,34 @@ function SleepSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
                       {awake && deciding !== w.id && (
                         <div className="wish__actions">
                           <button type="button" className="btn btn--primary btn--sm" onClick={() => setDeciding(w.id)}>
-                            No, keep the money
+                            Nu, păstrez banii
                           </button>
                           <button
                             type="button"
                             className="btn btn--ghost btn--sm"
                             onClick={() => {
                               set(w.id, { status: 'bought' });
-                              toast('Fair enough. Enjoy it.');
+                              toast('Perfect. Să-ți fie de bine.');
                             }}
                           >
-                            Yes, still want it
+                            Da, încă îl vreau
                           </button>
                         </div>
                       )}
                       {awake && deciding === w.id && (
                         <div className="wish__keep">
-                          <div className="qr__goals" role="radiogroup" aria-label="Put it towards">
+                          <div className="qr__goals" role="radiogroup" aria-label="Unde merg banii">
                             {goals.map((g) => (
                               <button key={g.id} type="button" role="radio" aria-checked={goalId === g.id} className="qr__goal" onClick={() => setGoalId(g.id)}>
                                 {g.name}
                               </button>
                             ))}
                             <button type="button" role="radio" aria-checked={goalId === null} className="qr__goal" onClick={() => setGoalId(null)}>
-                              No goal
+                              Fără obiectiv
                             </button>
                           </div>
                           <button type="button" className="btn btn--primary btn--sm" onClick={() => keep(w)}>
-                            Save {formatLei(w.amount)}
+                            Pune deoparte {formatLei(w.amount)}
                           </button>
                         </div>
                       )}
@@ -247,7 +248,7 @@ function SleepSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
 
         {keptTotal > 0 && (
           <p className="sleep__kept">
-            Not bought after sleeping on it: <strong className="money">{formatLei(keptTotal)}</strong> across {kept.length} thing{kept.length === 1 ? '' : 's'}.
+            Bani necheltuiți după ce Kip a dormit pe idee: <strong className="money">{formatLei(keptTotal)}</strong>, din {plural(kept.length, 'lucru', 'lucruri')}.
           </p>
         )}
       </div>

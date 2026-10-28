@@ -11,10 +11,10 @@ import { formatLei } from '../lib/money';
 
 type Filter = 'all' | 'contribution' | 'withdrawal' | 'pending';
 const FILTERS: { value: Filter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'contribution', label: 'Contributions' },
-  { value: 'withdrawal', label: 'Withdrawals' },
-  { value: 'pending', label: 'Pending & failed' },
+  { value: 'all', label: 'Toate' },
+  { value: 'contribution', label: 'Depuneri' },
+  { value: 'withdrawal', label: 'Retrageri' },
+  { value: 'pending', label: 'În așteptare și eșuate' },
 ];
 
 export function Activity() {
@@ -48,14 +48,14 @@ export function Activity() {
   return (
     <div className="screen">
       <header className="page-head">
-        <h1>Activity</h1>
+        <h1>Activitate</h1>
         <Button variant="primary" size="sm" icon={Plus} onClick={() => setAdding(true)}>
-          Add entry
+          Adaugă o intrare
         </Button>
       </header>
 
       <div className="stack">
-        <div className="chips" role="group" aria-label="Filter by type">
+        <div className="chips" role="group" aria-label="Filtrează după tip">
           {FILTERS.map((f) => (
             <button key={f.value} type="button" className="chip" aria-pressed={filter === f.value} onClick={() => setFilter(f.value)}>
               {f.label}
@@ -64,15 +64,15 @@ export function Activity() {
         </div>
         {data.goals.length > 0 && (
           <label className="row small" style={{ gap: 8 }}>
-            <span className="muted">Goal</span>
+            <span className="muted">Obiectiv</span>
             <select className="select" style={{ minHeight: 40, width: 'auto', maxWidth: '100%', fontSize: 'var(--fs-sm)' }} value={goalFilter} onChange={(e) => setGoalFilter(e.target.value)}>
-              <option value="all">All goals</option>
+              <option value="all">Toate obiectivele</option>
               {data.goals.map((g) => (
                 <option key={g.id} value={g.id}>
                   {g.name}
                 </option>
               ))}
-              <option value="none">Unallocated</option>
+              <option value="none">Nealocat</option>
             </select>
           </label>
         )}
@@ -82,18 +82,18 @@ export function Activity() {
         <div className="card">
           <EmptyState
             icon={ListOrdered}
-            title="Nothing recorded yet"
-            body="Every contribution and withdrawal you record shows up here, with where it came from."
+            title="Nimic adăugat încă"
+            body="Fiecare depunere și retragere pe care o adaugi apare aici, cu sursa ei."
             action={
               <Button variant="primary" onClick={() => setAdding(true)}>
-                Record your first savings
+                Adaugă primele economii
               </Button>
             }
           />
         </div>
       ) : groups.length === 0 ? (
         <div className="card">
-          <EmptyState icon={ListOrdered} title="No matches" body="Nothing matches these filters." action={<Button onClick={() => { setFilter('all'); setGoalFilter('all'); }}>Clear filters</Button>} />
+          <EmptyState icon={ListOrdered} title="Niciun rezultat" body="Nimic nu se potrivește cu filtrele astea." action={<Button onClick={() => { setFilter('all'); setGoalFilter('all'); }}>Resetează filtrele</Button>} />
         </div>
       ) : (
         <div className="stack-lg">
@@ -117,7 +117,7 @@ export function Activity() {
             </section>
           ))}
           <p className="small subtle" style={{ textAlign: 'center' }}>
-            Pending and failed entries are shown but never counted in your savings.
+            Intrările în așteptare și cele eșuate apar aici, dar nu intră niciodată în economiile tale.
           </p>
         </div>
       )}

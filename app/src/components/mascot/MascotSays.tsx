@@ -26,7 +26,7 @@ export function MascotSays({ state = 'idle', message, messageKey, size = 120, la
   const words = typeof message === 'string' ? message.split(' ') : null;
   return (
     <div className={`mascot-says mascot-says--${layout} ${className}`}>
-      <button type="button" className="mascot-says__seal" onClick={onPoke} aria-label={`${MASCOT_NAME}, the Kept seal`} tabIndex={onPoke ? 0 : -1}>
+      <button type="button" className="mascot-says__seal" onClick={onPoke} aria-label={`${MASCOT_NAME}, foca de la Kept`} tabIndex={onPoke ? 0 : -1}>
         <Seal state={state} size={size} appear={appear} direction={direction} title="" />
       </button>
       <AnimatePresence mode="popLayout">

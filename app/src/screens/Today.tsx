@@ -11,7 +11,7 @@ import { formatLei } from '../lib/money';
 
 export function greeting(): string {
   const h = new Date().getHours();
-  return h < 5 ? 'Good evening' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  return h < 5 ? 'Bună seara' : h < 12 ? 'Bună dimineața' : h < 18 ? 'Bună ziua' : 'Bună seara';
 }
 
 /** The Today panel: what used to be the Home dashboard, minus the balance (the hub orb shows it). */
@@ -41,7 +41,7 @@ export function Today() {
     <div className="screen screen--wide">
       {account?.isDemo && (
         <Banner tone="demo" icon={FlaskConical}>
-          <strong>Sample data.</strong> You’re exploring with a demo account. Nothing here is real money.
+          <strong>Date demo.</strong> Folosești un cont demo. Niciun ban de aici nu e real.
         </Banner>
       )}
       <ConnectionBanner />
@@ -51,11 +51,11 @@ export function Today() {
           icon={Bell}
           action={
             <button type="button" className="banner__action" onClick={() => setCheckIn(true)}>
-              Review
+              Verifică
             </button>
           }
         >
-          Your weekly reminder: take a minute to check your plan.
+          Mementoul tău săptămânal: ia-ți un minut să-ți verifici planul.
         </Banner>
       )}
 
@@ -67,10 +67,10 @@ export function Today() {
         <div className="stack-lg">
           <section className="section" aria-labelledby="goal-h">
             <div className="section-head">
-              <h2 id="goal-h">{goal ? 'Primary goal' : 'Goals'}</h2>
+              <h2 id="goal-h">{goal ? 'Obiectiv principal' : 'Obiective'}</h2>
               {goal && (
                 <Link to="/goals" className="link-btn">
-                  All goals
+                  Toate obiectivele
                 </Link>
               )}
             </div>
@@ -78,7 +78,7 @@ export function Today() {
               <GoalCard goal={goal} />
             ) : (
               <div className="card">
-                <EmptyState icon={Target} title="No active goal" body="Create a goal to get a plan and see your progress here." action={<Button variant="primary" onClick={() => nav('/goals/new')}>Create a goal</Button>} />
+                <EmptyState icon={Target} title="Niciun obiectiv activ" body="Creează un obiectiv ca să primești un plan și să-ți vezi progresul aici." action={<Button variant="primary" onClick={() => nav('/goals/new')}>Creează un obiectiv</Button>} />
               </div>
             )}
           </section>
@@ -87,10 +87,10 @@ export function Today() {
 
           <section className="section" aria-labelledby="recent-h">
             <div className="section-head">
-              <h2 id="recent-h">Recent activity</h2>
+              <h2 id="recent-h">Activitate recentă</h2>
               {recent.length > 0 && (
                 <Link to="/activity" className="link-btn">
-                  See all
+                  Vezi tot
                 </Link>
               )}
             </div>
@@ -104,7 +104,7 @@ export function Today() {
                   ))}
                 </ul>
               ) : (
-                <EmptyState icon={TrendingUp} title="No activity yet" body="When you record savings, they’ll show up here." />
+                <EmptyState icon={TrendingUp} title="Nicio activitate încă" body="Când adaugi economii, le vezi aici." />
               )}
             </div>
           </section>
@@ -132,32 +132,32 @@ function TodayCard({ action, onAdd, onCheckIn }: { action: TodayAction; onAdd: (
   switch (action.kind) {
     case 'create-goal':
       icon = Target;
-      title = 'Create your first goal';
-      body = 'Pick something to save for and Kept will help you plan it.';
-      cta = { label: 'Create a goal', run: () => nav('/goals/new') };
+      title = 'Creează primul tău obiectiv';
+      body = 'Alege ceva pentru care vrei să economisești, iar Kept te ajută să-ți faci planul.';
+      cta = { label: 'Creează un obiectiv', run: () => nav('/goals/new') };
       break;
     case 'set-plan':
-      title = 'Set a savings plan';
-      body = `${action.goal.name} doesn’t have a plan yet.`;
-      cta = { label: 'Set plan', run: () => nav(`/goals/${action.goal.id}`) };
+      title = 'Fă-ți un plan de economisire';
+      body = `${action.goal.name} nu are încă un plan.`;
+      cta = { label: 'Fă un plan', run: () => nav(`/goals/${action.goal.id}`) };
       break;
     case 'planned-contribution':
       icon = Plus;
-      title = `Planned for today: ${formatLei(action.amount)}`;
-      body = `Towards ${action.goal.name}. Only if it fits this week. You can skip it or record a different amount.`;
-      cta = { label: 'Record it', run: () => onAdd(action.goal.id, action.amount) };
+      title = `Plănuit pentru azi: ${formatLei(action.amount)}`;
+      body = `Pentru ${action.goal.name}. Doar dacă îți permiți săptămâna asta. Poți să sari peste sau să adaugi altă sumă.`;
+      cta = { label: 'Adaugă suma', run: () => onAdd(action.goal.id, action.amount) };
       break;
     case 'fix-connection':
       icon = RefreshCw;
-      title = 'Reconnect the demo connection';
-      body = 'The last sync failed. Your last known figures are kept.';
+      title = 'Refă conexiunea demo';
+      body = 'Ultima sincronizare a eșuat. Păstrăm ultimele cifre cunoscute.';
       cta = {
-        label: 'Retry sync',
+        label: 'Reîncearcă sincronizarea',
         run: async () => {
           setBusy(true);
           try {
             await sync();
-            toast('Synced');
+            toast('Sincronizat');
           } catch (e) {
             toast((e as Error).message, 'error');
           } finally {
@@ -168,32 +168,32 @@ function TodayCard({ action, onAdd, onCheckIn }: { action: TodayAction; onAdd: (
       break;
     case 'goal-reached':
       icon = PartyPopper;
-      title = `You reached ${action.goal.name}!`;
-      body = 'Decide what’s next: archive it, raise the target, or start a new goal.';
-      cta = { label: 'Open goal', run: () => nav(`/goals/${action.goal.id}`) };
+      title = `${action.goal.name}: obiectiv atins!`;
+      body = 'Tu alegi ce urmează: îl arhivezi, mărești ținta sau începi un obiectiv nou.';
+      cta = { label: 'Deschide obiectivul', run: () => nav(`/goals/${action.goal.id}`) };
       break;
     case 'review-week':
       icon = TrendingUp;
-      title = 'Look back at your week';
-      body = 'See what came in and out, then confirm your plan for next week.';
-      cta = { label: 'Review plan', run: onCheckIn };
+      title = 'Aruncă o privire la săptămâna ta';
+      body = 'Vezi ce a intrat și ce a ieșit, apoi confirmă-ți planul pentru săptămâna viitoare.';
+      cta = { label: 'Verifică planul', run: onCheckIn };
       break;
     case 'review-plan':
-      title = 'Quick plan check-in';
-      body = `Is your plan for ${action.goal.name} still realistic this week? Takes 10 seconds.`;
-      cta = { label: 'Check in', run: onCheckIn };
+      title = 'Verificare rapidă a planului';
+      body = `Planul pentru ${action.goal.name} mai e realist săptămâna asta? Durează 10 secunde.`;
+      cta = { label: 'Bifează ziua de azi', run: onCheckIn };
       break;
     case 'done-today':
       icon = CircleCheck;
-      title = 'You’re done for today';
-      body = 'Today counts towards your streak. Nothing else needed.';
+      title = 'Gata pe azi';
+      body = 'Azi intră în seria ta. Nu mai ai nimic de făcut.';
       break;
   }
   const Icon = icon;
   return (
     <section className="card stack" aria-labelledby="today-h">
       <p className="group-label" style={{ padding: 0 }}>
-        Today
+        Azi
       </p>
       <div className="row row--top">
         <span className="list-row__icon" aria-hidden style={action.kind === 'done-today' ? { background: 'var(--accent-soft)', color: 'var(--accent-ink)' } : undefined}>
@@ -222,32 +222,32 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
   const goals = data.goals;
   const syncing = data.connection.status === 'syncing';
   return (
-    <Sheet open={open} onClose={onClose} title="Balance details">
+    <Sheet open={open} onClose={onClose} title="Detalii sold">
       <div className="stack-lg">
         <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
           <SourceLine />
         </div>
         <dl className="card" style={{ margin: 0, paddingTop: 'var(--s-2)', paddingBottom: 'var(--s-2)' }}>
           <div className="kv">
-            <dt>Total savings</dt>
+            <dt>Economii totale</dt>
             <dd className="money">{formatLei(b.total)}</dd>
           </div>
           {goals.map((g) => (
             <div className="kv" key={g.id}>
               <dt className="truncate" style={{ paddingLeft: 'var(--s-3)' }}>
                 {g.name}
-                {g.status !== 'active' ? ` (${g.status})` : ''}
+                {g.status === 'paused' ? ' (în pauză)' : g.status === 'archived' ? ' (arhivat)' : ''}
               </dt>
               <dd className="money">{formatLei(goalSaved(data.transactions, g.id))}</dd>
             </div>
           ))}
           <div className="kv">
-            <dt style={{ paddingLeft: 'var(--s-3)' }}>Unallocated</dt>
+            <dt style={{ paddingLeft: 'var(--s-3)' }}>Nealocat</dt>
             <dd className="money">{formatLei(b.unallocated)}</dd>
           </div>
           {(b.pendingIn > 0 || b.pendingOut > 0) && (
             <div className="kv">
-              <dt>Pending (not counted)</dt>
+              <dt>În așteptare (nu se adună)</dt>
               <dd className="money">
                 {b.pendingIn > 0 && formatLei(b.pendingIn, { sign: true })} {b.pendingOut > 0 && formatLei(-b.pendingOut)}
               </dd>
@@ -255,12 +255,12 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
           )}
         </dl>
         <p className="small muted">
-          Each leu is counted once: it either belongs to one goal or is unallocated. The total only includes confirmed entries. Pending and failed ones are left out.
+          Fiecare leu e numărat o singură dată: ori aparține unui obiectiv, ori e nealocat. Totalul include doar intrările confirmate. Cele în așteptare și cele eșuate rămân pe dinafară.
         </p>
         {data.tracking === 'demo' ? (
           <div className="stack">
             <p className="small subtle">
-              Demo Bank is simulated. Last sync: {data.connection.lastSyncAt ? relativeTime(data.connection.lastSyncAt) : 'never'}.
+              Banca Demo e simulată. Ultima sincronizare: {data.connection.lastSyncAt ? relativeTime(data.connection.lastSyncAt) : 'niciodată'}.
             </p>
             <Button
               block
@@ -269,18 +269,18 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
               onClick={async () => {
                 try {
                   await sync();
-                  toast('Synced. Pending transfers are confirmed.');
+                  toast('Sincronizat. Transferurile în așteptare sunt confirmate.');
                 } catch (e) {
                   toast((e as Error).message, 'error');
                 }
               }}
             >
-              Sync now
+              Sincronizează acum
             </Button>
           </div>
         ) : (
           <Banner tone="neutral" icon={HardDrive}>
-            These figures are what you recorded manually. Kept can’t see your bank account.
+            Cifrele astea sunt ce ai adăugat tu manual. Kept nu-ți vede contul bancar.
           </Banner>
         )}
         <Button
@@ -291,9 +291,9 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
             nav('/activity');
           }}
         >
-          View all activity
+          Vezi toată activitatea
         </Button>
-        {activeGoals(goals).length === 0 && <p className="small subtle">No goals yet, so everything is unallocated.</p>}
+        {activeGoals(goals).length === 0 && <p className="small subtle">Încă n-ai obiective, așa că totul e nealocat.</p>}
       </div>
     </Sheet>
   );

@@ -19,9 +19,9 @@ interface Panel {
   icon: LucideIcon;
 }
 const PANELS: Panel[] = [
-  { id: 'goals', label: 'Goals', path: '/goals', icon: Target },
-  { id: 'activity', label: 'Activity', path: '/activity', icon: ListOrdered },
-  { id: 'profile', label: 'Profile', path: '/profile', icon: User },
+  { id: 'goals', label: 'Obiective', path: '/goals', icon: Target },
+  { id: 'activity', label: 'Activitate', path: '/activity', icon: ListOrdered },
+  { id: 'profile', label: 'Profil', path: '/profile', icon: User },
 ];
 const panelFor = (pathname: string) => PANELS.find((p) => pathname === p.path || pathname.startsWith(`${p.path}/`)) ?? null;
 
@@ -135,7 +135,7 @@ function SectionPanel({ panel, origin, onClose, pathname, children }: { panel: P
           <Icon size={20} aria-hidden />
           {panel.label}
         </span>
-        <button type="button" className="panel__close" onClick={onClose} aria-label={`Close ${panel.label}`}>
+        <button type="button" className="panel__close" onClick={onClose} aria-label={`Închide ${panel.label}`}>
           <ChevronDown size={22} aria-hidden />
         </button>
       </header>

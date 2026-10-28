@@ -24,7 +24,7 @@ export function TransactionDetail() {
 
   return (
     <div className="screen">
-      <TopBar title={isIn ? 'Contribution' : 'Withdrawal'} />
+      <TopBar title={isIn ? 'Depunere' : 'Retragere'} />
       <section className="stack" style={{ alignItems: 'center', textAlign: 'center', paddingBlock: 'var(--s-4)' }}>
         <span className="list-row__icon" style={{ width: 56, height: 56, ...(isIn ? { background: 'var(--accent-soft)', color: 'var(--accent-ink)' } : {}) }} aria-hidden>
           {isIn ? <ArrowDownLeft size={26} /> : <ArrowUpRight size={26} />}
@@ -35,53 +35,53 @@ export function TransactionDetail() {
         >
           {formatLei(isIn ? tx.amount : -tx.amount, { sign: true, forceDecimals: true })}
         </p>
-        <p className="muted clamp-2">{tx.note || (isIn ? 'Contribution' : 'Withdrawal')}</p>
+        <p className="muted clamp-2">{tx.note || (isIn ? 'Depunere' : 'Retragere')}</p>
         <TxStatusPill tx={tx} />
       </section>
 
       {tx.status === 'pending' && (
         <Banner tone="warn" icon={Clock}>
-          <strong>Transfer pending.</strong> This isn’t part of your savings total yet. {tx.source === 'demo' ? 'It confirms on the next simulated sync.' : ''}
+          <strong>Transfer în așteptare.</strong> Nu intră încă în totalul economiilor. {tx.source === 'demo' ? 'Se confirmă la următoarea sincronizare simulată.' : ''}
         </Banner>
       )}
       {tx.status === 'failed' && (
         <Banner tone="danger" icon={XCircle}>
-          <strong>This transfer failed.</strong> No money was added, and it isn’t counted anywhere.
+          <strong>Transferul a eșuat.</strong> Nu s-a adăugat niciun ban și nu contează nicăieri.
         </Banner>
       )}
       {tx.source === 'demo' && (
         <Banner tone="demo" icon={FlaskConical}>
-          Simulated by the demo connection. Not a real bank record.
+          Simulat de conexiunea demo. Nu e o înregistrare bancară reală.
         </Banner>
       )}
 
       <section className="card">
         <dl style={{ margin: 0 }}>
           <div className="kv">
-            <dt>Status</dt>
+            <dt>Stare</dt>
             <dd>{txStatusText(tx)}</dd>
           </div>
           <div className="kv">
-            <dt>Source</dt>
-            <dd>{tx.source === 'demo' ? 'Demo Bank (simulated)' : 'Manual entry'}</dd>
+            <dt>Sursă</dt>
+            <dd>{tx.source === 'demo' ? 'Banca Demo (simulată)' : 'Intrare manuală'}</dd>
           </div>
           <div className="kv">
-            <dt>{isIn ? 'Towards' : 'Taken from'}</dt>
-            <dd>{goal ? <Link to={`/goals/${goal.id}`}>{goal.name}</Link> : 'Unallocated savings'}</dd>
+            <dt>{isIn ? 'Pentru' : 'Luat din'}</dt>
+            <dd>{goal ? <Link to={`/goals/${goal.id}`}>{goal.name}</Link> : 'Economii nealocate'}</dd>
           </div>
           <div className="kv">
-            <dt>Date</dt>
+            <dt>Data</dt>
             <dd>{formatDate(tx.date)}</dd>
           </div>
           <div className="kv">
-            <dt>Recorded</dt>
+            <dt>Adăugat</dt>
             <dd>
-              {formatDate(tx.createdAt.slice(0, 10))}, {recorded.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+              {formatDate(tx.createdAt.slice(0, 10))}, {recorded.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
             </dd>
           </div>
           {tx.updatedAt !== tx.createdAt && tx.source === 'manual' && (
             <div className="kv">
-              <dt>Last edited</dt>
+              <dt>Editat ultima dată</dt>
               <dd>{formatDate(tx.updatedAt.slice(0, 10))}</dd>
             </div>
           )}
@@ -91,32 +91,32 @@ export function TransactionDetail() {
       {tx.source === 'manual' ? (
         <div className="btn-row">
           <Button icon={PenLine} onClick={() => setEditing(true)}>
-            Edit
+            Editează
           </Button>
           <Button variant="danger" icon={Trash2} onClick={() => setConfirm(true)}>
-            Delete
+            Șterge
           </Button>
         </div>
       ) : (
-        <p className="small subtle">Entries from the demo connection can’t be edited or deleted, the same as records imported from a real bank.</p>
+        <p className="small subtle">Intrările din conexiunea demo nu pot fi editate sau șterse, la fel ca înregistrările importate dintr-o bancă reală.</p>
       )}
 
       <MoneySheet open={editing} onClose={() => setEditing(false)} editing={tx} />
       <ConfirmDialog
         open={confirm}
-        title="Delete this entry?"
+        title="Ștergi intrarea asta?"
         danger
-        body={`${formatLei(tx.amount)} ${isIn ? 'will be removed from' : 'will be added back to'} ${goal ? goal.name : 'unallocated savings'}. Your streak history isn’t affected.`}
-        confirmLabel="Delete"
+        body={`${isIn ? `Scoatem ${formatLei(tx.amount)} din` : `Punem ${formatLei(tx.amount)} înapoi în`} ${goal ? goal.name : 'economiile nealocate'}. Istoricul seriei tale nu se schimbă.`}
+        confirmLabel="Șterge"
         onClose={() => setConfirm(false)}
         onConfirm={() => {
           try {
             deleteTransaction(tx.id);
-            toast('Entry deleted');
+            toast('Intrare ștearsă');
             nav('/activity', { replace: true });
           } catch (e) {
             setConfirm(false);
-            toast(e instanceof ActionError ? e.message : 'Could not delete this entry.', 'error');
+            toast(e instanceof ActionError ? e.message : 'Nu am putut șterge intrarea.', 'error');
           }
         }}
       />

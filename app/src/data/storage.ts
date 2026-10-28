@@ -100,7 +100,7 @@ const normEmail = (e: string) => e.trim().toLowerCase();
 export async function createAccount(name: string, email: string, password: string): Promise<Account> {
   const accounts = listAccounts();
   if (accounts.some((a) => a.email === normEmail(email))) {
-    throw new AuthError('An account with this email already exists on this device.', 'email');
+    throw new AuthError('Există deja un cont cu acest email pe dispozitivul ăsta.', 'email');
   }
   const salt = uid();
   const account: Account = {
@@ -112,7 +112,7 @@ export async function createAccount(name: string, email: string, password: strin
     createdAt: new Date().toISOString(),
     isDemo: false,
   };
-  if (!write(ACCOUNTS, [...accounts, account])) throw new AuthError('Could not save your account. Storage may be full or blocked.');
+  if (!write(ACCOUNTS, [...accounts, account])) throw new AuthError('Nu ți-am putut salva contul. Spațiul de stocare e plin sau blocat.');
   saveData(account.id, emptyData());
   return account;
 }
@@ -120,9 +120,9 @@ export async function createAccount(name: string, email: string, password: strin
 export async function signIn(email: string, password: string): Promise<Account> {
   const account = listAccounts().find((a) => a.email === normEmail(email) && !a.isDemo);
   // Same message for both cases so the form doesn't reveal which emails exist.
-  if (!account) throw new AuthError('Email or password is incorrect.');
+  if (!account) throw new AuthError('Emailul sau parola nu sunt corecte.');
   const hash = await hashPassword(password, account.salt);
-  if (hash !== account.passwordHash) throw new AuthError('Email or password is incorrect.');
+  if (hash !== account.passwordHash) throw new AuthError('Emailul sau parola nu sunt corecte.');
   return account;
 }
 
@@ -148,7 +148,7 @@ export function updateAccount(id: string, patch: Partial<Pick<Account, 'name' | 
   const idx = accounts.findIndex((a) => a.id === id);
   if (idx < 0) return null;
   if (patch.email && accounts.some((a) => a.id !== id && a.email === normEmail(patch.email!))) {
-    throw new AuthError('Another account on this device already uses this email.', 'email');
+    throw new AuthError('Alt cont de pe dispozitivul ăsta folosește deja emailul acesta.', 'email');
   }
   const next = { ...accounts[idx], ...patch, ...(patch.email ? { email: normEmail(patch.email) } : {}) };
   accounts[idx] = next;

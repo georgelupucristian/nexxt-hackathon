@@ -60,8 +60,8 @@ const Ctx = createContext<Store | null>(null);
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function validateAmount(amount: number) {
-  if (!Number.isInteger(amount) || amount <= 0) throw new ActionError('Enter an amount greater than 0.');
-  if (amount > MAX_AMOUNT) throw new ActionError('That amount looks too large. Check for a typo.');
+  if (!Number.isInteger(amount) || amount <= 0) throw new ActionError('Scrie o sumă mai mare decât 0.');
+  if (amount > MAX_AMOUNT) throw new ActionError('Suma pare prea mare. Verifică dacă n-ai scris o cifră în plus.');
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -98,7 +98,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const commit = useCallback((fn: (d: UserData) => UserData) => {
     const acc = accountRef.current;
     const cur = dataRef.current;
-    if (!acc || !cur) throw new ActionError('You are signed out.');
+    if (!acc || !cur) throw new ActionError('Ai ieșit din cont.');
     const next = fn(cur);
     dataRef.current = next;
     setData(next);
@@ -181,7 +181,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             reminder: opts.reminder,
             connection:
               opts.tracking === 'demo'
-                ? { ...d.connection, status: 'connected', institution: 'Demo Bank (simulated)', lastSyncAt: new Date().toISOString(), lastError: null }
+                ? { ...d.connection, status: 'connected', institution: 'Banca Demo (simulată)', lastSyncAt: new Date().toISOString(), lastError: null }
                 : d.connection,
             onboarding: { ...d.onboarding, completed: true, step: 4 },
           };
@@ -189,7 +189,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
 
       createGoal(input) {
-        if (!input.name.trim()) throw new ActionError('Give your goal a name.');
+        if (!input.name.trim()) throw new ActionError('Dă-i un nume obiectivului.');
         validateAmount(input.target);
         const goal: Goal = {
           ...input,
@@ -203,7 +203,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         return goal;
       },
       updateGoal(id, patch) {
-        if (patch.name !== undefined && !patch.name.trim()) throw new ActionError('Give your goal a name.');
+        if (patch.name !== undefined && !patch.name.trim()) throw new ActionError('Dă-i un nume obiectivului.');
         if (patch.target !== undefined) validateAmount(patch.target);
         commit((d) => {
           let goals = d.goals.map((g) => (g.id === id ? { ...g, ...patch } : g));
@@ -242,15 +242,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addTransaction(input) {
         validateAmount(input.amount);
         const d = dataRef.current!;
-        if (input.date > todayKey()) throw new ActionError('The date can’t be in the future.');
+        if (input.date > todayKey()) throw new ActionError('Data nu poate fi în viitor.');
         if (input.type === 'withdrawal') {
           const max = available(d.transactions, input.goalId);
-          if (input.amount > max) throw new ActionError(`Only ${(max / 100).toLocaleString('ro-RO')} lei is available here.`);
+          if (input.amount > max) throw new ActionError(`Aici sunt disponibili doar ${(max / 100).toLocaleString('ro-RO')} lei.`);
         }
         const now = new Date().toISOString();
         const isDemo = d.tracking === 'demo';
         if (isDemo && (d.connection.status === 'error' || !navigator.onLine)) {
-          throw new ActionError('The demo connection needs attention, so no simulated transfer was started. Reconnect and try again.');
+          throw new ActionError('Conexiunea demo are nevoie de atenție, așa că n-am pornit niciun transfer simulat. Reconectează-te și încearcă din nou.');
         }
         const tx: Transaction = {
           id: uid('t_'),
@@ -278,20 +278,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       editTransaction(id, patch) {
         const d = dataRef.current!;
         const tx = d.transactions.find((t) => t.id === id);
-        if (!tx) throw new ActionError('This transaction no longer exists.');
-        if (tx.source !== 'manual') throw new ActionError('Only manually recorded entries can be edited.');
+        if (!tx) throw new ActionError('Tranzacția asta nu mai există.');
+        if (tx.source !== 'manual') throw new ActionError('Poți edita doar intrările adăugate manual.');
         const merged = { ...tx, ...patch };
         validateAmount(merged.amount);
-        if (merged.date > todayKey()) throw new ActionError('The date can’t be in the future.');
+        if (merged.date > todayKey()) throw new ActionError('Data nu poate fi în viitor.');
         if (merged.type === 'withdrawal') {
           const max = available(d.transactions, merged.goalId, id);
-          if (merged.amount > max) throw new ActionError(`Only ${(max / 100).toLocaleString('ro-RO')} lei is available here.`);
+          if (merged.amount > max) throw new ActionError(`Aici sunt disponibili doar ${(max / 100).toLocaleString('ro-RO')} lei.`);
         } else {
           // Shrinking a contribution must not leave a later withdrawal uncovered.
           const without = d.transactions.filter((t) => t.id !== id);
           const after = [...without, merged];
           if (available(after, tx.goalId) < 0 || available(after, merged.goalId) < 0) {
-            throw new ActionError('This change would make a withdrawal larger than what was saved.');
+            throw new ActionError('Cu schimbarea asta, o retragere ar depăși suma economisită.');
           }
         }
         commit((cur) => ({
@@ -303,12 +303,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const d = dataRef.current!;
         const tx = d.transactions.find((t) => t.id === id);
         if (!tx) return;
-        if (tx.source !== 'manual') throw new ActionError('Simulated entries come from the demo connection and can’t be deleted.');
+        if (tx.source !== 'manual') throw new ActionError('Intrările simulate vin din conexiunea demo și nu pot fi șterse.');
         if (tx.type === 'contribution' && tx.status === 'confirmed') {
           const rest = d.transactions.filter((t) => t.id !== id);
           const bucket = rest.filter((t) => t.goalId === tx.goalId && t.status === 'confirmed');
           const left = bucket.reduce((s2, t) => s2 + (t.type === 'contribution' ? t.amount : -t.amount), 0);
-          if (left < 0) throw new ActionError('Delete the withdrawal that used this money first.');
+          if (left < 0) throw new ActionError('Mai întâi șterge retragerea care a folosit banii ăștia.');
         }
         commit((cur) => ({ ...cur, transactions: cur.transactions.filter((t) => t.id !== id) }));
       },
@@ -329,7 +329,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           tracking: method,
           connection:
             method === 'demo'
-              ? { ...d.connection, status: 'connected', institution: 'Demo Bank (simulated)', lastSyncAt: new Date().toISOString(), lastError: null }
+              ? { ...d.connection, status: 'connected', institution: 'Banca Demo (simulată)', lastSyncAt: new Date().toISOString(), lastError: null }
               : { ...d.connection, status: 'none', institution: null, lastError: null },
         }));
       },
@@ -341,7 +341,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         const cur = dataRef.current!;
         if (!navigator.onLine || cur.connection.simulateFailure) {
           // Failure keeps every known transaction and the last sync time; only the status changes.
-          const msg = !navigator.onLine ? 'You’re offline.' : 'Demo Bank didn’t respond (simulated failure).';
+          const msg = !navigator.onLine ? 'Ești offline.' : 'Banca Demo n-a răspuns (eroare simulată).';
           commit((c) => ({ ...c, connection: { ...c.connection, status: 'error', lastError: msg } }));
           throw new ActionError(msg);
         }

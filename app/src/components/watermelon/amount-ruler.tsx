@@ -24,7 +24,7 @@ interface AmountRulerProps {
   hint?: string;
 }
 
-export function AmountRuler({ value, onChange, step = 1_00, min = 1_00, max = 2_000_00, label, suffix = 'lei', hint = 'Drag, scroll, or tap the number to type it' }: AmountRulerProps) {
+export function AmountRuler({ value, onChange, step = 1_00, min = 1_00, max = 2_000_00, label, suffix = 'lei', hint = 'Trage, derulează sau apasă pe număr ca să-l scrii' }: AmountRulerProps) {
   const x = useSpring(-(value / step) * GAP, { stiffness: 500, damping: 45 });
   const current = useRef(value);
   current.current = value;
@@ -68,7 +68,7 @@ export function AmountRuler({ value, onChange, step = 1_00, min = 1_00, max = 2_
             autoFocus
             onFocus={(e) => e.currentTarget.select()} // typing replaces the old amount
             inputMode="numeric"
-            aria-label={`${label}, in ${suffix}`}
+            aria-label={`${label}, în ${suffix}`}
             value={raw}
             onChange={(e) => setRaw(e.target.value.replace(/[^\d]/g, '').slice(0, 7))}
             onBlur={finishTyping}
@@ -87,7 +87,7 @@ export function AmountRuler({ value, onChange, step = 1_00, min = 1_00, max = 2_
               setRaw(String(Math.round(value / 100)));
               setEditing(true);
             }}
-            aria-label={`${value / 100} ${suffix}. Tap to type an exact amount.`}
+            aria-label={`${value / 100} ${suffix}. Apasă ca să scrii suma exactă.`}
           >
             <NumberFlow value={value / 100} className="font-display text-[64px] leading-none font-black text-ink tabular-nums" format={{ maximumFractionDigits: 0 }} locales="ro-RO" />
           </button>

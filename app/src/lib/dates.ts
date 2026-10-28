@@ -1,4 +1,5 @@
 // All calendar logic works on local YYYY-MM-DD strings; weeks start on Monday.
+import { plural } from './ro';
 
 export function toKey(d: Date): string {
   const y = d.getFullYear();
@@ -40,17 +41,17 @@ export function daysBetween(a: string, b: string): number {
   return Math.round((fromKey(b).getTime() - fromKey(a).getTime()) / 86_400_000);
 }
 
-export const WEEKDAY_SHORT = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-export const WEEKDAY_NAME = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export const WEEKDAY_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+export const WEEKDAY_NAME = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'];
 
-const dayFmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' });
-const dayYearFmt = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-const longFmt = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+const dayFmt = new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'short' });
+const dayYearFmt = new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'short', year: 'numeric' });
+const longFmt = new Intl.DateTimeFormat('ro-RO', { weekday: 'long', day: 'numeric', month: 'long' });
 
 export function formatDay(key: string, now = new Date()): string {
   const t = todayKey(now);
-  if (key === t) return 'Today';
-  if (key === addDays(t, -1)) return 'Yesterday';
+  if (key === t) return 'Azi';
+  if (key === addDays(t, -1)) return 'Ieri';
   const d = fromKey(key);
   return d.getFullYear() === now.getFullYear() ? dayFmt.format(d) : dayYearFmt.format(d);
 }
@@ -66,16 +67,15 @@ export function formatLong(key: string): string {
 export function relativeTime(iso: string, now = new Date()): string {
   const diff = Math.max(0, now.getTime() - new Date(iso).getTime());
   const min = Math.round(diff / 60_000);
-  if (min < 1) return 'just now';
-  if (min < 60) return `${min} min ago`;
+  if (min < 1) return 'chiar acum';
+  if (min < 60) return `acum ${min} min`;
   const h = Math.round(min / 60);
-  if (h < 24) return `${h} h ago`;
+  if (h < 24) return `acum ${h} h`;
   const d = Math.round(h / 24);
-  return d === 1 ? 'yesterday' : `${d} days ago`;
+  return d === 1 ? 'ieri' : `acum ${plural(d, 'zi', 'zile')}`;
 }
 
+/** Day of the month as Romanian writes it: a plain number ("pe 5 ale lunii"), no ordinal suffix. */
 export function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  return String(n);
 }

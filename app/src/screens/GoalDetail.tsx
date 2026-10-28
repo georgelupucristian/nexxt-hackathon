@@ -11,6 +11,7 @@ import { goalSaved, nextPlannedDate, progress, projectedFinish, sortTx } from '.
 import { useData, useStore } from '../data/store';
 import { formatDate, formatDay } from '../lib/dates';
 import { formatLei } from '../lib/money';
+import { plural } from '../lib/ro';
 
 export function GoalDetail() {
   const { id } = useParams();
@@ -36,7 +37,7 @@ export function GoalDetail() {
 
   return (
     <div className="screen">
-      <TopBar title="Goal" end={<IconButton label="Goal options" icon={MoreHorizontal} onClick={() => setMenu(true)} />} />
+      <TopBar title="Obiectiv" end={<IconButton label="Opțiuni obiectiv" icon={MoreHorizontal} onClick={() => setMenu(true)} />} />
 
       <section className={`goal-hero goal-hero--${goal.kind}`} aria-labelledby="goal-name">
         <GoalGauge pct={p} paused={goal.status !== 'active'}>
@@ -46,7 +47,7 @@ export function GoalDetail() {
             <span className="goal-hero__cur">lei</span>
           </div>
           <p className="goal-hero__of money">
-            of {formatLei(goal.target)} · <NumberFlow value={Math.round(p * 100)} />%
+            din {formatLei(goal.target)} · <NumberFlow value={Math.round(p * 100)} />%
           </p>
         </GoalGauge>
         <div className="goal-hero__title">
@@ -54,19 +55,19 @@ export function GoalDetail() {
             {goal.name}
           </h1>
           <div className="row" style={{ gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {goal.isPrimary && goal.status === 'active' && <span className="pill pill--info">Primary</span>}
+            {goal.isPrimary && goal.status === 'active' && <span className="pill pill--info">Principal</span>}
             <HealthPill goal={goal} saved={saved} />
           </div>
-          <p className="small muted">{remaining > 0 ? `${formatLei(remaining)} to go` : 'Target reached. Nice work.'}</p>
-          {goal.motivation && <p className="muted" style={{ fontStyle: 'italic' }}>“{goal.motivation}”</p>}
+          <p className="small muted">{remaining > 0 ? `Mai ai ${formatLei(remaining)} până la țintă` : 'Țintă atinsă. Bravo!'}</p>
+          {goal.motivation && <p className="muted" style={{ fontStyle: 'italic' }}>„{goal.motivation}”</p>}
         </div>
 
         {goal.status === 'paused' && (
           <div className="banner">
             <Pause size={18} aria-hidden />
-            <div className="grow">This goal is paused. Your saved money stays here; planned contributions are on hold.</div>
+            <div className="grow">Obiectivul e pe pauză. Banii economisiți rămân aici, iar depunerile planificate așteaptă.</div>
             <button type="button" className="banner__action" onClick={() => store.updateGoal(goal.id, { status: 'active' })}>
-              Resume
+              Reia
             </button>
           </div>
         )}
@@ -74,12 +75,12 @@ export function GoalDetail() {
         {!archived && (
           <div className="goal-hero__actions">
             <motion.button type="button" className="btn btn--primary btn--xl grow" whileTap={{ scale: 0.97 }} onClick={() => setMoney({ open: true, mode: 'contribution', goalId: goal.id })}>
-              <Plus size={20} aria-hidden /> Add money
+              <Plus size={20} aria-hidden /> Adaugă bani
             </motion.button>
             <motion.button type="button" className="btn btn--secondary btn--xl grow" whileTap={{ scale: 0.97 }} disabled={saved <= 0} onClick={() => setMoney({ open: true, mode: 'withdrawal', goalId: goal.id })}>
-              <Minus size={20} aria-hidden /> Withdraw
+              <Minus size={20} aria-hidden /> Retrage
             </motion.button>
-            <motion.button type="button" className="btn btn--secondary btn--xl goal-hero__tune" whileTap={{ scale: 0.95 }} onClick={() => setPlanOpen(true)} aria-label="Adjust plan" title="Adjust plan">
+            <motion.button type="button" className="btn btn--secondary btn--xl goal-hero__tune" whileTap={{ scale: 0.95 }} onClick={() => setPlanOpen(true)} aria-label="Ajustează planul" title="Ajustează planul">
               <SlidersHorizontal size={20} aria-hidden />
             </motion.button>
           </div>
@@ -90,36 +91,36 @@ export function GoalDetail() {
         <dl style={{ margin: 0 }}>
           <div className="kv">
             <dt>Plan</dt>
-            <dd>{goal.status === 'paused' ? `On hold (${planLabel(goal.plan)})` : planLabel(goal.plan)}</dd>
+            <dd>{goal.status === 'paused' ? `Pe pauză (${planLabel(goal.plan)})` : planLabel(goal.plan)}</dd>
           </div>
           {next && remaining > 0 && (
             <div className="kv">
-              <dt>Next planned</dt>
+              <dt>Următoarea depunere</dt>
               <dd>
                 {formatLei(goal.plan.amount)} · {formatDay(next)}
               </dd>
             </div>
           )}
           <div className="kv">
-            <dt>Target date</dt>
-            <dd>{goal.targetDate ? formatDate(goal.targetDate) : 'No deadline'}</dd>
+            <dt>Data țintă</dt>
+            <dd>{goal.targetDate ? formatDate(goal.targetDate) : 'Fără termen'}</dd>
           </div>
           {finish && remaining > 0 && (
             <div className="kv">
-              <dt>Estimated finish</dt>
+              <dt>Final estimat</dt>
               <dd>{formatDate(finish)}</dd>
             </div>
           )}
         </dl>
         {finish && goal.targetDate && finish > goal.targetDate && remaining > 0 && (
           <p className="small muted" style={{ paddingTop: 'var(--s-3)' }}>
-            At this pace you’d finish after your target date. You could raise the amount, move the date, or keep going as is. All fine.
+            În ritmul ăsta ai termina după data țintă. Poți mări suma, muta data sau continua la fel. Oricare e în regulă.
           </p>
         )}
       </section>
 
       <section className="section" aria-labelledby="hist-h">
-        <h2 id="hist-h">History</h2>
+        <h2 id="hist-h">Istoric</h2>
         <div className="card card--flush">
           {history.length ? (
             <ul className="list">
@@ -130,59 +131,59 @@ export function GoalDetail() {
               ))}
             </ul>
           ) : (
-            <EmptyState icon={TrendingUp} title="No contributions yet" body="Your first contribution doesn’t have to be big. Anything counts." />
+            <EmptyState icon={TrendingUp} title="Nicio depunere încă" body="Prima depunere nu trebuie să fie mare. Orice sumă contează." />
           )}
         </div>
       </section>
 
-      <Sheet open={menu} onClose={() => setMenu(false)} title="Goal options">
+      <Sheet open={menu} onClose={() => setMenu(false)} title="Opțiuni obiectiv">
         <div className="card card--flush">
           <ul className="list">
             {!archived && (
               <li>
                 <button type="button" className="list-row" onClick={() => nav(`/goals/${goal.id}/edit`)}>
                   <span className="list-row__icon"><Pencil size={18} aria-hidden /></span>
-                  <span className="list-row__body strong">Edit name, target or date</span>
+                  <span className="list-row__body strong">Editează numele, ținta sau data</span>
                 </button>
               </li>
             )}
             {goal.status === 'active' && !goal.isPrimary && (
               <li>
-                <button type="button" className="list-row" onClick={() => { store.setPrimary(goal.id); setMenu(false); toast('Shown on Home as your primary goal'); }}>
+                <button type="button" className="list-row" onClick={() => { store.setPrimary(goal.id); setMenu(false); toast('Apare pe ecranul Acasă ca obiectiv principal'); }}>
                   <span className="list-row__icon"><Star size={18} aria-hidden /></span>
-                  <span className="list-row__body strong">Make primary goal</span>
+                  <span className="list-row__body strong">Fă-l obiectiv principal</span>
                 </button>
               </li>
             )}
             {goal.status === 'active' && (
               <li>
-                <button type="button" className="list-row" onClick={() => { store.updateGoal(goal.id, { status: 'paused' }); setMenu(false); toast('Goal paused'); }}>
+                <button type="button" className="list-row" onClick={() => { store.updateGoal(goal.id, { status: 'paused' }); setMenu(false); toast('Obiectiv pus pe pauză'); }}>
                   <span className="list-row__icon"><Pause size={18} aria-hidden /></span>
                   <span className="list-row__body">
-                    <span className="strong">Pause goal</span>
-                    <span className="small subtle">Keeps the money here, puts the plan on hold.</span>
+                    <span className="strong">Pune obiectivul pe pauză</span>
+                    <span className="small subtle">Banii rămân aici, planul stă pe loc.</span>
                   </span>
                 </button>
               </li>
             )}
             {goal.status === 'paused' && (
               <li>
-                <button type="button" className="list-row" onClick={() => { store.updateGoal(goal.id, { status: 'active' }); setMenu(false); toast('Goal resumed'); }}>
+                <button type="button" className="list-row" onClick={() => { store.updateGoal(goal.id, { status: 'active' }); setMenu(false); toast('Obiectiv reluat'); }}>
                   <span className="list-row__icon"><Play size={18} aria-hidden /></span>
-                  <span className="list-row__body strong">Resume goal</span>
+                  <span className="list-row__body strong">Reia obiectivul</span>
                 </button>
               </li>
             )}
             <li>
-              <button type="button" className="list-row" onClick={() => { if (archived) { store.updateGoal(goal.id, { status: 'active' }); setMenu(false); toast('Goal restored'); } else { setMenu(false); setConfirm('archive'); } }}>
+              <button type="button" className="list-row" onClick={() => { if (archived) { store.updateGoal(goal.id, { status: 'active' }); setMenu(false); toast('Obiectiv restaurat'); } else { setMenu(false); setConfirm('archive'); } }}>
                 <span className="list-row__icon">{archived ? <ArchiveRestore size={18} aria-hidden /> : <Archive size={18} aria-hidden />}</span>
-                <span className="list-row__body strong">{archived ? 'Restore goal' : 'Archive goal'}</span>
+                <span className="list-row__body strong">{archived ? 'Restaurează obiectivul' : 'Arhivează obiectivul'}</span>
               </button>
             </li>
             <li>
               <button type="button" className="list-row" style={{ color: 'var(--danger)' }} onClick={() => { setMenu(false); setConfirm('delete'); }}>
                 <span className="list-row__icon" style={{ background: 'var(--danger-soft)', color: 'var(--danger)' }}><Trash2 size={18} aria-hidden /></span>
-                <span className="list-row__body strong">Delete goal</span>
+                <span className="list-row__body strong">Șterge obiectivul</span>
               </button>
             </li>
           </ul>
@@ -191,26 +192,26 @@ export function GoalDetail() {
 
       <ConfirmDialog
         open={confirm === 'archive'}
-        title="Archive this goal?"
-        body={<>It moves to the archived list. {saved > 0 ? <>The {formatLei(saved)} saved in it stays part of your total and still belongs to this goal.</> : null} You can restore it anytime.</>}
-        confirmLabel="Archive"
+        title="Arhivezi obiectivul?"
+        body={<>Trece în lista de arhivate. {saved > 0 ? <>Suma de {formatLei(saved)} strânsă aici rămâne în totalul tău și aparține în continuare acestui obiectiv.</> : null} Îl poți restaura oricând.</>}
+        confirmLabel="Arhivează"
         onClose={() => setConfirm(null)}
         onConfirm={() => {
           store.updateGoal(goal.id, { status: 'archived' });
           setConfirm(null);
-          toast('Goal archived');
+          toast('Obiectiv arhivat');
         }}
       />
       <ConfirmDialog
         open={confirm === 'delete'}
-        title="Delete this goal?"
+        title="Ștergi obiectivul?"
         danger
-        body={<>The goal and its plan are removed. Its {history.length} {history.length === 1 ? 'entry stays' : 'entries stay'} in Activity as unallocated, so your total savings don’t change{saved > 0 ? ` (${formatLei(saved)} becomes unallocated)` : ''}. This can’t be undone.</>}
-        confirmLabel="Delete goal"
+        body={<>Obiectivul și planul lui dispar. {plural(history.length, 'înregistrare', 'înregistrări')} {history.length === 1 ? 'rămâne' : 'rămân'} în Activitate, la „Nealocat”, deci totalul economiilor nu se schimbă{saved > 0 ? ` (suma de ${formatLei(saved)} devine nealocată)` : ''}. Asta nu se poate anula.</>}
+        confirmLabel="Șterge obiectivul"
         onClose={() => setConfirm(null)}
         onConfirm={() => {
           store.deleteGoal(goal.id);
-          toast('Goal deleted');
+          toast('Obiectiv șters');
           nav('/goals', { replace: true });
         }}
       />

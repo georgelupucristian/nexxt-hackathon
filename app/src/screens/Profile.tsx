@@ -25,6 +25,13 @@ import { bestStreak, currentStreak } from '../data/selectors';
 import { AuthError } from '../data/storage';
 import { useData, useStore } from '../data/store';
 import { relativeTime, WEEKDAY_NAME } from '../lib/dates';
+import { plural } from '../lib/ro';
+
+/** "Lun", "Mar"… cut from the localized weekday names. */
+function shortDay(i: number): string {
+  const n = WEEKDAY_NAME[i];
+  return n.charAt(0).toUpperCase() + n.slice(1, 3);
+}
 
 interface Item {
   to: string;
@@ -41,26 +48,26 @@ export function Profile() {
 
   const groups: { title: string; items: Item[] }[] = [
     {
-      title: 'Savings',
+      title: 'Economii',
       items: [
-        { to: '/profile/tracking', label: 'Tracking & connections', icon: Link2, detail: data.tracking === 'demo' ? 'Demo connection' : 'Manual' },
-        { to: '/profile/reminders', label: 'Reminders', icon: Bell, detail: data.reminder.enabled ? `${WEEKDAY_NAME[data.reminder.day].slice(0, 3)} ${data.reminder.time}` : 'Off' },
-        { to: '/profile/streaks', label: 'Streak rules', icon: Flame, detail: `${currentStreak(data)} days` },
+        { to: '/profile/tracking', label: 'Urmărire și conexiuni', icon: Link2, detail: data.tracking === 'demo' ? 'Conexiune demo' : 'Manual' },
+        { to: '/profile/reminders', label: 'Mementouri', icon: Bell, detail: data.reminder.enabled ? `${shortDay(data.reminder.day)} ${data.reminder.time}` : 'Oprit' },
+        { to: '/profile/streaks', label: 'Regulile seriei', icon: Flame, detail: plural(currentStreak(data), 'zi', 'zile') },
       ],
     },
     {
-      title: 'Account',
+      title: 'Cont',
       items: [
-        { to: '/profile/account', label: 'Personal details', icon: UserRound },
-        { to: '/profile/privacy', label: 'Privacy & security', icon: ShieldCheck },
-        { to: '/profile/accessibility', label: 'Accessibility', icon: Accessibility },
+        { to: '/profile/account', label: 'Date personale', icon: UserRound },
+        { to: '/profile/privacy', label: 'Confidențialitate și securitate', icon: ShieldCheck },
+        { to: '/profile/accessibility', label: 'Accesibilitate', icon: Accessibility },
       ],
     },
     {
-      title: 'Support',
+      title: 'Suport',
       items: [
-        { to: '/how-it-works', label: 'How Kept works', icon: BookOpen },
-        { to: '/profile/help', label: 'Help & FAQ', icon: LifeBuoy },
+        { to: '/how-it-works', label: 'Cum funcționează Kept', icon: BookOpen },
+        { to: '/profile/help', label: 'Ajutor și întrebări frecvente', icon: LifeBuoy },
       ],
     },
   ];
@@ -73,7 +80,7 @@ export function Profile() {
         </span>
         <div className="grow">
           <h1 className="truncate">{account?.name}</h1>
-          <p className="small muted truncate">{account?.isDemo ? 'Demo account · sample data' : account?.email}</p>
+          <p className="small muted truncate">{account?.isDemo ? 'Cont demo · date demo' : account?.email}</p>
         </div>
       </header>
 
@@ -100,16 +107,16 @@ export function Profile() {
       ))}
 
       <Button block icon={LogOut} onClick={() => setConfirmOut(true)}>
-        Sign out
+        Ieși din cont
       </Button>
       <p className="xs subtle" style={{ textAlign: 'center' }}>
-        Kept 0.1 · data stored on this device
+        Kept 0.1 · datele stau pe acest dispozitiv
       </p>
       <ConfirmDialog
         open={confirmOut}
-        title="Sign out?"
-        body="Your goals and entries stay saved on this device. Sign in again with the same email to see them."
-        confirmLabel="Sign out"
+        title="Ieși din cont?"
+        body="Obiectivele și intrările tale rămân salvate pe acest dispozitiv. Intră din nou cu același email ca să le vezi."
+        confirmLabel="Ieși din cont"
         onClose={() => setConfirmOut(false)}
         onConfirm={() => {
           signOut();
@@ -123,13 +130,13 @@ export function Profile() {
 export function ProfileSection() {
   const { section } = useParams();
   const map: Record<string, { title: string; el: JSX.Element }> = {
-    account: { title: 'Personal details', el: <AccountSection /> },
-    tracking: { title: 'Tracking & connections', el: <TrackingSection /> },
-    reminders: { title: 'Reminders', el: <RemindersSection /> },
-    privacy: { title: 'Privacy & security', el: <PrivacySection /> },
-    accessibility: { title: 'Accessibility', el: <AccessibilitySection /> },
-    help: { title: 'Help & FAQ', el: <HelpSection /> },
-    streaks: { title: 'Streak rules', el: <StreakSection /> },
+    account: { title: 'Date personale', el: <AccountSection /> },
+    tracking: { title: 'Urmărire și conexiuni', el: <TrackingSection /> },
+    reminders: { title: 'Mementouri', el: <RemindersSection /> },
+    privacy: { title: 'Confidențialitate și securitate', el: <PrivacySection /> },
+    accessibility: { title: 'Accesibilitate', el: <AccessibilitySection /> },
+    help: { title: 'Ajutor și întrebări frecvente', el: <HelpSection /> },
+    streaks: { title: 'Regulile seriei', el: <StreakSection /> },
   };
   const s = section ? map[section] : undefined;
   if (!s) return <Navigate to="/profile" replace />;
@@ -147,28 +154,28 @@ function AccountSection() {
   const [name, setName] = useState(account?.name ?? '');
   const [email, setEmail] = useState(account?.email ?? '');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  if (account?.isDemo) return <Banner tone="demo" icon={FlaskConical}>The demo account can’t be edited. Create your own account to set your details.</Banner>;
+  if (account?.isDemo) return <Banner tone="demo" icon={FlaskConical}>Contul demo nu poate fi editat. Fă-ți propriul cont ca să-ți setezi datele.</Banner>;
   const dirty = name.trim() !== account?.name || email.trim().toLowerCase() !== account?.email;
   function save(e: FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = 'Enter your name.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) errs.email = 'Enter a valid email.';
+    if (!name.trim()) errs.name = 'Scrie-ți numele.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) errs.email = 'Scrie un email valid.';
     setErrors(errs);
     if (Object.keys(errs).length) return;
     try {
       updateProfile({ name: name.trim(), email: email.trim() });
-      toast('Details saved');
+      toast('Date salvate');
     } catch (err) {
-      setErrors({ email: err instanceof AuthError ? err.message : 'Could not save.' });
+      setErrors({ email: err instanceof AuthError ? err.message : 'Nu am putut salva.' });
     }
   }
   return (
     <form className="stack-lg" onSubmit={save} noValidate>
-      <TextField label="First name" value={name} maxLength={40} error={errors.name} onChange={(e) => setName(e.target.value)} />
-      <TextField label="Email" type="email" value={email} error={errors.email} onChange={(e) => setEmail(e.target.value)} hint="Used to sign in on this device." />
+      <TextField label="Prenume" value={name} maxLength={40} error={errors.name} onChange={(e) => setName(e.target.value)} />
+      <TextField label="Email" type="email" value={email} error={errors.email} onChange={(e) => setEmail(e.target.value)} hint="Îl folosești ca să intri în cont pe acest dispozitiv." />
       <Button type="submit" variant="primary" block disabled={!dirty}>
-        Save changes
+        Salvează modificările
       </Button>
     </form>
   );
@@ -191,31 +198,31 @@ function TrackingSection() {
             {demo ? <FlaskConical size={18} /> : <PenLine size={18} />}
           </span>
           <div className="grow">
-            <h2>{demo ? 'Demo connection' : 'Manual tracking'}</h2>
-            <p className="small muted">{demo ? 'Demo Bank (simulated) · no real bank' : 'You record what you save. Nothing is connected.'}</p>
+            <h2>{demo ? 'Conexiune demo' : 'Urmărire manuală'}</h2>
+            <p className="small muted">{demo ? 'Banca Demo (simulată) · nicio bancă reală' : 'Tu adaugi ce economisești. Nimic nu e conectat.'}</p>
           </div>
         </div>
         {demo && (
           <dl style={{ margin: 0 }}>
             <div className="kv">
-              <dt>Status</dt>
+              <dt>Stare</dt>
               <dd>
                 {c.status === 'syncing' ? (
-                  'Syncing…'
+                  'Se sincronizează…'
                 ) : c.status === 'error' || !online ? (
-                  <span className="pill pill--danger">Requires attention</span>
+                  <span className="pill pill--danger">Are nevoie de atenție</span>
                 ) : (
-                  <span className="pill pill--success">Connected (simulated)</span>
+                  <span className="pill pill--success">Conectat (simulat)</span>
                 )}
               </dd>
             </div>
             <div className="kv">
-              <dt>Last updated</dt>
-              <dd>{c.lastSyncAt ? relativeTime(c.lastSyncAt) : 'Never'}</dd>
+              <dt>Ultima actualizare</dt>
+              <dd>{c.lastSyncAt ? relativeTime(c.lastSyncAt) : 'Niciodată'}</dd>
             </div>
             {c.lastError && (
               <div className="kv">
-                <dt>Last error</dt>
+                <dt>Ultima eroare</dt>
                 <dd>{c.lastError}</dd>
               </div>
             )}
@@ -228,13 +235,13 @@ function TrackingSection() {
             onClick={async () => {
               try {
                 await sync();
-                toast('Synced');
+                toast('Sincronizat');
               } catch (e) {
                 toast((e as Error).message, 'error');
               }
             }}
           >
-            Sync now
+            Sincronizează acum
           </Button>
         )}
       </section>
@@ -242,23 +249,23 @@ function TrackingSection() {
       {demo && (
         <section className="card row row--between">
           <div className="grow">
-            <h3>Simulate a connection failure</h3>
-            <p className="small muted">Makes the next syncs fail so you can see how Kept keeps your last known data.</p>
+            <h3>Simulează o eroare de conexiune</h3>
+            <p className="small muted">Următoarele sincronizări vor eșua, ca să vezi cum îți păstrează Kept ultimele date cunoscute.</p>
           </div>
-          <Switch checked={c.simulateFailure} onChange={setSimulateFailure} label="Simulate a connection failure" />
+          <Switch checked={c.simulateFailure} onChange={setSimulateFailure} label="Simulează o eroare de conexiune" />
         </section>
       )}
 
       <section className="section">
-        <h2 className="group-label">Switch method</h2>
+        <h2 className="group-label">Schimbă metoda</h2>
         <div className="card card--flush">
           <ul className="list">
             <li>
               <button type="button" className="list-row" disabled={!demo} aria-current={!demo || undefined} onClick={() => setConfirm('manual')}>
                 <span className="list-row__icon"><PenLine size={18} aria-hidden /></span>
                 <span className="list-row__body">
-                  <span className="strong">Manual tracking</span>
-                  <span className="small subtle">{!demo ? 'Current method' : 'Stop the demo connection'}</span>
+                  <span className="strong">Urmărire manuală</span>
+                  <span className="small subtle">{!demo ? 'Metoda actuală' : 'Oprește conexiunea demo'}</span>
                 </span>
               </button>
             </li>
@@ -266,8 +273,8 @@ function TrackingSection() {
               <button type="button" className="list-row" disabled={demo} onClick={() => setConfirm('demo')}>
                 <span className="list-row__icon"><FlaskConical size={18} aria-hidden /></span>
                 <span className="list-row__body">
-                  <span className="strong">Demo connection</span>
-                  <span className="small subtle">{demo ? 'Current method' : 'Simulated transfers and syncing'}</span>
+                  <span className="strong">Conexiune demo</span>
+                  <span className="small subtle">{demo ? 'Metoda actuală' : 'Transferuri și sincronizare simulate'}</span>
                 </span>
               </button>
             </li>
@@ -275,8 +282,8 @@ function TrackingSection() {
               <div className="list-row" style={{ opacity: 0.55 }}>
                 <span className="list-row__icon"><Link2 size={18} aria-hidden /></span>
                 <span className="list-row__body">
-                  <span className="strong">Real bank connection</span>
-                  <span className="small subtle">Not available in this version</span>
+                  <span className="strong">Conexiune bancară reală</span>
+                  <span className="small subtle">Nu e disponibilă în versiunea asta</span>
                 </span>
               </div>
             </li>
@@ -286,26 +293,26 @@ function TrackingSection() {
 
       <ConfirmDialog
         open={confirm === 'manual'}
-        title="Switch to manual tracking?"
-        body={`New entries will be recorded manually. ${demoCount ? `Your ${demoCount} simulated entries stay in Activity, still labelled as simulated.` : ''}`}
-        confirmLabel="Switch"
+        title="Treci pe urmărire manuală?"
+        body={`Intrările noi le adaugi manual.${demoCount === 1 ? ' Intrarea ta simulată rămâne în Activitate, marcată în continuare ca simulată.' : demoCount ? ` Cele ${plural(demoCount, 'intrare simulată', 'intrări simulate')} rămân în Activitate, marcate în continuare ca simulate.` : ''}`}
+        confirmLabel="Schimbă"
         onClose={() => setConfirm(null)}
         onConfirm={() => {
           setTracking('manual');
           setConfirm(null);
-          toast('Now tracking manually');
+          toast('Acum adaugi manual');
         }}
       />
       <ConfirmDialog
         open={confirm === 'demo'}
-        title="Turn on the demo connection?"
-        body="New entries will be simulated transfers from “Demo Bank”. They start pending and confirm on sync. No real money moves. Your manual entries stay as they are."
-        confirmLabel="Turn on"
+        title="Pornești conexiunea demo?"
+        body="Intrările noi vor fi transferuri simulate de la „Banca Demo”. Pornesc în așteptare și se confirmă la sincronizare. Nu se mișcă bani reali. Intrările tale manuale rămân cum sunt."
+        confirmLabel="Pornește"
         onClose={() => setConfirm(null)}
         onConfirm={() => {
           setTracking('demo');
           setConfirm(null);
-          toast('Demo connection on');
+          toast('Conexiunea demo e pornită');
         }}
       />
     </div>
@@ -320,21 +327,21 @@ function RemindersSection() {
     <div className="stack-lg">
       <section className="card row row--between">
         <div>
-          <h2>Weekly reminder</h2>
-          <p className="small muted">{r.enabled ? `${WEEKDAY_NAME[r.day]}s at ${r.time}` : 'Off'}</p>
+          <h2>Memento săptămânal</h2>
+          <p className="small muted">{r.enabled ? `În fiecare ${WEEKDAY_NAME[r.day].toLowerCase()}, la ${r.time}` : 'Oprit'}</p>
         </div>
-        <Switch checked={r.enabled} onChange={(v) => setReminder({ ...r, enabled: v })} label="Weekly reminder" />
+        <Switch checked={r.enabled} onChange={(v) => setReminder({ ...r, enabled: v })} label="Memento săptămânal" />
       </section>
       {r.enabled && (
         <>
-          <Field label="Day">
+          <Field label="Ziua">
             <DayPicker value={r.day} onChange={(d) => setReminder({ ...r, day: d })} />
           </Field>
-          <TextField label="Time" type="time" value={r.time} onChange={(e) => setReminder({ ...r, time: e.target.value || '19:00' })} />
+          <TextField label="Ora" type="time" value={r.time} onChange={(e) => setReminder({ ...r, time: e.target.value || '19:00' })} />
         </>
       )}
       <Banner tone="neutral" icon={Bell}>
-        Reminders show as a banner on Home when you open Kept on or after the chosen time, until you do a savings action that day. Push notifications aren’t available in this version.
+        Mementourile apar ca banner pe ecranul Acasă când deschizi Kept la ora aleasă sau după, până faci ceva pentru economii în ziua aia. Notificările push nu sunt disponibile în versiunea asta.
       </Banner>
     </div>
   );
@@ -357,35 +364,35 @@ function PrivacySection() {
   return (
     <div className="stack-lg">
       <section className="card stack">
-        <h2>What Kept stores</h2>
+        <h2>Ce păstrează Kept</h2>
         <ul className="check-list small">
           <li>
             <HardDrive size={18} aria-hidden />
-            <span>Your name, email, goals, plans, entries and settings. Only in this browser, on this device.</span>
+            <span>Numele, emailul, obiectivele, planurile, intrările și setările tale. Doar în acest browser, pe acest dispozitiv.</span>
           </li>
           <li>
             <ShieldCheck size={18} aria-hidden />
-            <span>Your password is never stored as text. Kept keeps a salted SHA-256 hash of it.</span>
+            <span>Parola ta nu e salvată niciodată ca text. Kept păstrează doar un hash SHA-256 cu salt.</span>
           </li>
           <li>
             <Link2 size={18} aria-hidden />
-            <span>No bank credentials, card numbers or real account data. There is no server and nothing is sent anywhere.</span>
+            <span>Fără date de autentificare bancare, numere de card sau date reale de cont. Nu există server și nu se trimite nimic nicăieri.</span>
           </li>
         </ul>
-        <p className="small subtle">Anyone with access to this browser profile could read local data. Use a device that’s yours.</p>
+        <p className="small subtle">Oricine are acces la acest profil de browser poate citi datele locale. Folosește un dispozitiv care e al tău.</p>
       </section>
       <Button icon={Download} onClick={exportData}>
-        Download my data (JSON)
+        Descarcă-mi datele (JSON)
       </Button>
       <Button variant="danger" icon={Trash2} onClick={() => setConfirm(true)}>
-        Delete account and all data
+        Șterge contul și toate datele
       </Button>
       <ConfirmDialog
         open={confirm}
         danger
-        title="Delete everything?"
-        body="Your account, goals, plans, entries and streak history are permanently removed from this device. This can’t be undone."
-        confirmLabel="Delete everything"
+        title="Ștergi tot?"
+        body="Contul, obiectivele, planurile, intrările și istoricul seriei dispar definitiv de pe acest dispozitiv. Nu poți anula asta."
+        confirmLabel="Șterge tot"
         onClose={() => setConfirm(false)}
         onConfirm={() => {
           deleteAccount();
@@ -400,9 +407,9 @@ function AccessibilitySection() {
   const data = useData();
   const { setPrefs } = useStore();
   const rows: { key: keyof typeof data.prefs; title: string; desc: string }[] = [
-    { key: 'largerText', title: 'Larger text', desc: 'Increases text size across the app.' },
-    { key: 'reduceMotion', title: 'Reduce motion', desc: 'Turns off transitions and animations. Also follows your system setting.' },
-    { key: 'hideBalance', title: 'Hide balance on Home', desc: 'Masks your total until you tap the eye icon.' },
+    { key: 'largerText', title: 'Text mai mare', desc: 'Mărește textul în toată aplicația.' },
+    { key: 'reduceMotion', title: 'Mai puține animații', desc: 'Oprește tranzițiile și animațiile. Ține cont și de setarea sistemului.' },
+    { key: 'hideBalance', title: 'Ascunde soldul pe ecranul Acasă', desc: 'Îți ascunde totalul până atingi iconița cu ochi.' },
   ];
   return (
     <div className="card card--flush">
@@ -423,12 +430,12 @@ function AccessibilitySection() {
 
 function HelpSection() {
   const faqs = [
-    { q: 'Does Kept hold or move my money?', a: 'No. Kept is a planner and tracker. With manual tracking you record what you set aside elsewhere. The demo connection only simulates transfers. No real money moves.' },
-    { q: 'Why doesn’t a pending entry count?', a: 'Pending means the money hasn’t arrived yet. Kept only counts confirmed entries, so your total never shows money you don’t have.' },
-    { q: 'What happens if I miss a planned contribution?', a: 'Nothing bad. Plans are guides. Your estimated finish date moves, and you can adjust the plan whenever you like.' },
-    { q: 'Can the same money count towards two goals?', a: 'No. Every entry belongs to one goal or is unallocated, so your total always equals goals + unallocated.' },
-    { q: 'I deleted a goal. Where did its money go?', a: 'Its entries move to unallocated savings. Your total doesn’t change.' },
-    { q: 'How do I use Kept on another device?', a: 'This version stores data only in this browser. You can download your data from Privacy & security.' },
+    { q: 'Kept îmi păstrează sau îmi mută banii?', a: 'Nu. Kept nu mută niciodată bani: e un planificator și un jurnal de economii. Cu urmărirea manuală, adaugi ce ai pus deoparte în altă parte. Conexiunea demo doar simulează transferuri, fără bani reali.' },
+    { q: 'De ce nu contează o intrare în așteptare?', a: '„În așteptare” înseamnă că banii n-au ajuns încă. Kept numără doar intrările confirmate, așa că totalul tău nu arată niciodată bani pe care nu-i ai.' },
+    { q: 'Ce se întâmplă dacă ratez o depunere plănuită?', a: 'Nimic rău. Planurile sunt doar un ghid. Data estimată de final se mută, iar tu poți ajusta planul oricând vrei.' },
+    { q: 'Pot pune aceiași bani la două obiective?', a: 'Nu. Fiecare intrare aparține unui singur obiectiv sau e nealocată, așa că totalul tău e mereu: obiective + nealocat.' },
+    { q: 'Am șters un obiectiv. Unde au ajuns banii lui?', a: 'Intrările lui trec la economiile nealocate. Totalul tău nu se schimbă.' },
+    { q: 'Cum folosesc Kept pe alt dispozitiv?', a: 'Versiunea asta păstrează datele doar în acest browser. Îți poți descărca datele din Confidențialitate și securitate.' },
   ];
   return (
     <div className="stack">
@@ -452,12 +459,12 @@ function StreakSection() {
     <div className="stack-lg">
       <div className="card row" style={{ gap: 'var(--s-8)' }}>
         <div className="stat">
-          <span>Current streak</span>
-          <strong>{currentStreak(data)} days</strong>
+          <span>Seria actuală</span>
+          <strong>{plural(currentStreak(data), 'zi', 'zile')}</strong>
         </div>
         <div className="stat">
-          <span>Best streak</span>
-          <strong>{bestStreak(data)} days</strong>
+          <span>Cea mai lungă serie</span>
+          <strong>{plural(bestStreak(data), 'zi', 'zile')}</strong>
         </div>
       </div>
       <StreakRules />

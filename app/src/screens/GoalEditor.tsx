@@ -9,10 +9,10 @@ import { todayKey } from '../lib/dates';
 import { MAX_AMOUNT, parseLei } from '../lib/money';
 
 const KINDS: { kind: GoalKind; label: string }[] = [
-  { kind: 'emergency', label: 'Emergency' },
-  { kind: 'tech', label: 'Tech' },
-  { kind: 'travel', label: 'Travel' },
-  { kind: 'custom', label: 'Other' },
+  { kind: 'emergency', label: 'Urgență' },
+  { kind: 'tech', label: 'Gadgeturi' },
+  { kind: 'travel', label: 'Călătorie' },
+  { kind: 'custom', label: 'Altceva' },
 ];
 
 export function GoalEditor() {
@@ -38,18 +38,18 @@ export function GoalEditor() {
   function submit(e: FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = 'Give your goal a name.';
-    if (targetB === null || targetB <= 0) errs.target = 'Enter a target amount, like 1500.';
-    else if (targetB > MAX_AMOUNT) errs.target = 'That amount looks too large.';
-    if (targetDate && targetDate <= todayKey() && targetDate !== existing?.targetDate) errs.targetDate = 'Pick a date in the future, or leave it empty.';
+    if (!name.trim()) errs.name = 'Dă-i un nume obiectivului.';
+    if (targetB === null || targetB <= 0) errs.target = 'Scrie o sumă țintă, de exemplu 1500.';
+    else if (targetB > MAX_AMOUNT) errs.target = 'Suma asta pare prea mare.';
+    if (targetDate && targetDate <= todayKey() && targetDate !== existing?.targetDate) errs.targetDate = 'Alege o dată din viitor sau lasă câmpul gol.';
     const planAmount = plan.amount ? parseLei(plan.amount) : 0;
-    if (!existing && (planAmount === null || (plan.frequency !== 'flexible' && planAmount <= 0))) errs.plan = 'Enter a plan amount, or choose Flexible.';
+    if (!existing && (planAmount === null || (plan.frequency !== 'flexible' && planAmount <= 0))) errs.plan = 'Scrie suma din plan sau alege Flexibil.';
     setErrors(errs);
     if (Object.keys(errs).length) return;
     try {
       if (existing) {
         updateGoal(existing.id, { kind, name: name.trim(), target: targetB!, targetDate: targetDate || null, motivation: motivation.trim() });
-        toast('Goal updated');
+        toast('Obiectiv actualizat');
         nav(`/goals/${existing.id}`, { replace: true });
       } else {
         const g = createGoal({
@@ -60,20 +60,20 @@ export function GoalEditor() {
           motivation: motivation.trim(),
           plan: { amount: planAmount ?? 0, frequency: plan.frequency, day: plan.frequency === 'flexible' ? null : plan.day },
         });
-        toast('Goal created');
+        toast('Obiectiv creat');
         nav(`/goals/${g.id}`, { replace: true });
       }
     } catch (err) {
-      setErrors({ form: err instanceof ActionError ? err.message : 'Could not save the goal.' });
+      setErrors({ form: err instanceof ActionError ? err.message : 'Nu am putut salva obiectivul.' });
     }
   }
 
   return (
     <div className="screen">
-      <TopBar title={existing ? 'Edit goal' : 'New goal'} />
+      <TopBar title={existing ? 'Editează obiectivul' : 'Obiectiv nou'} />
       <form className="stack-lg" onSubmit={submit} noValidate>
-        <Field label="Type">
-          <div className="options" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }} role="radiogroup" aria-label="Goal type">
+        <Field label="Tip">
+          <div className="options" style={{ gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }} role="radiogroup" aria-label="Tipul obiectivului">
             {KINDS.map((k) => {
               const Icon = GOAL_ICON[k.kind];
               return (
@@ -85,15 +85,15 @@ export function GoalEditor() {
             })}
           </div>
         </Field>
-        <TextField label="Name" value={name} maxLength={48} error={errors.name} placeholder="e.g. Summer in Lisbon" onChange={(e) => setName(e.target.value)} />
-        <TextField label="Target amount" inputMode="decimal" suffix="lei" value={target} error={errors.target} placeholder="1500" onChange={(e) => setTarget(e.target.value.replace(/[^\d.,]/g, '').slice(0, 12))} />
-        <TextField label={<>Target date <span className="subtle">(optional)</span></>} type="date" min={todayKey()} value={targetDate} error={errors.targetDate} onChange={(e) => setTargetDate(e.target.value)} />
-        <Field label={<>Why it matters <span className="subtle">(optional)</span></>} htmlFor="mot">
+        <TextField label="Nume" value={name} maxLength={48} error={errors.name} placeholder="ex. Vară în Lisabona" onChange={(e) => setName(e.target.value)} />
+        <TextField label="Suma țintă" inputMode="decimal" suffix="lei" value={target} error={errors.target} placeholder="1500" onChange={(e) => setTarget(e.target.value.replace(/[^\d.,]/g, '').slice(0, 12))} />
+        <TextField label={<>Data țintă <span className="subtle">(opțional)</span></>} type="date" min={todayKey()} value={targetDate} error={errors.targetDate} onChange={(e) => setTargetDate(e.target.value)} />
+        <Field label={<>De ce contează <span className="subtle">(opțional)</span></>} htmlFor="mot">
           <textarea id="mot" className="textarea" maxLength={120} value={motivation} onChange={(e) => setMotivation(e.target.value)} />
         </Field>
         {!existing && (
           <section className="stack-lg" style={{ paddingTop: 'var(--s-2)', borderTop: 'var(--border)' }}>
-            <h2 style={{ paddingTop: 'var(--s-4)' }}>Savings plan</h2>
+            <h2 style={{ paddingTop: 'var(--s-4)' }}>Plan de economisire</h2>
             <PlanForm plan={plan} onChange={setPlan} target={targetB} targetDate={targetDate || null} />
             {errors.plan && <p className="field-error" role="alert">{errors.plan}</p>}
           </section>
@@ -104,7 +104,7 @@ export function GoalEditor() {
           </div>
         )}
         <Button type="submit" variant="primary" block>
-          {existing ? 'Save changes' : 'Create goal'}
+          {existing ? 'Salvează modificările' : 'Creează obiectivul'}
         </Button>
       </form>
     </div>

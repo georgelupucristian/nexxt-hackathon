@@ -10,13 +10,13 @@ import { formatDate, todayKey, WEEKDAY_NAME } from '../lib/dates';
 import { formatLei, MAX_AMOUNT, parseLei } from '../lib/money';
 
 const KINDS: { kind: GoalKind; title: string; desc: string; name: string }[] = [
-  { kind: 'emergency', title: 'Emergency fund', desc: 'A cushion for surprises', name: 'Emergency fund' },
-  { kind: 'tech', title: 'Laptop or tech', desc: 'New laptop, phone, gear', name: 'New laptop' },
-  { kind: 'travel', title: 'Travel or exchange', desc: 'Erasmus, trips, flights', name: 'Exchange semester' },
-  { kind: 'custom', title: 'Something else', desc: 'Name your own goal', name: '' },
+  { kind: 'emergency', title: 'Fond de urgență', desc: 'O rezervă pentru neprevăzute', name: 'Fond de urgență' },
+  { kind: 'tech', title: 'Laptop sau gadgeturi', desc: 'Laptop nou, telefon, accesorii', name: 'Laptop nou' },
+  { kind: 'travel', title: 'Călătorie sau Erasmus', desc: 'Mobilități, excursii, zboruri', name: 'Semestru Erasmus' },
+  { kind: 'custom', title: 'Altceva', desc: 'Pune-i tu un nume', name: '' },
 ];
 
-const STEPS = ['Goal', 'Plan', 'Tracking', 'Reminder', 'Review'];
+const STEPS = ['Obiectiv', 'Plan', 'Evidență', 'Memento', 'Verificare'];
 
 export function Onboarding() {
   const data = useData();
@@ -38,17 +38,17 @@ export function Onboarding() {
   function validate(s: number): Record<string, string> {
     const e: Record<string, string> = {};
     if (s === 0) {
-      if (!draft.kind) e.kind = 'Choose what you’re saving for.';
-      if (!draft.name.trim()) e.name = 'Give your goal a name.';
-      if (target === null || target <= 0) e.target = 'Enter a target amount, like 3000.';
-      else if (target > MAX_AMOUNT) e.target = 'That amount looks too large.';
-      if (draft.targetDate && draft.targetDate <= todayKey()) e.targetDate = 'Pick a date in the future, or leave it empty.';
+      if (!draft.kind) e.kind = 'Alege pentru ce strângi bani.';
+      if (!draft.name.trim()) e.name = 'Dă-i un nume obiectivului.';
+      if (target === null || target <= 0) e.target = 'Scrie o sumă țintă, de exemplu 3000.';
+      else if (target > MAX_AMOUNT) e.target = 'Suma asta pare prea mare.';
+      if (draft.targetDate && draft.targetDate <= todayKey()) e.targetDate = 'Alege o dată din viitor sau lasă câmpul gol.';
     }
     if (s === 1) {
-      if (planAmount === null) e.plan = 'Enter a valid amount, like 50.';
-      else if (draft.frequency !== 'flexible' && planAmount <= 0) e.plan = 'Enter how much you plan to save, or choose Flexible.';
+      if (planAmount === null) e.plan = 'Scrie o sumă validă, de exemplu 50.';
+      else if (draft.frequency !== 'flexible' && planAmount <= 0) e.plan = 'Scrie cât vrei să pui deoparte sau alege Flexibil.';
     }
-    if (s === 2 && !draft.tracking) e.tracking = 'Choose how you want to track your savings.';
+    if (s === 2 && !draft.tracking) e.tracking = 'Alege cum vrei să ții evidența economiilor.';
     return e;
   }
 
@@ -86,8 +86,8 @@ export function Onboarding() {
   return (
     <div className="screen screen--bare" style={{ minHeight: '100dvh' }}>
       <header className="topbar" style={{ gridTemplateColumns: 'var(--touch) 1fr auto' }}>
-        <div>{step > 0 && <IconButton label="Previous step" icon={ArrowLeft} onClick={() => go(step - 1)} />}</div>
-        <div className="ob-progress" role="progressbar" aria-label="Setup progress" aria-valuemin={1} aria-valuemax={5} aria-valuenow={step + 1} aria-valuetext={`Step ${step + 1} of 5: ${STEPS[step]}`}>
+        <div>{step > 0 && <IconButton label="Pasul anterior" icon={ArrowLeft} onClick={() => go(step - 1)} />}</div>
+        <div className="ob-progress" role="progressbar" aria-label="Progresul configurării" aria-valuemin={1} aria-valuemax={5} aria-valuenow={step + 1} aria-valuetext={`Pasul ${step + 1} din 5: ${STEPS[step]}`}>
           {STEPS.map((s, i) => (
             <span key={s} data-on={i <= step} />
           ))}
@@ -101,14 +101,14 @@ export function Onboarding() {
             nav('/welcome');
           }}
         >
-          Save & exit
+          Salvează și ieși
         </button>
       </header>
 
       {step === 0 && <GoalStep draft={draft} set={set} errors={errors} />}
       {step === 1 && (
         <section className="stack-lg">
-          <StepTitle n={2} title="Make a plan that fits" sub="Pick an amount you can manage. You can lower it, pause it or change it anytime." />
+          <StepTitle n={2} title="Fă-ți un plan pe măsură" sub="Alege o sumă pe care o poți duce. Poți s-o micșorezi, s-o pui pe pauză sau s-o schimbi oricând." />
           <PlanForm
             plan={{ amount: draft.planAmount, frequency: draft.frequency, day: draft.day }}
             onChange={(p) => set({ planAmount: p.amount, frequency: p.frequency, day: p.day })}
@@ -124,7 +124,7 @@ export function Onboarding() {
 
       <div className="ob-footer">
         <Button variant="primary" block onClick={next}>
-          {step === 4 ? 'Finish setup' : 'Continue'}
+          {step === 4 ? 'Termină configurarea' : 'Continuă'}
         </Button>
         {step === 3 && (
           <Button
@@ -135,10 +135,10 @@ export function Onboarding() {
               go(4);
             }}
           >
-            Skip reminders
+            Sari peste memento
           </Button>
         )}
-        {step === 4 && <p className="small subtle" style={{ textAlign: 'center' }}>You don’t need to add any money to finish.</p>}
+        {step === 4 && <p className="small subtle" style={{ textAlign: 'center' }}>Nu trebuie să adaugi bani ca să termini.</p>}
       </div>
     </div>
   );
@@ -147,7 +147,7 @@ export function Onboarding() {
 function StepTitle({ n, title, sub }: { n: number; title: string; sub: string }) {
   return (
     <div className="stack" style={{ gap: 6, paddingTop: 'var(--s-2)' }}>
-      <p className="small subtle strong">Step {n} of 5</p>
+      <p className="small subtle strong">Pasul {n} din 5</p>
       <h1>{title}</h1>
       <p className="muted">{sub}</p>
     </div>
@@ -157,8 +157,8 @@ function StepTitle({ n, title, sub }: { n: number; title: string; sub: string })
 function GoalStep({ draft, set, errors }: { draft: OnboardingDraft; set: (p: Partial<OnboardingDraft>) => void; errors: Record<string, string> }) {
   return (
     <section className="stack-lg">
-      <StepTitle n={1} title="What are you saving for?" sub="Start with one goal. You can add more later." />
-      <div className="options options--2" role="radiogroup" aria-label="Goal type">
+      <StepTitle n={1} title="Pentru ce strângi bani?" sub="Începe cu un obiectiv. Poți adăuga altele mai târziu." />
+      <div className="options options--2" role="radiogroup" aria-label="Tipul obiectivului">
         {KINDS.map((k) => {
           const Icon = GOAL_ICON[k.kind];
           return (
@@ -189,9 +189,9 @@ function GoalStep({ draft, set, errors }: { draft: OnboardingDraft; set: (p: Par
       {errors.kind && <p className="field-error" role="alert">{errors.kind}</p>}
       {draft.kind && (
         <div className="stack-lg">
-          <TextField label="Goal name" value={draft.name} maxLength={48} error={errors.name} placeholder="e.g. Concert tickets" onChange={(e) => set({ name: e.target.value })} />
+          <TextField label="Numele obiectivului" value={draft.name} maxLength={48} error={errors.name} placeholder="ex. Bilete la concert" onChange={(e) => set({ name: e.target.value })} />
           <TextField
-            label="Target amount"
+            label="Suma țintă"
             inputMode="decimal"
             suffix="lei"
             placeholder="3000"
@@ -200,16 +200,16 @@ function GoalStep({ draft, set, errors }: { draft: OnboardingDraft; set: (p: Par
             onChange={(e) => set({ target: e.target.value.replace(/[^\d.,]/g, '').slice(0, 12) })}
           />
           <TextField
-            label={<>Target date <span className="subtle">(optional)</span></>}
+            label={<>Data țintă <span className="subtle">(opțional)</span></>}
             type="date"
             min={todayKey()}
             value={draft.targetDate}
             error={errors.targetDate}
-            hint="Leave empty if there’s no deadline."
+            hint="Lasă gol dacă nu ai un termen."
             onChange={(e) => set({ targetDate: e.target.value })}
           />
-          <Field label={<>Why it matters to you <span className="subtle">(optional)</span></>} htmlFor="motivation" hint="We’ll show this on your goal as a reminder.">
-            <textarea id="motivation" className="textarea" maxLength={120} value={draft.motivation} onChange={(e) => set({ motivation: e.target.value })} placeholder="e.g. So I can study abroad without stressing about rent" />
+          <Field label={<>De ce contează pentru tine <span className="subtle">(opțional)</span></>} htmlFor="motivation" hint="Îți arătăm asta pe obiectiv, ca să-ți amintești de ce o faci.">
+            <textarea id="motivation" className="textarea" maxLength={120} value={draft.motivation} onChange={(e) => set({ motivation: e.target.value })} placeholder="ex. Ca să pot studia în străinătate fără grija chiriei" />
           </Field>
         </div>
       )}
@@ -220,17 +220,17 @@ function GoalStep({ draft, set, errors }: { draft: OnboardingDraft; set: (p: Par
 function TrackingStep({ draft, set, error }: { draft: OnboardingDraft; set: (p: Partial<OnboardingDraft>) => void; error?: string }) {
   return (
     <section className="stack-lg">
-      <StepTitle n={3} title="How will you track your savings?" sub="Kept doesn’t hold or move money. It keeps track of what you set aside." />
-      <div className="options" role="radiogroup" aria-label="Tracking method">
+      <StepTitle n={3} title="Cum ții evidența economiilor?" sub="Kept nu păstrează și nu mută bani. Doar ține evidența a ce pui deoparte." />
+      <div className="options" role="radiogroup" aria-label="Metoda de evidență">
         <button type="button" role="radio" aria-checked={draft.tracking === 'manual'} className="option option--row" onClick={() => set({ tracking: 'manual' })}>
           <span className="option__icon" aria-hidden>
             <PenLine size={22} />
           </span>
           <span className="grow">
             <span className="option__title" style={{ display: 'block' }}>
-              Track manually <span className="pill pill--success" style={{ marginLeft: 4 }}>Recommended</span>
+              Evidență manuală <span className="pill pill--success" style={{ marginLeft: 4 }}>Recomandat</span>
             </span>
-            <span className="option__desc">Record each amount you put aside: in any account, a jar, anywhere.</span>
+            <span className="option__desc">Notezi fiecare sumă pe care o pui deoparte: în orice cont, într-un borcan, oriunde.</span>
           </span>
         </button>
         <button type="button" role="radio" aria-checked={draft.tracking === 'demo'} className="option option--row" onClick={() => set({ tracking: 'demo' })}>
@@ -239,9 +239,9 @@ function TrackingStep({ draft, set, error }: { draft: OnboardingDraft; set: (p: 
           </span>
           <span className="grow">
             <span className="option__title" style={{ display: 'block' }}>
-              Try a demo connection
+              Încearcă o conexiune demo
             </span>
-            <span className="option__desc">See how a connected account would behave, with simulated transfers and syncing.</span>
+            <span className="option__desc">Vezi cum s-ar comporta un cont conectat, cu transferuri și sincronizări simulate.</span>
           </span>
         </button>
         <div className="option option--row" aria-disabled="true" style={{ opacity: 0.55, cursor: 'not-allowed' }}>
@@ -250,37 +250,37 @@ function TrackingStep({ draft, set, error }: { draft: OnboardingDraft; set: (p: 
           </span>
           <span className="grow">
             <span className="option__title" style={{ display: 'block' }}>
-              Connect a real bank
+              Conectează o bancă reală
             </span>
-            <span className="option__desc">Not available in this version.</span>
+            <span className="option__desc">Nu e disponibil în versiunea asta.</span>
           </span>
         </div>
       </div>
       {error && <p className="field-error" role="alert">{error}</p>}
       {draft.tracking === 'demo' && (
         <div className="card stack-lg">
-          <h2>What the demo connection does</h2>
+          <h2>Ce face conexiunea demo</h2>
           <ul className="check-list small">
             <li>
               <FlaskConical size={18} aria-hidden color="var(--demo)" />
               <span>
-                <strong>Everything is simulated.</strong> “Demo Bank” isn’t real and no bank is contacted.
+                <strong>Totul e simulat.</strong> „Banca Demo” nu există și nu contactăm nicio bancă.
               </span>
             </li>
             <li>
               <Eye size={18} aria-hidden />
               <span>
-                <strong>Read-style behaviour only.</strong> Transfers you start appear as pending, then confirm on the next simulated sync.
+                <strong>Merge ca un cont doar de citire.</strong> Transferurile pe care le pornești apar „În așteptare”, apoi se confirmă la următoarea sincronizare simulată.
               </span>
             </li>
             <li>
               <Lock size={18} aria-hidden />
               <span>
-                <strong>No real money moves</strong>, ever. Every simulated entry is labelled so it can’t be mistaken for real savings.
+                <strong>Nu se mută bani reali</strong>, niciodată. Fiecare înregistrare simulată e marcată clar, ca să nu fie confundată cu economii reale.
               </span>
             </li>
           </ul>
-          <p className="small subtle">You can switch to manual tracking anytime in Profile.</p>
+          <p className="small subtle">Poți trece oricând la evidența manuală din Profil.</p>
         </div>
       )}
     </section>
@@ -291,22 +291,22 @@ function ReminderStep({ draft, set }: { draft: OnboardingDraft; set: (p: Partial
   const r = draft.reminder;
   return (
     <section className="stack-lg">
-      <StepTitle n={4} title="Want a gentle nudge?" sub="One reminder a week, on the day that suits you. You can change or turn it off later." />
+      <StepTitle n={4} title="Vrei un mic imbold?" sub="Un memento pe săptămână, în ziua care ți se potrivește. Îl poți schimba sau opri mai târziu." />
       <div className="card row row--between">
         <div className="row">
           {r.enabled ? <Bell size={20} aria-hidden /> : <BellOff size={20} aria-hidden />}
-          <span className="strong">Weekly reminder</span>
+          <span className="strong">Memento săptămânal</span>
         </div>
-        <Switch checked={r.enabled} onChange={(v) => set({ reminder: { ...r, enabled: v } })} label="Weekly reminder" />
+        <Switch checked={r.enabled} onChange={(v) => set({ reminder: { ...r, enabled: v } })} label="Memento săptămânal" />
       </div>
       {r.enabled && (
         <>
-          <Field label="Day">
+          <Field label="Ziua">
             <DayPicker value={r.day} onChange={(d) => set({ reminder: { ...r, day: d } })} />
           </Field>
-          <TextField label="Time" type="time" value={r.time} onChange={(e) => set({ reminder: { ...r, time: e.target.value || '19:00' } })} />
+          <TextField label="Ora" type="time" value={r.time} onChange={(e) => set({ reminder: { ...r, time: e.target.value || '19:00' } })} />
           <Banner tone="neutral" icon={Bell}>
-            Reminders appear inside Kept when you open it on or after that time. This version doesn’t send push notifications.
+            Mementourile apar în Kept când îl deschizi la ora aleasă sau după. Versiunea asta nu trimite notificări push.
           </Banner>
         </>
       )}
@@ -317,20 +317,22 @@ function ReminderStep({ draft, set }: { draft: OnboardingDraft; set: (p: Partial
 function ReviewStep({ draft, go }: { draft: OnboardingDraft; go: (s: number) => void }) {
   const target = parseLei(draft.target) ?? 0;
   const amount = draft.planAmount ? parseLei(draft.planAmount) ?? 0 : 0;
-  const rows: { label: string; value: string; step: number }[] = [
-    { label: 'Goal', value: draft.name, step: 0 },
-    { label: 'Target', value: `${formatLei(target)}${draft.targetDate ? ` by ${formatDate(draft.targetDate)}` : ''}`, step: 0 },
-    { label: 'Plan', value: planLabel({ amount, frequency: draft.frequency, day: draft.day }), step: 1 },
-    { label: 'Tracking', value: draft.tracking === 'demo' ? 'Demo connection (simulated)' : 'Manual tracking', step: 2 },
+  // `edit` is the button's accessible name: Romanian needs the articled noun ("obiectivul"), not label.toLowerCase()
+  const rows: { label: string; edit: string; value: string; step: number }[] = [
+    { label: 'Obiectiv', edit: 'Editează obiectivul', value: draft.name, step: 0 },
+    { label: 'Țintă', edit: 'Editează ținta', value: `${formatLei(target)}${draft.targetDate ? ` până la ${formatDate(draft.targetDate)}` : ''}`, step: 0 },
+    { label: 'Plan', edit: 'Editează planul', value: planLabel({ amount, frequency: draft.frequency, day: draft.day }), step: 1 },
+    { label: 'Evidență', edit: 'Editează evidența', value: draft.tracking === 'demo' ? 'Conexiune demo (simulată)' : 'Evidență manuală', step: 2 },
     {
-      label: 'Reminder',
-      value: draft.reminder.enabled ? `${WEEKDAY_NAME[draft.reminder.day]}s at ${draft.reminder.time}` : 'Off',
+      label: 'Memento',
+      edit: 'Editează mementoul',
+      value: draft.reminder.enabled ? `În fiecare ${WEEKDAY_NAME[draft.reminder.day].toLowerCase()}, la ${draft.reminder.time}` : 'Oprit',
       step: 3,
     },
   ];
   return (
     <section className="stack-lg">
-      <StepTitle n={5} title="Ready to go" sub="Check everything looks right. Tap Edit to change a step." />
+      <StepTitle n={5} title="Gata de start" sub="Verifică dacă totul arată bine. Apasă Editează ca să schimbi un pas." />
       <div className="card card--flush">
         <ul className="list">
           {rows.map((r) => (
@@ -339,8 +341,8 @@ function ReviewStep({ draft, go }: { draft: OnboardingDraft; go: (s: number) => 
                 <span className="small subtle">{r.label}</span>
                 <span className="strong clamp-2">{r.value}</span>
               </span>
-              <button type="button" className="link-btn" onClick={() => go(r.step)} aria-label={`Edit ${r.label.toLowerCase()}`}>
-                Edit
+              <button type="button" className="link-btn" onClick={() => go(r.step)} aria-label={r.edit}>
+                Editează
               </button>
             </li>
           ))}
@@ -348,12 +350,12 @@ function ReviewStep({ draft, go }: { draft: OnboardingDraft; go: (s: number) => 
       </div>
       {draft.motivation && (
         <p className="muted" style={{ fontStyle: 'italic' }}>
-          “{draft.motivation}”
+          „{draft.motivation}”
         </p>
       )}
       <div className="row small muted">
         <CheckCircle2 size={18} aria-hidden color="var(--accent)" />
-        Your progress is saved. You can close the app and pick up later.
+        Progresul tău e salvat. Poți închide aplicația și continua mai târziu.
       </div>
     </section>
   );
