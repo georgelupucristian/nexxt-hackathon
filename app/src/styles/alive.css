@@ -1216,6 +1216,13 @@ body:has(.party) .dial-bounds {
 .dial--open .dial__kip {
   cursor: pointer;
 }
+/* press feedback on the face, so it never fights the drag or the open scale */
+.dial__face {
+  transition: scale 140ms var(--ease);
+}
+.dial__kip:active .dial__face {
+  scale: 0.9;
+}
 .dial__progress {
   position: absolute;
   inset: 0;
@@ -1641,43 +1648,50 @@ body:has(.party) .dial-bounds {
 }
 
 /* ---------- streak moment (Duolingo-style) ---------- */
+/* Over the app, not instead of it: the home screen stays visible, frosted, behind the moment. */
 .streak-moment {
+  --fire: #f2830d;
+  --fire-deep: #d9620b;
+  --cold: #d6d1c7;
   position: fixed;
   inset: 0;
   z-index: 75;
-  display: grid;
-  place-items: center;
-  padding: var(--s-6) var(--gutter);
-  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+  padding: max(28px, env(safe-area-inset-top)) var(--gutter) calc(20px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  background: color-mix(in oklab, var(--bg) 58%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  backdrop-filter: blur(22px) saturate(1.25);
 }
 body:has(.streak-moment) .dial-bounds {
   display: none;
 }
 .streak-moment__inner {
+  flex: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--s-5);
+  justify-content: center;
   text-align: center;
-}
-.streak-moment__kip {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
 }
 .streak-moment__bubble {
   position: relative;
-  margin: 0;
+  z-index: 2;
+  margin: 0 0 6px;
   max-width: 30ch;
   padding: 12px 16px;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
   font-weight: 600;
+  text-wrap: balance;
   transform-origin: bottom center;
+  box-shadow: 0 6px 18px rgba(23, 32, 27, 0.08);
 }
 .streak-moment__bubble::after {
   content: '';
@@ -1692,85 +1706,122 @@ body:has(.streak-moment) .dial-bounds {
   border-bottom: 1px solid var(--line);
   transform: rotate(45deg);
 }
-.streak-moment__fire {
-  display: flex;
-  align-items: center;
-  gap: var(--s-4);
+.streak-hero {
+  position: relative;
+  width: 250px;
+  height: 196px;
 }
-.flame {
-  width: 84px;
-  height: 105px;
-  overflow: visible;
+.streak-hero__fire {
+  position: absolute;
+  left: 20px;
+  bottom: 6px;
+  transform-origin: 50% 100%;
 }
-.streak-moment__count {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.streak-hero__kip {
+  position: absolute;
+  right: 6px;
+  bottom: -4px;
 }
 .streak-moment__num {
+  margin-top: var(--s-2);
   font-family: var(--font-display);
-  font-size: 4rem;
+  font-size: 6rem;
   font-weight: 800;
-  line-height: 1;
-  color: var(--surface-3);
-  transition: color 300ms var(--ease);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--cold);
+  transition: color 400ms var(--ease);
   font-variant-numeric: tabular-nums;
 }
 .streak-moment__num.is-lit {
-  color: #e8611a;
+  color: var(--fire);
 }
 .streak-moment__label {
-  font-weight: 700;
-  color: var(--ink-2);
+  font-family: var(--font-display);
+  font-size: var(--fs-xl, 1.5rem);
+  font-weight: 750;
+  color: var(--cold);
+  transition: color 400ms var(--ease);
 }
+.streak-moment__label.is-lit {
+  color: var(--fire);
+}
+
+/* week: labels on top, then one track where the run is a single filled bar */
 .streak-week {
-  list-style: none;
-  margin: 0;
-  padding: var(--s-4);
+  --dot: 36px;
   width: 100%;
+  margin-top: var(--s-6);
+}
+.streak-week__days,
+.streak-week__track {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface);
+  justify-items: center;
 }
-.streak-week__day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+.streak-week__days {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
 }
 .streak-week__w {
-  font-size: var(--fs-xs);
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--ink-3);
 }
-.streak-week__day.is-today .streak-week__w {
-  color: #e8611a;
+.streak-week__w.is-today {
+  color: var(--fire);
+}
+.streak-week__track {
+  position: relative;
+  align-items: center;
 }
 .streak-week__dot {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: var(--dot);
+  height: var(--dot);
   border-radius: 50%;
-  border: 2px solid var(--line-strong);
+  background: color-mix(in oklab, var(--surface-3) 80%, transparent);
   color: #fff;
 }
 .streak-week__dot.is-done {
-  background: #f08a24;
-  border-color: #f08a24;
+  background: transparent;
+}
+.streak-week__dot.is-done.is-today {
+  background: var(--fire);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--fire) 28%, transparent);
 }
 .streak-week__dot.is-break {
   background: var(--info-soft);
-  border-color: var(--info);
+}
+/* a pill from the first day of the run to today; a run from last week enters from the left edge */
+.streak-week__run {
+  position: absolute;
+  top: 50%;
+  height: var(--dot);
+  translate: 0 -50%;
+  left: calc((var(--from) + 0.5) / 7 * 100% - var(--dot) / 2);
+  width: calc((var(--to) - var(--from)) / 7 * 100% + var(--dot));
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--fire-deep), var(--fire));
+}
+.streak-week__run.is-continued {
+  left: -12px;
+  width: calc((var(--to) + 0.5) / 7 * 100% + var(--dot) / 2 + 12px);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px);
+  mask-image: linear-gradient(90deg, transparent, #000 36px);
 }
 .streak-moment__fine {
-  margin: 0;
+  margin: var(--s-5) 0 0;
+  max-width: 34ch;
   font-size: var(--fs-sm);
   color: var(--ink-2);
+  text-wrap: balance;
 }
 .streak-moment__go {
   width: 100%;
+  max-width: 380px;
 }
