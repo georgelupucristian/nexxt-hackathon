@@ -1,0 +1,26 @@
+{
+  "skill_name": "hackathon-ready",
+  "evals": [
+    {
+      "id": 0,
+      "name": "catchup-comment-existing-code",
+      "prompt": "ok so we're at hour 16 of a 24h hackathon and our code has basically zero comments. project is PitchDeck AI - you upload a meeting recording and then ask questions about it. the files are api/main.py, worker/ingest.py and web/upload.js. judging is in the morning and part of the score is whether we can explain our own code, so can you go through and comment it properly? make it sound like we wrote it not like a robot wrote it",
+      "expected_output": "The three source files edited in place with inline comments in a lowercase, no-trailing-period developer voice that explain WHY rather than what. Comments should catch the genuinely non-obvious things: the 50-word chunk overlap, the manual cosine similarity, the in-memory JOBS dict + lock being a scale-out blocker, the hardcoded DEMO_USERS, the jittered retry backoff, the 0.78 threshold, SSE-with-polling-fallback, the signed-URL direct upload, and the all-zero-vector check working around an API that returns 200 on failure. Density should vary rather than being uniform. No fabricated rationales.",
+      "files": ["api/main.py", "worker/ingest.py", "web/upload.js"]
+    },
+    {
+      "id": 1,
+      "name": "judge-prep-demo-doc",
+      "prompt": "we present in 3 hours. i need the demo doc sorted - run of show plus i want you to be brutal and come up with the questions the judges are actually going to hit us with so we're not caught out. the project is in this folder (PitchDeck AI, upload a meeting recording and ask questions about it). read the code first so the answers are real",
+      "expected_output": "A docs/DEMO.md containing a run-of-show with timings and spoken lines, an explicit live-vs-hardcoded section flagging DEMO_USERS and anything else faked, a fallback plan, and ~10 adversarial questions with honest short answers grounded in what the code actually does (single-instance in-memory state, exact cosine search that won't scale, threshold tuning, key handling, prompt injection via transcript, 'isn't this just a RAG wrapper').",
+      "files": ["api/main.py", "worker/ingest.py", "web/upload.js"]
+    },
+    {
+      "id": 2,
+      "name": "live-mode-new-feature",
+      "prompt": "hackathon project, ~8 hours left. right now PitchDeck AI only lets one person query a recording at a time and everything's in memory. i want to add a share link so a teammate can open the same job read-only. build it and keep it documented as you go - we get graded on explaining our architecture choices, not just on whether it runs",
+      "expected_output": "Working share-link code with inline comments written in the human voice at the moment of the decision, plus a docs/DECISIONS.md entry for the share-token approach that names the alternatives considered (real auth, unguessable UUID, signed token) and the cost of the choice, plus a BUILDLOG line. Documentation should be produced as part of the same pass, not as a separate afterthought.",
+      "files": ["api/main.py", "worker/ingest.py", "web/upload.js"]
+    }
+  ]
+}

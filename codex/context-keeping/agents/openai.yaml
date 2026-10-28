@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Keeping"
+  short_description: "Preserve and restore task context across long sessions"
+  default_prompt: "Create or update a concise context snapshot with objective, current state, decisions, open questions, and exact next steps."
