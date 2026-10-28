@@ -6,6 +6,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Young Serif has one weight; never let the browser fake a bold version of it */
+  font-synthesis-weight: none;
 }
 body {
   margin: 0;
@@ -15,7 +17,6 @@ body {
   font-size: var(--fs-md);
   line-height: var(--lh);
   -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'cv11', 'ss01';
 }
 h1,
 h2,

@@ -45,6 +45,13 @@ export function HubShell() {
 
   const openAdd = (goalId: string | null = goal?.id ?? null, presetAmount?: number) => setMoney({ open: true, mode: 'contribution', goalId, presetAmount });
 
+  // Kip was dragged onto a goal: ask how much goes into it
+  useEffect(() => {
+    const onFeed = (e: Event) => setMoney({ open: true, mode: 'contribution', goalId: (e as CustomEvent<string>).detail });
+    window.addEventListener('kip:feed', onFeed);
+    return () => window.removeEventListener('kip:feed', onFeed);
+  }, []);
+
   // panels grow out of the dial, wherever the user has dragged it
   const dialCenter = (): Origin => {
     const el = document.querySelector('.dial__kip');

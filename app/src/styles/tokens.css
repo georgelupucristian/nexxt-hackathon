@@ -44,9 +44,11 @@
   --tint-activity-ink: var(--ink);
   --tint-profile-ink: var(--ink);
 
-  /* type scale (one display face for headings and big numbers, one text face) */
-  --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Bricolage Grotesque', var(--font);
+  /* One heavy grotesk for everything (Archivo: black weight for headings and money, regular for
+     reading), and one brush face used for a single word at a time, never for sentences. */
+  --font: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-brush: 'Knewave', 'Archivo', cursive;
   --fs-xs: 0.8125rem; /* 13: captions and labels, nothing smaller */
   --fs-sm: 0.875rem; /* 14: secondary text */
   --fs-md: 0.9375rem; /* 15: body */

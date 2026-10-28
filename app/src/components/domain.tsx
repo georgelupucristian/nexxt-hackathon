@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChevronRight, Eye, EyeOff, Flame, FlaskConical, Info, Pause, PenLine, RefreshCw, WifiOff } from '@/lib/icons';
+import { CalendarClock, ChevronRight, Eye, EyeOff, Flame, FlaskConical, Info, Pause, PenLine, RefreshCw, WifiOff } from '@/lib/icons';
 import { Link } from 'react-router-dom';
 import { breakdown, goalSaved, nextPlannedDate, planHealth, progress, weekStates, type DayState, type WeekSummary } from '../data/selectors';
 import { useData, useStore } from '../data/store';
@@ -126,7 +126,7 @@ const DAY_LABEL: Record<DayState, string> = {
   'today-done': 'today, savings action done',
   today: 'today, nothing yet',
   missed: 'missed',
-  paused: 'break day',
+  paused: 'ice floe',
   future: 'upcoming',
   before: 'before you joined',
 };
@@ -201,7 +201,7 @@ export function GoalCard({ goal, compact }: { goal: Goal; compact?: boolean }) {
   const next = goal.status === 'active' ? nextPlannedDate(goal.plan) : null;
   const remaining = Math.max(0, goal.target - saved);
   return (
-    <Link to={`/goals/${goal.id}`} className="card card--interactive goal-card" aria-label={`${goal.name}: ${formatLei(saved)} of ${formatLei(goal.target)}`}>
+    <Link to={`/goals/${goal.id}`} className="card card--interactive goal-card" data-feed-goal={goal.id} data-feed-name={goal.name} aria-label={`${goal.name}: ${formatLei(saved)} of ${formatLei(goal.target)}`}>
       <div className="row row--top">
         <GoalGlyph kind={goal.kind} status={goal.status} />
         <div className="grow">
@@ -252,13 +252,16 @@ export function TxRow({ tx }: { tx: Transaction }) {
   const title = tx.note || (isIn ? 'Contribution' : 'Withdrawal');
   return (
     <Link to={`/activity/${tx.id}`} className="list-row">
-      <span className="list-row__icon" style={isIn ? { background: 'var(--accent-soft)', color: 'var(--accent-ink)' } : undefined} aria-hidden>
-        {isIn ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
+      {/* a ledger date instead of an arrow-in-a-circle: it says something */}
+      <span className="list-row__date" aria-hidden>
+        <b>{Number(tx.date.slice(8, 10))}</b>
+        <small>{new Date(`${tx.date}T12:00:00`).toLocaleDateString('en-GB', { month: 'short' })}</small>
       </span>
       <span className="list-row__body">
         <span className="strong truncate">{title}</span>
         <span className="small subtle truncate">
-          {goal ? goal.name : 'Unallocated'} · {formatDay(tx.date)}
+          {goal ? goal.name : 'Not assigned'}
+          <span className="sr-only"> · {formatDay(tx.date)}</span>
         </span>
       </span>
       <span className="list-row__end">

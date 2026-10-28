@@ -121,7 +121,7 @@ export function StreakMoment() {
                 })}
               </div>
             </motion.div>
-            <p className="streak-moment__fine">A day counts when you save or check in. Breaks never cost you money.</p>
+            <p className="streak-moment__fine">A day counts when you save or check in. Ice floe days keep it going.</p>
           </div>
 
           <motion.button type="button" className="btn btn--primary btn--lg streak-moment__go" initial={{ opacity: 0, y: 12 }} animate={{ opacity: lit ? 1 : 0, y: lit ? 0 : 12 }} transition={{ delay: 1.1 }} onClick={() => setMoment(null)}>

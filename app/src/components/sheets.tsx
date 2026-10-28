@@ -447,15 +447,15 @@ export function StreakSheet({ open, onClose }: { open: boolean; onClose: () => v
         </div>
         <StreakRules />
         <div className="card card--tint stack">
-          <h3>Need a break?</h3>
-          <p className="small muted">Mark today as a break day. It won’t count, and it won’t end your streak. Your savings are never affected.</p>
+          <h3>Need an ice floe?</h3>
+          <p className="small muted">Seals rest on ice floes. Put today on one: Kip floats, your streak stays, your savings don’t change.</p>
           <Button
             size="sm"
             disabled={doneToday && !paused}
             onClick={() => togglePause(today)}
             style={{ alignSelf: 'flex-start' }}
           >
-            {paused ? 'Undo break for today' : 'Take today off'}
+            {paused ? 'Back to a normal day' : 'Float today'}
           </Button>
           {doneToday && !paused && <p className="xs subtle">You already did a savings action today ({formatDay(today)}).</p>}
         </div>
@@ -478,7 +478,7 @@ export function StreakRules() {
           <strong>Missed a day?</strong> Your streak starts again from your next action. Your best streak and all your savings stay.
         </li>
         <li>
-          <strong>Break days</strong> pause the streak without breaking it. Use them for exams, holidays or tight weeks.
+          <strong>Ice floes</strong> are rest days. The streak waits on them. Use them for exams, holidays or tight weeks.
         </li>
       </ul>
       <div className="legend" aria-label="Legend">
@@ -492,7 +492,7 @@ export function StreakRules() {
           <i style={{ background: 'var(--surface-2)', border: '1.5px solid var(--line-strong)' }} /> Missed
         </span>
         <span>
-          <i style={{ background: 'var(--info-soft)', border: '1.5px solid var(--info)' }} /> Break
+          <i style={{ background: 'var(--info-soft)', border: '1.5px solid var(--info)' }} /> Ice floe
         </span>
         <span>
           <i style={{ border: '1.5px dashed var(--line-strong)' }} /> Upcoming

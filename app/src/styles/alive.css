@@ -285,7 +285,7 @@ h2 {
 }
 .panel .screen {
   padding-top: var(--s-4);
-  padding-bottom: calc(var(--s-12) + env(safe-area-inset-bottom));
+  padding-bottom: calc(128px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
 }
 /* the panel header already names the section */
 .panel .page-head h1 {
@@ -1186,19 +1186,26 @@ body:has(.party) .dial-bounds {
 }
 .dial {
   position: absolute;
-  right: 12px;
-  bottom: calc(18px + env(safe-area-inset-bottom));
+  left: 50%;
+  margin-left: -36px;
+  bottom: calc(22px + env(safe-area-inset-bottom));
   width: 72px;
   height: 72px;
   pointer-events: auto;
   touch-action: none;
 }
+.dial--feeding .dial__kip {
+  cursor: grabbing;
+  box-shadow: 0 16px 34px rgba(23, 32, 27, 0.28);
+}
+/* a light frost, not a dark curtain: you still see where you are */
 .dial-backdrop {
   position: fixed;
   inset: 0;
   z-index: 55;
-  background: rgba(23, 32, 27, 0.22);
-  backdrop-filter: blur(2px);
+  background: color-mix(in oklab, var(--bg) 22%, transparent);
+  -webkit-backdrop-filter: blur(6px) saturate(1.1);
+  backdrop-filter: blur(6px) saturate(1.1);
 }
 .dial__kip {
   position: absolute;
@@ -1258,70 +1265,84 @@ body:has(.party) .dial-bounds {
 }
 .dial__here {
   position: absolute;
+  z-index: 3;
   left: 50%;
-  top: calc(100% + 4px);
+  top: calc(100% - 9px);
   translate: -50% 0;
-  padding: 2px 8px;
+  padding: 2px 9px;
   border-radius: var(--r-pill);
   background: var(--ink);
   color: #fff;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   pointer-events: none;
 }
-.dial__ring {
+
+/* the half ring: liquid glass slices clipped to their exact shape, so the blur, the tint and the
+   tap target are all the slice itself */
+.dial__arc {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 0;
-  height: 0;
   z-index: 1;
 }
-.dial__svg {
+.dial__glass {
   position: absolute;
-  left: -140px;
-  top: -140px;
-  width: 280px;
-  height: 280px;
-  overflow: visible;
-  filter: drop-shadow(0 10px 22px rgba(23, 32, 27, 0.16));
-}
-.dial__seg {
+  inset: 0;
+  padding: 0;
+  border: 0;
   cursor: pointer;
-  fill: var(--surface);
-  stroke: var(--line);
-  stroke-width: 1;
-  transition: fill var(--t-fast);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.55), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.22));
+  -webkit-backdrop-filter: blur(16px) saturate(1.9) brightness(1.06);
+  backdrop-filter: blur(16px) saturate(1.9) brightness(1.06);
+  transition: background-color var(--t-fast);
 }
-.dial__seg--hover {
-  fill: var(--surface-2);
+.dial__glass--hover {
+  background-color: rgba(255, 255, 255, 0.28);
 }
-.dial__seg--current {
-  fill: var(--accent);
-  stroke: var(--accent);
+.dial__glass--current {
+  color: #fff;
+  background:
+    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.28), transparent 55%),
+    linear-gradient(180deg, color-mix(in oklab, var(--accent) 88%, transparent), color-mix(in oklab, var(--accent) 70%, transparent));
 }
-.dial__label {
+.dial__glass:focus-visible {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+.dial__word {
   position: absolute;
   translate: -50% -50%;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  width: 76px;
-  padding: 6px 0;
-  border: 0;
-  border-radius: var(--r-md);
-  background: transparent;
-  color: var(--ink);
-  font: inherit;
-  font-size: var(--fs-xs);
-  font-weight: 650;
-  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
 }
-.dial__label--current {
-  color: #fff;
+.dial__glass--current .dial__word {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
+.dial__rims {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 18px rgba(23, 32, 27, 0.14));
+}
+
+/* a goal Kip is hovering over, mid-drag */
+[data-feed-goal] {
+  transition: box-shadow 160ms var(--ease), scale 160ms var(--ease);
+}
+[data-feed-goal].is-feed-target {
+  scale: 1.02;
+  box-shadow: 0 0 0 3px var(--accent), 0 12px 30px rgba(31, 122, 82, 0.2);
+}
+
 
 .home2__head {
   position: relative;
@@ -1861,4 +1882,446 @@ body:has(.streak-moment) .dial-bounds {
 .streak-moment__go {
   width: 100%;
   max-width: 380px;
+}
+
+/* headings and money: black weight, tight, the way a bank card prints numbers */
+.h1,
+.h2,
+h1,
+h2 {
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+.brush {
+  font-family: var(--font-brush);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+/* ---------- home: heavy type, a dark vault card, tiles ---------- */
+.home3__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  font-stretch: 105%;
+}
+.home3__name {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 1.2em;
+  line-height: 1;
+  color: var(--accent);
+  transform: rotate(-2deg);
+}
+.vault {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 18px 16px;
+  border-radius: 24px;
+  color: #f3f1ea;
+  background:
+    radial-gradient(90% 70% at 100% 0%, rgba(84, 190, 130, 0.22), transparent 60%),
+    #14231a;
+}
+.vault__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.vault__label {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(243, 241, 234, 0.7);
+}
+.vault__eye {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+}
+.vault__amount {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 6px 0 0;
+  font-size: clamp(2.75rem, 13vw, 3.75rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.vault__amount > span:last-child {
+  font-size: 0.42em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: rgba(243, 241, 234, 0.6);
+}
+.vault__split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 10px 0 16px;
+  font-size: var(--fs-sm);
+  color: rgba(243, 241, 234, 0.72);
+}
+.vault__pending {
+  color: #f5c46b;
+}
+.vault__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vault__actions .qr {
+  flex: 1;
+}
+.vault .btn--primary,
+.vault .btn--secondary {
+  background: #9be4b8;
+  border-color: #9be4b8;
+  color: #0f1d15;
+}
+.vault .qr--open {
+  background: rgba(255, 255, 255, 0.08);
+}
+.vault .qr__input input,
+.vault .qr__input span {
+  color: #f3f1ea;
+}
+.vault .qr__goal,
+.vault .qr__pick {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+  color: #f3f1ea;
+}
+.vault .qr__goal[aria-checked='true'] {
+  background: #f3f1ea;
+  color: #0f1d15;
+}
+.vault__more {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(243, 241, 234, 0.8);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.tile:active {
+  scale: 0.98;
+}
+.tile--wide {
+  grid-column: 1 / -1;
+}
+.tile__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tile__amount {
+  font-size: 1.625rem;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.tile--wide .tile__amount {
+  font-size: 2.125rem;
+}
+.tile__amount small {
+  font-size: 0.55em;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.tile__sub {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+.tile__bar {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.tile__bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.tile__note {
+  margin-top: 8px;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+.tile__note.is-late {
+  color: var(--warn-ink, #8a5a00);
+}
+.tile--streak .tile__label svg,
+.tile--streak .tile__amount {
+  color: #e8761a;
+}
+.tile__week {
+  display: flex;
+  gap: 5px;
+  margin: 6px 0 2px;
+}
+.wk {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+.wk--done,
+.wk--today-done {
+  background: #f2830d;
+}
+.wk--today {
+  box-shadow: inset 0 0 0 2px #f2830d;
+  background: transparent;
+}
+.wk--paused {
+  background: var(--info-soft);
+  box-shadow: inset 0 0 0 1.5px var(--info);
+}
+.wk--future,
+.wk--before {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+}
+.home3__title {
+  padding-right: 76px; /* the sign-out link sits in the top right corner */
+}
+.vault .qr:not(.qr--open) {
+  justify-content: stretch;
+}
+.vault .qr:not(.qr--open) .qr__btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* status as words, not badges */
+.status {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.status--warn {
+  color: var(--warn);
+}
+.status--danger {
+  color: var(--danger);
+}
+/* ledger date in activity rows */
+.list-row__date {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  line-height: 1;
+}
+.list-row__date b {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.list-row__date small {
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+/* goal icons sit on the page, not in tinted tiles */
+.goal-glyph {
+  background: none;
+  color: var(--ink);
+  border-radius: 0;
+}
+img.goal-glyph--kip {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+img.goal-glyph--kip.goal-glyph--lg {
+  width: 56px;
+  height: 56px;
+}
+/* every remaining "pill" reads as a coloured word */
+.pill,
+.pill[class*='pill--'] {
+  padding: 0;
+  background: none;
+  font-weight: 700;
+}
+.pill svg {
+  display: none;
+}
+.pill--dark {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---------- sleep on it ---------- */
+.tile--sleep {
+  position: relative;
+}
+.tile__kip {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+.tile--sleep .tile__label {
+  padding-right: 42px;
+}
+.tile__amount--text {
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+}
+.tile--sleep.is-awake {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.sleep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.sleep__intro {
+  margin: 0;
+  color: var(--ink-2);
+}
+.sleep__form {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 8px;
+}
+.sleep__form .btn {
+  grid-column: 1 / -1;
+}
+.sleep__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wish {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.wish--awake {
+  border-color: var(--accent);
+}
+.wish__kip {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+.wish__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wish__name {
+  margin: 0;
+  font-weight: 800;
+}
+.wish__name .money {
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.wish__when,
+.wish__ask {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+.wish__ask {
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+.wish__skip {
+  margin-left: 10px;
+  font-size: var(--fs-xs);
+}
+.wish__actions,
+.wish__keep {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.sleep__kept {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
 }

@@ -132,7 +132,7 @@ export function upsertDemoAccount(): Account {
   if (existing) return existing;
   const account: Account = {
     id: uid('demo_'),
-    name: 'Alex',
+    name: 'Ioana',
     email: 'demo@kept.local',
     salt: '',
     passwordHash: '',

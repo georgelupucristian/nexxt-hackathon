@@ -2,15 +2,11 @@ import {
   AlertCircle,
   ArrowLeft,
   CheckCircle2,
-  Clock,
-  FlaskConical,
   Laptop,
-  PenLine,
   Plane,
   ShieldCheck,
   Target,
   X,
-  XCircle,
   type LucideIcon,
 } from '@/lib/icons';
 import {
@@ -227,8 +223,11 @@ export const GOAL_ICON: Record<GoalKind, LucideIcon> = {
 };
 
 export function GoalGlyph({ kind, size, status }: { kind: GoalKind; size?: 'lg'; status?: GoalStatus }) {
+  // A paused or archived goal shows Kip asleep instead of an icon: the state reads at a glance.
+  if (status && status !== 'active')
+    return <img className={`goal-glyph goal-glyph--kip ${size === 'lg' ? 'goal-glyph--lg' : ''}`} src="/mascot/sleep-face.webp" alt="" />;
   return (
-    <span className={`goal-glyph goal-glyph--${kind} ${size === 'lg' ? 'goal-glyph--lg' : ''} ${status && status !== 'active' ? 'goal-glyph--paused' : ''}`} aria-hidden>
+    <span className={`goal-glyph goal-glyph--${kind} ${size === 'lg' ? 'goal-glyph--lg' : ''}`} aria-hidden>
       <Emoji3D name={GOAL_EMOJI[kind]} size={size === 'lg' ? 38 : 30} />
     </span>
   );
@@ -236,29 +235,11 @@ export function GoalGlyph({ kind, size, status }: { kind: GoalKind; size?: 'lg';
 
 /** One pill per transaction that says both where it came from and whether it counts. */
 export function TxStatusPill({ tx }: { tx: Transaction }) {
-  if (tx.status === 'failed')
-    return (
-      <span className="pill pill--danger">
-        <XCircle aria-hidden /> Failed
-      </span>
-    );
-  if (tx.status === 'pending')
-    return (
-      <span className="pill pill--warn">
-        <Clock aria-hidden /> Pending
-      </span>
-    );
-  if (tx.source === 'demo')
-    return (
-      <span className="pill pill--demo">
-        <FlaskConical aria-hidden /> Simulated
-      </span>
-    );
-  return (
-    <span className="pill">
-      <PenLine aria-hidden /> Manual
-    </span>
-  );
+  // plain coloured words, no badges; a normal manual entry needs no label at all
+  if (tx.status === 'failed') return <span className="status status--danger">Failed</span>;
+  if (tx.status === 'pending') return <span className="status status--warn">Pending</span>;
+  if (tx.source === 'demo') return <span className="status">Simulated</span>;
+  return null;
 }
 
 export function txStatusText(tx: Transaction): string {

@@ -1,12 +1,13 @@
 import NumberFlow from '@number-flow/react';
-import { ArrowRight, ChevronRight, Eye, EyeOff } from '@/lib/icons';
+import { ArrowRight, ChevronRight, Eye, EyeOff, Flame } from '@/lib/icons';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { HealthPill, planLabel, TxRow } from '../domain';
+import { planLabel, TxRow } from '../domain';
 import { hubLine } from '../mascot/lines';
-import { GoalGlyph, useToast } from '../ui';
-import { GoalStack, PlanSimulator, QuickRecord } from './Playful';
+import { useToast } from '../ui';
+import { PlanSimulator, QuickRecord } from './Playful';
+import { SleepTile } from './SleepOnIt';
 import {
   activeGoals,
   breakdown,
@@ -52,15 +53,18 @@ export function Hub({ onAdd, onDetails }: HubProps) {
   const action = todayAction(data);
   const firstUse = data.transactions.length === 0 && !account?.isDemo;
   const name = titleCase(account?.name ?? '');
+  const others = activeGoals(data.goals).filter((g) => g.id !== goal?.id).slice(0, 3);
 
   return (
     <div className="home2">
-      <motion.header className="home2__head" {...enter(0)}>
+      <motion.header className="home2__head home3__head" {...enter(0)}>
         <Link to="/logout" className="home2__out">
           Sign out
         </Link>
-        <p className="home2__hello">{greeting()},</p>
-        <h1 className="home2__name">{name || 'welcome'}</h1>
+        <h1 className="home3__title">
+          {greeting()},<br />
+          <span className="brush home3__name">{name || 'friend'}</span>
+        </h1>
       </motion.header>
 
       {firstUse ? (
@@ -71,26 +75,26 @@ export function Hub({ onAdd, onDetails }: HubProps) {
         <div className="home2__grid">
           <div className="home2__col">
             <motion.div {...enter(1)}>
-              <Overview goal={goal} onDetails={onDetails} primaryElsewhere={hasPrimary(action)} />
+              <Vault goal={goal} onDetails={onDetails} primaryElsewhere={hasPrimary(action)} />
             </motion.div>
-            <motion.div {...enter(2)}>
-              <NextStep action={action} onAdd={onAdd} />
+            <motion.div {...enter(2)} className="tiles">
+              {goal && <GoalTile goal={goal} wide />}
+              <StreakTile />
+              <SleepTile />
+              {others.map((g) => (
+                <GoalTile key={g.id} goal={g} />
+              ))}
             </motion.div>
           </div>
           <div className="home2__col">
-            {goal && (
-              <motion.div {...enter(3)}>
-                <GoalStack goals={[goal, ...activeGoals(data.goals).filter((g) => g.id !== goal.id)]} render={(g) => <GoalSummary goal={g} />} />
-              </motion.div>
-            )}
+            <motion.div {...enter(3)}>
+              <NextStep action={action} onAdd={onAdd} />
+            </motion.div>
             {goal && goal.plan.frequency !== 'flexible' && (
               <motion.div {...enter(4)}>
                 <PlanSimulator goal={goal} />
               </motion.div>
             )}
-            <motion.div {...enter(4)}>
-              <CheckIns />
-            </motion.div>
             <motion.div {...enter(5)}>
               <Recent onAdd={onAdd} />
             </motion.div>
@@ -105,80 +109,36 @@ const hasPrimary = (a: TodayAction) => a.kind !== 'done-today' && a.kind !== 're
 
 // ---------- what you've saved ----------
 
-function Overview({ goal, onDetails, primaryElsewhere }: { goal: Goal | null; onDetails: () => void; primaryElsewhere: boolean }) {
+function Vault({ goal, onDetails, primaryElsewhere }: { goal: Goal | null; onDetails: () => void; primaryElsewhere: boolean }) {
   const data = useData();
   const { setPrefs } = useStore();
   const b = breakdown(data.transactions);
   const hidden = data.prefs.hideBalance;
-  const saved = goal ? goalSaved(data.transactions, goal.id) : 0;
-  const pct = goal && goal.target > 0 ? Math.min(1, saved / goal.target) : 0;
-  const r = 64;
-  const circ = 2 * Math.PI * r;
   const money = (v: number) => (hidden ? '••••' : formatLei(v));
 
   return (
-    <section className="card overview" aria-labelledby="ov-title">
-      <div className="card-head">
-        <h2 id="ov-title" className="h3">
-          Your savings
+    <section className="vault" aria-labelledby="vault-title">
+      <div className="vault__top">
+        <h2 id="vault-title" className="vault__label">
+          Saved
         </h2>
-        <button type="button" className="icon-btn icon-btn--sm" onClick={() => setPrefs({ hideBalance: !hidden })} aria-label={hidden ? 'Show amounts' : 'Hide amounts'}>
+        <button type="button" className="vault__eye" onClick={() => setPrefs({ hideBalance: !hidden })} aria-label={hidden ? 'Show amounts' : 'Hide amounts'}>
           {hidden ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
         </button>
       </div>
-
-      <div className="overview__body">
-        {goal && (
-          <div className="goalring" role="img" aria-label={`${Math.round(pct * 100)}% of ${goal.name}`}>
-            <svg viewBox="0 0 160 160" aria-hidden>
-              <circle cx="80" cy="80" r={r} className="goalring__track" />
-              <motion.circle
-                cx="80"
-                cy="80"
-                r={r}
-                className="goalring__fill"
-                strokeDasharray={circ}
-                transform="rotate(-90 80 80)"
-                initial={{ strokeDashoffset: circ }}
-                animate={{ strokeDashoffset: circ * (1 - pct) }}
-                transition={{ type: 'spring', stiffness: 40, damping: 16, delay: 0.2 }}
-              />
-            </svg>
-            <div className="goalring__center">
-              <span className="goalring__pct">
-                <NumberFlow value={Math.round(pct * 100)} />%
-              </span>
-            </div>
-            <span className="goalring__label">{goal.name}</span>
-          </div>
-        )}
-
-        <dl className="overview__figures">
-          <div className="fig fig--main">
-            <dt>Saved, confirmed</dt>
-            <dd className="money">{hidden ? '••••' : <NumberFlow value={b.total / 100} locales="ro-RO" format={{ maximumFractionDigits: 2 }} suffix=" lei" />}</dd>
-          </div>
-          <div className="fig">
-            <dt>In goals</dt>
-            <dd className="money">{money(b.allocated)}</dd>
-          </div>
-          <div className="fig">
-            <dt>Not assigned to a goal</dt>
-            <dd className="money">{money(b.unallocated)}</dd>
-          </div>
-          {b.pendingIn > 0 && (
-            <div className="fig fig--pending">
-              <dt>Pending, not counted yet</dt>
-              <dd className="money">{money(b.pendingIn)}</dd>
-            </div>
-          )}
-        </dl>
-      </div>
-
-      <div className="overview__actions">
+      <p className="vault__amount money">
+        {hidden ? '••••' : <NumberFlow value={b.total / 100} locales="ro-RO" format={{ maximumFractionDigits: 0 }} />}
+        <span>lei</span>
+      </p>
+      <p className="vault__split">
+        <span>{money(b.allocated)} in goals</span>
+        <span>{money(b.unallocated)} free</span>
+        {b.pendingIn > 0 && <span className="vault__pending">{money(b.pendingIn)} on the way</span>}
+      </p>
+      <div className="vault__actions">
         <QuickRecord goal={goal} primary={!primaryElsewhere} />
-        <button type="button" className="btn btn--ghost" onClick={onDetails}>
-          Details
+        <button type="button" className="vault__more" onClick={onDetails}>
+          How it adds up
         </button>
       </div>
     </section>
@@ -295,7 +255,7 @@ function NextStep({ action, onAdd }: { action: TodayAction; onAdd: (goalId?: str
 
 // ---------- goal context and the one insight that matters ----------
 
-function GoalSummary({ goal }: { goal: Goal }) {
+function GoalTile({ goal, wide }: { goal: Goal; wide?: boolean }) {
   const data = useData();
   const saved = goalSaved(data.transactions, goal.id);
   const pct = goal.target > 0 ? Math.min(1, saved / goal.target) : 0;
@@ -303,74 +263,41 @@ function GoalSummary({ goal }: { goal: Goal }) {
   const pace = goal.targetDate && goal.targetDate > todayKey() ? requiredPace(saved, goal.target, goal.targetDate) : null;
   const health = planHealth(goal, saved);
 
+  // one sentence that says something you couldn't see from the numbers
   let insight = '';
-  if (saved >= goal.target) insight = 'Target reached.';
-  else if (goal.plan.frequency === 'flexible') insight = 'Flexible plan, so there’s no finish date. Set a regular amount to see one.';
+  if (saved >= goal.target) insight = 'Done. Time to decide what’s next.';
+  else if (goal.plan.frequency === 'flexible') insight = 'No fixed plan, so no finish date yet.';
   else if (finish && goal.targetDate) {
     const weeks = Math.round(Math.abs(daysBetween(goal.targetDate, finish)) / 7);
     insight =
       finish > goal.targetDate
-        ? `At this pace you finish about ${weeks} week${weeks === 1 ? '' : 's'} after your date. ${pace ? `Saving ${formatLei(pace.perWeek)} a week would get you there on time.` : ''}`
+        ? `${weeks} week${weeks === 1 ? '' : 's'} late at this pace.${pace ? ` ${formatLei(Math.ceil(pace.perWeek / 100) * 100)} a week gets you there on time.` : ''}`
         : weeks === 0
-          ? 'At this pace you finish right on your date.'
-          : `At this pace you finish about ${weeks} week${weeks === 1 ? '' : 's'} before your date.`;
-  } else if (finish) insight = `At this pace you reach it around ${formatDate(finish)}.`;
+          ? 'Lands right on your date.'
+          : `${weeks} week${weeks === 1 ? '' : 's'} early at this pace.`;
+  } else if (finish) insight = `Around ${formatDate(finish)} at this pace.`;
 
   return (
-    <section className="card goal2" aria-labelledby="goal2-title">
-      <Link to={`/goals/${goal.id}`} className="goal2__head">
-        <GoalGlyph kind={goal.kind} status={goal.status} />
-        <span className="grow">
-          <span id="goal2-title" className="h3 block">
-            {goal.name}
-          </span>
-          <span className="small muted">Primary goal</span>
-        </span>
-        <HealthPill goal={goal} saved={saved} />
-        <ChevronRight size={18} aria-hidden className="muted" />
-      </Link>
-      <p className="goal2__amount">
-        <span className="money">{formatLei(saved)}</span> <span className="muted">of {formatLei(goal.target)}</span>
-      </p>
-      <div className="bar" aria-hidden>
-        <motion.span initial={{ width: 0 }} animate={{ width: `${Math.max(pct * 100, pct > 0 ? 1.5 : 0)}%` }} transition={{ type: 'spring', stiffness: 60, damping: 18 }} />
-      </div>
-      <dl className="kv2">
-        <div>
-          <dt>Plan</dt>
-          <dd>{planLabel(goal.plan)}</dd>
-        </div>
-        <div>
-          <dt>Target date</dt>
-          <dd>{goal.targetDate ? formatDate(goal.targetDate) : 'No deadline'}</dd>
-        </div>
-        <div>
-          <dt>Estimated finish</dt>
-          <dd>{finish ? formatDate(finish) : 'Not yet'}</dd>
-        </div>
-        <div>
-          <dt>Left to save</dt>
-          <dd className="money">{formatLei(Math.max(0, goal.target - saved))}</dd>
-        </div>
-      </dl>
-      {insight && <p className={`insight ${health === 'behind' ? 'insight--warn' : ''}`}>{insight}</p>}
-    </section>
+    <Link to={`/goals/${goal.id}`} className={`tile ${wide ? 'tile--wide' : ''}`} data-feed-goal={goal.id} data-feed-name={goal.name} aria-label={`${goal.name}: ${formatLei(saved)} of ${formatLei(goal.target)}`}>
+      <span className="tile__label">
+        {goal.name}
+        {wide && <ChevronRight size={16} aria-hidden />}
+      </span>
+      <span className="tile__amount money">{formatLei(saved)}</span>
+      <span className="tile__sub">
+        {Math.round(pct * 100)}% of {formatLei(goal.target)}
+      </span>
+      <span className="tile__bar" aria-hidden>
+        <motion.i initial={{ width: 0 }} animate={{ width: `${Math.max(pct * 100, pct > 0 ? 2 : 0)}%` }} transition={{ type: 'spring', stiffness: 60, damping: 18 }} />
+      </span>
+      {wide && insight && <span className={`tile__note ${health === 'behind' ? 'is-late' : ''}`}>{insight}</span>}
+    </Link>
   );
 }
 
 // ---------- consistency, kept apart from money ----------
 
-const DAY_LABEL: Record<string, string> = {
-  done: 'Saved or checked in',
-  'today-done': 'Today, done',
-  today: 'Today',
-  missed: 'No action',
-  paused: 'Break day',
-  future: 'Upcoming',
-  before: 'Before you joined',
-};
-
-function CheckIns() {
+function StreakTile() {
   const data = useData();
   const { account, checkIn } = useStore();
   const toast = useToast();
@@ -380,49 +307,30 @@ function CheckIns() {
   const todayDone = days.some((d) => d.state === 'today-done');
 
   return (
-    <section className="card" aria-labelledby="ci-title">
-      <div className="card-head">
-        <h2 id="ci-title" className="h3">
-          Check-ins
-        </h2>
-        <span className="small muted">{streak > 0 ? `${streak} day${streak === 1 ? '' : 's'} in a row` : 'No run yet'}</span>
-      </div>
-      <ol className="days" aria-label="This week">
+    <button
+      type="button"
+      className={`tile tile--streak ${todayDone ? 'is-done' : ''}`}
+      onClick={() => {
+        if (todayDone) return;
+        checkIn();
+        toast('Checked in for today.');
+      }}
+      aria-label={`${streak} day streak. ${todayDone ? 'Today is counted.' : 'Tap to check in for today.'}`}
+    >
+      <span className="tile__label">
+        <Flame size={16} aria-hidden /> Streak
+      </span>
+      <span className="tile__amount">
+        {streak}
+        <small> {streak === 1 ? 'day' : 'days'}</small>
+      </span>
+      <span className="tile__week" aria-hidden>
         {days.map((d, i) => (
-          <li key={d.key} className={`day2 day2--${d.state}`} title={DAY_LABEL[d.state]} aria-label={`${d.key}: ${DAY_LABEL[d.state]}`}>
-            <span className="day2__w">{WEEKDAY_SHORT[i]}</span>
-            <span className="day2__dot" aria-hidden />
-          </li>
+          <i key={d.key} className={`wk wk--${d.state}`} title={WEEKDAY_SHORT[i]} />
         ))}
-      </ol>
-      <ul className="legend" aria-hidden>
-        <li>
-          <i className="day2__dot day2--done" /> Saved or checked in
-        </li>
-        <li>
-          <i className="day2__dot day2--today" /> Today
-        </li>
-        <li>
-          <i className="day2__dot day2--paused" /> Break
-        </li>
-        <li>
-          <i className="day2__dot day2--missed" /> No action
-        </li>
-      </ul>
-      <p className="small muted">A day counts when you record savings or check in. Missing one never touches your money, and you can mark a break any time.</p>
-      {!todayDone && (
-        <button
-          type="button"
-          className="btn btn--secondary btn--sm"
-          onClick={() => {
-            checkIn();
-            toast('Checked in for today.');
-          }}
-        >
-          Check in for today
-        </button>
-      )}
-    </section>
+      </span>
+      <span className="tile__sub">{todayDone ? 'Today counts' : 'Tap to check in'}</span>
+    </button>
   );
 }
 
