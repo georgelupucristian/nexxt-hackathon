@@ -1794,6 +1794,30 @@ body:has(.streak-moment) .dial-bounds {
   background: var(--fire);
   box-shadow: 0 0 0 4px color-mix(in oklab, var(--fire) 28%, transparent);
 }
+/* today, once the bar reaches it: a live flame inside the circle, the check on top */
+.streak-week__dot.is-burning {
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 85%, #f59a2a, var(--fire-deep) 70%);
+  animation: dot-heat 1.6s ease-in-out infinite;
+}
+.streak-week__dot svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 1px rgba(120, 40, 0, 0.45));
+}
+.streak-week__flame {
+  position: absolute;
+  inset: 0;
+}
+@keyframes dot-heat {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--fire) 26%, transparent), 0 0 14px 2px color-mix(in oklab, var(--fire) 35%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--fire) 34%, transparent), 0 0 22px 5px color-mix(in oklab, var(--fire) 45%, transparent);
+  }
+}
 .streak-week__dot.is-break {
   background: var(--info-soft);
 }
@@ -1806,7 +1830,20 @@ body:has(.streak-moment) .dial-bounds {
   left: calc((var(--from) + 0.5) / 7 * 100% - var(--dot) / 2);
   width: calc((var(--to) - var(--from)) / 7 * 100% + var(--dot));
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--fire-deep), var(--fire));
+  /* heat moving along the run, slow enough to read as warmth rather than a loading bar */
+  background: linear-gradient(90deg, var(--fire-deep), var(--fire) 40%, #f9a43a 50%, var(--fire) 60%, var(--fire-deep)) 0 0 / 220% 100%;
+  animation: run-heat 2.8s linear infinite;
+}
+@keyframes run-heat {
+  to {
+    background-position: -220% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .streak-week__run,
+  .streak-week__dot.is-burning {
+    animation: none;
+  }
 }
 .streak-week__run.is-continued {
   left: -12px;

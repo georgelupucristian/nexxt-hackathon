@@ -346,7 +346,7 @@ function GoalSummary({ goal }: { goal: Goal }) {
         </div>
         <div>
           <dt>Estimated finish</dt>
-          <dd>{finish ? formatDate(finish) : '—'}</dd>
+          <dd>{finish ? formatDate(finish) : 'Not yet'}</dd>
         </div>
         <div>
           <dt>Left to save</dt>

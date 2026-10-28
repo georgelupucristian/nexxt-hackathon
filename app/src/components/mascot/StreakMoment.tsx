@@ -29,6 +29,7 @@ export function StreakMoment() {
   const prev = useRef(streak);
   const [moment, setMoment] = useState<{ from: number; to: number } | null>(null);
   const [lit, setLit] = useState(false);
+  const [burning, setBurning] = useState(false);
   const joined = account?.isDemo ? '2000-01-01' : account ? toKey(new Date(account.createdAt)) : todayKey();
 
   useEffect(() => {
@@ -38,8 +39,11 @@ export function StreakMoment() {
       const wait = document.querySelector('.party') ? 2800 : 250;
       const t = setTimeout(() => {
         setLit(false);
+        setBurning(false);
         setMoment({ from, to: streak });
         setTimeout(() => setLit(true), 700);
+        // the bar starts filling ~0.45s after the flame lights and takes ~0.55s to reach today
+        setTimeout(() => setBurning(true), 700 + 950);
       }, wait);
       prev.current = streak;
       return () => clearTimeout(t);
@@ -66,8 +70,8 @@ export function StreakMoment() {
 
             {/* Kip stands in front of the flame, like Duo in front of his */}
             <div className="streak-hero">
-              <motion.div className="streak-hero__fire" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: lit ? [0.92, 1.08, 1] : 0.92, opacity: 1 }} transition={{ duration: 0.6, ease: 'easeOut' }}>
-                <Fire lit={lit} width={150} height={190} />
+              <motion.div className="streak-hero__fire" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+                <Fire lit={lit} width={170} height={210} />
               </motion.div>
               <motion.div className="streak-hero__kip" initial={{ x: 40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 22, delay: 0.1 }}>
                 <Seal state={lit ? 'happy' : 'celebrate'} size={150} appear="pop" title="" />
@@ -104,11 +108,13 @@ export function StreakMoment() {
                   return (
                     <motion.span
                       key={d.key}
-                      className={`streak-week__dot ${done ? 'is-done' : ''} ${d.state === 'paused' ? 'is-break' : ''} ${isToday ? 'is-today' : ''}`}
+                      className={`streak-week__dot ${done ? 'is-done' : ''} ${d.state === 'paused' ? 'is-break' : ''} ${isToday ? 'is-today' : ''} ${isToday && burning ? 'is-burning' : ''}`}
                       initial={isToday ? { scale: 0.4 } : false}
-                      animate={isToday && lit ? { scale: [0.4, 1.25, 1] } : {}}
-                      transition={{ delay: 0.95, duration: 0.45 }}
+                      animate={isToday && lit ? { scale: [0.4, 1.3, 1] } : {}}
+                      transition={{ delay: 0.95, duration: 0.5 }}
                     >
+                      {/* today catches fire when the bar reaches it */}
+                      {isToday && burning && <Fire lit width={36} height={36} fill className="streak-week__flame" />}
                       {done && <Check size={16} strokeWidth={3} aria-hidden />}
                     </motion.span>
                   );

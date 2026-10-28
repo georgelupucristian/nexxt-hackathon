@@ -1,5 +1,5 @@
 // Sample data for the "Explore with sample data" entry. Every transaction is source 'demo',
-// so the UI labels it as simulated — it is never presented as a real bank record.
+// so the UI labels it as simulated. It is never presented as a real bank record.
 import { addDays, todayKey, weekday } from '../lib/dates';
 import { uid } from '../lib/id';
 import { emptyData } from './storage';
@@ -49,7 +49,7 @@ export function sampleData(today = todayKey()): UserData {
     });
   };
   // Eight weeks of mostly-kept plans, one withdrawal, one failed transfer and one pending.
-  for (let w = 8; w >= 1; w--) add(w * 7 - 1, 'contribution', w === 5 ? 60_00 : 100_00, laptop, w === 5 ? 'Smaller week — exams' : 'Weekly plan');
+  for (let w = 8; w >= 1; w--) add(w * 7 - 1, 'contribution', w === 5 ? 60_00 : 100_00, laptop, w === 5 ? 'Smaller week, exams' : 'Weekly plan');
   add(52, 'contribution', 150_00, emergency, 'Monthly plan');
   add(22, 'contribution', 150_00, emergency, 'Monthly plan');
   add(30, 'contribution', 250_00, null, 'Birthday money');

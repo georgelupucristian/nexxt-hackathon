@@ -27,7 +27,7 @@ export interface Goal {
 
 export type TxType = 'contribution' | 'withdrawal';
 export type TxStatus = 'confirmed' | 'pending' | 'failed';
-// manual: the user typed it in. demo: produced by the simulated connection — never real money.
+// manual: the user typed it in. demo: produced by the simulated connection, never real money.
 export type TxSource = 'manual' | 'demo';
 
 export interface Transaction {

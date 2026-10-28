@@ -159,7 +159,7 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
         <dl className="sim__out">
           <div>
             <dt>You’d finish</dt>
-            <dd className="sim__big">{finish ? formatDate(finish) : '—'}</dd>
+            <dd className="sim__big">{finish ? formatDate(finish) : 'Not yet'}</dd>
           </div>
           <div>
             <dt>Time to go</dt>

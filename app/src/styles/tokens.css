@@ -1,4 +1,4 @@
-/* Kept design tokens — one system for every screen.
+/* Kept design tokens: one system for every screen.
    Colour has a job or it isn't used: moss = actions, progress and money you saved; amber = pending
    or needs attention; red = failed; blue = information and simulated data. Everything else is
    warm neutral. (Deliberately the opposite of the dark-and-hot-pink look of Step.) */
@@ -47,7 +47,7 @@
   /* type scale (one display face for headings and big numbers, one text face) */
   --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Bricolage Grotesque', var(--font);
-  --fs-xs: 0.8125rem; /* 13: captions, labels — nothing smaller */
+  --fs-xs: 0.8125rem; /* 13: captions and labels, nothing smaller */
   --fs-sm: 0.875rem; /* 14: secondary text */
   --fs-md: 0.9375rem; /* 15: body */
   --fs-lg: 1.0625rem; /* 17: card titles */

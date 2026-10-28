@@ -262,8 +262,8 @@ export function TxStatusPill({ tx }: { tx: Transaction }) {
 }
 
 export function txStatusText(tx: Transaction): string {
-  if (tx.status === 'failed') return 'Failed — not counted in your savings';
-  if (tx.status === 'pending') return tx.source === 'demo' ? 'Transfer pending — counts once confirmed' : 'Pending';
+  if (tx.status === 'failed') return 'Failed, not counted in your savings';
+  if (tx.status === 'pending') return tx.source === 'demo' ? 'Transfer pending. Counts once confirmed.' : 'Pending';
   return tx.source === 'demo' ? 'Confirmed (simulated, demo connection)' : 'Recorded manually by you';
 }
 

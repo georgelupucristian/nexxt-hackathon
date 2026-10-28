@@ -113,7 +113,7 @@ export function GoalDetail() {
         </dl>
         {finish && goal.targetDate && finish > goal.targetDate && remaining > 0 && (
           <p className="small muted" style={{ paddingTop: 'var(--s-3)' }}>
-            At this pace you’d finish after your target date. You could raise the amount, move the date, or keep going as is — all fine.
+            At this pace you’d finish after your target date. You could raise the amount, move the date, or keep going as is. All fine.
           </p>
         )}
       </section>

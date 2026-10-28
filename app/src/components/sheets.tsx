@@ -82,7 +82,7 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
           const g = bucketId ? data.goals.find((x) => x.id === bucketId) : null;
           celebrate({ title: `+${formatLei(amount)} saved`, sub: g ? `Towards ${g.name}. Nice and steady.` : 'Added to your unallocated savings.' });
         } else {
-          toast(isDemo ? 'Simulated transfer started — pending until the next sync' : `${formatLei(amount)} withdrawal recorded`);
+          toast(isDemo ? 'Transfer started. It stays pending until the next sync.' : `${formatLei(amount)} withdrawal recorded`);
         }
       }
       onClose();
@@ -167,11 +167,11 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
             {buckets.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.name}
-                {type === 'withdrawal' ? ` — ${formatLei(available(data.transactions, g.id, editing?.id))}` : ''}
+                {type === 'withdrawal' ? ` (${formatLei(available(data.transactions, g.id, editing?.id))} free)` : ''}
                 {g.status === 'paused' ? ' (paused)' : ''}
               </option>
             ))}
-            <option value="none">Unallocated{type === 'withdrawal' ? ` — ${formatLei(available(data.transactions, null, editing?.id))}` : ''}</option>
+            <option value="none">Unallocated{type === 'withdrawal' ? ` (${formatLei(available(data.transactions, null, editing?.id))} free)` : ''}</option>
           </select>
         </Field>
 
@@ -278,10 +278,10 @@ export function PlanForm({
       {finish && (
         <p className="small muted">
           At this pace you’d reach {goal ? 'the' : 'your'} target around <strong>{formatDate(finish)}</strong>
-          {targetDate && finish > targetDate ? ' — after your target date. That’s fine; you can change either one later.' : '.'}
+          {targetDate && finish > targetDate ? ', after your target date. That’s fine, you can change either one later.' : '.'}
         </p>
       )}
-      <p className="small subtle">Estimates assume every planned contribution happens and nothing is withdrawn. A plan is a guide, not an obligation — change it whenever your budget changes.</p>
+      <p className="small subtle">Estimates assume every planned contribution happens and nothing is withdrawn. A plan is a guide, not a promise. Change it whenever your budget changes.</p>
     </div>
   );
 }
@@ -395,7 +395,7 @@ export function CheckInSheet({ open, onClose }: { open: boolean; onClose: () => 
               block
               onClick={() => {
                 checkIn();
-                toast('Checked in — plan confirmed');
+                toast('Checked in. Plan confirmed.');
                 onClose();
               }}
             >
@@ -478,7 +478,7 @@ export function StreakRules() {
           <strong>Missed a day?</strong> Your streak starts again from your next action. Your best streak and all your savings stay.
         </li>
         <li>
-          <strong>Break days</strong> pause the streak without breaking it — for exams, holidays or tight weeks.
+          <strong>Break days</strong> pause the streak without breaking it. Use them for exams, holidays or tight weeks.
         </li>
       </ul>
       <div className="legend" aria-label="Legend">

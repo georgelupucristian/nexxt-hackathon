@@ -33,4 +33,4 @@ export function parseLei(raw: string): Bani | null {
   return Number.isFinite(value) ? value : null;
 }
 
-export const MAX_AMOUNT: Bani = 10_000_000_00; // 10 million lei — anything above is almost certainly a typo
+export const MAX_AMOUNT: Bani = 10_000_000_00; // 10 million lei; anything above is almost certainly a typo

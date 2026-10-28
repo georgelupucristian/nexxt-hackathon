@@ -361,7 +361,7 @@ function PrivacySection() {
         <ul className="check-list small">
           <li>
             <HardDrive size={18} aria-hidden />
-            <span>Your name, email, goals, plans, entries and settings — only in this browser’s local storage on this device.</span>
+            <span>Your name, email, goals, plans, entries and settings. Only in this browser, on this device.</span>
           </li>
           <li>
             <ShieldCheck size={18} aria-hidden />
@@ -423,11 +423,11 @@ function AccessibilitySection() {
 
 function HelpSection() {
   const faqs = [
-    { q: 'Does Kept hold or move my money?', a: 'No. Kept is a planner and tracker. With manual tracking you record what you set aside elsewhere. The demo connection only simulates transfers — no real money moves.' },
+    { q: 'Does Kept hold or move my money?', a: 'No. Kept is a planner and tracker. With manual tracking you record what you set aside elsewhere. The demo connection only simulates transfers. No real money moves.' },
     { q: 'Why doesn’t a pending entry count?', a: 'Pending means the money hasn’t arrived yet. Kept only counts confirmed entries, so your total never shows money you don’t have.' },
     { q: 'What happens if I miss a planned contribution?', a: 'Nothing bad. Plans are guides. Your estimated finish date moves, and you can adjust the plan whenever you like.' },
     { q: 'Can the same money count towards two goals?', a: 'No. Every entry belongs to one goal or is unallocated, so your total always equals goals + unallocated.' },
-    { q: 'I deleted a goal — where did its money go?', a: 'Its entries move to unallocated savings. Your total doesn’t change.' },
+    { q: 'I deleted a goal. Where did its money go?', a: 'Its entries move to unallocated savings. Your total doesn’t change.' },
     { q: 'How do I use Kept on another device?', a: 'This version stores data only in this browser. You can download your data from Privacy & security.' },
   ];
   return (

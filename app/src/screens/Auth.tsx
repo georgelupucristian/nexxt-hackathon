@@ -60,10 +60,10 @@ export function HowItWorks() {
   const { account } = useStore();
   const nav = useNavigate();
   const steps = [
-    { icon: Flag, title: 'Choose what you’re saving for', body: 'An emergency fund, a laptop, an exchange semester — or anything else. Add a target and, if you like, a date.' },
+    { icon: Flag, title: 'Choose what you’re saving for', body: 'An emergency fund, a laptop, an exchange semester, anything. Add a target and, if you like, a date.' },
     { icon: CalendarCheck, title: 'Set a plan that fits', body: 'Weekly, monthly or flexible. Kept shows what each option means for your finish date. You can lower it, pause it or change it anytime.' },
     { icon: PiggyBank, title: 'Record what you save', body: 'Log contributions and withdrawals yourself, or try the clearly-labelled demo connection. Kept never moves real money.' },
-    { icon: LineChart, title: 'See where you stand', body: 'One balance, split between goals and unallocated savings — so the same money is never counted twice.' },
+    { icon: LineChart, title: 'See where you stand', body: 'One balance, split between goals and unallocated savings, so the same money is never counted twice.' },
   ];
   return (
     <div className="screen screen--bare">

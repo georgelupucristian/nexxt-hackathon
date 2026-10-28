@@ -230,7 +230,7 @@ function TrackingStep({ draft, set, error }: { draft: OnboardingDraft; set: (p: 
             <span className="option__title" style={{ display: 'block' }}>
               Track manually <span className="pill pill--success" style={{ marginLeft: 4 }}>Recommended</span>
             </span>
-            <span className="option__desc">Record each amount you put aside — in any account, a jar, anywhere.</span>
+            <span className="option__desc">Record each amount you put aside: in any account, a jar, anywhere.</span>
           </span>
         </button>
         <button type="button" role="radio" aria-checked={draft.tracking === 'demo'} className="option option--row" onClick={() => set({ tracking: 'demo' })}>
@@ -353,7 +353,7 @@ function ReviewStep({ draft, go }: { draft: OnboardingDraft; go: (s: number) => 
       )}
       <div className="row small muted">
         <CheckCircle2 size={18} aria-hidden color="var(--accent)" />
-        Your progress so far is saved — you can close the app and resume later.
+        Your progress is saved. You can close the app and pick up later.
       </div>
     </section>
   );

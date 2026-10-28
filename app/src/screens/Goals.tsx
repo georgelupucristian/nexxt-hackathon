@@ -31,7 +31,7 @@ export function Goals() {
           <EmptyState
             icon={Target}
             title="Save with goals"
-            body="A goal gives your savings a purpose and a plan. Start with one — you can add more anytime."
+            body="A goal gives your savings a purpose and a plan. Start with one. You can add more anytime."
             action={
               <Button variant="primary" onClick={() => nav('/goals/new')}>
                 Create a goal

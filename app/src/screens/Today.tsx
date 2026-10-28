@@ -144,7 +144,7 @@ function TodayCard({ action, onAdd, onCheckIn }: { action: TodayAction; onAdd: (
     case 'planned-contribution':
       icon = Plus;
       title = `Planned for today: ${formatLei(action.amount)}`;
-      body = `Towards ${action.goal.name}. Only if it fits this week — you can skip or record a different amount.`;
+      body = `Towards ${action.goal.name}. Only if it fits this week. You can skip it or record a different amount.`;
       cta = { label: 'Record it', run: () => onAdd(action.goal.id, action.amount) };
       break;
     case 'fix-connection':
@@ -255,7 +255,7 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
           )}
         </dl>
         <p className="small muted">
-          Each leu is counted once: it either belongs to one goal or is unallocated. The total only includes confirmed entries — pending and failed ones are left out.
+          Each leu is counted once: it either belongs to one goal or is unallocated. The total only includes confirmed entries. Pending and failed ones are left out.
         </p>
         {data.tracking === 'demo' ? (
           <div className="stack">
@@ -269,7 +269,7 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
               onClick={async () => {
                 try {
                   await sync();
-                  toast('Synced — pending simulated transfers confirmed');
+                  toast('Synced. Pending transfers are confirmed.');
                 } catch (e) {
                   toast((e as Error).message, 'error');
                 }
@@ -293,7 +293,7 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
         >
           View all activity
         </Button>
-        {activeGoals(goals).length === 0 && <p className="small subtle">No goals yet — everything is unallocated.</p>}
+        {activeGoals(goals).length === 0 && <p className="small subtle">No goals yet, so everything is unallocated.</p>}
       </div>
     </Sheet>
   );

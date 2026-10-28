@@ -98,7 +98,7 @@ export function TransactionDetail() {
           </Button>
         </div>
       ) : (
-        <p className="small subtle">Entries from the demo connection can’t be edited or deleted — just like records imported from a real bank.</p>
+        <p className="small subtle">Entries from the demo connection can’t be edited or deleted, the same as records imported from a real bank.</p>
       )}
 
       <MoneySheet open={editing} onClose={() => setEditing(false)} editing={tx} />

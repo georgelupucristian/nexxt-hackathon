@@ -173,7 +173,7 @@ export function WeekStrip({ joined, streak, onOpen }: { joined: string; streak: 
 // ---------- Goals ----------
 
 export function planLabel(plan: Plan): string {
-  if (plan.frequency === 'flexible') return plan.amount > 0 ? `About ${formatLei(plan.amount)} when you can` : 'Flexible — whenever you can';
+  if (plan.frequency === 'flexible') return plan.amount > 0 ? `About ${formatLei(plan.amount)} when you can` : 'Flexible, whenever you can';
   if (plan.frequency === 'weekly') return `${formatLei(plan.amount)} every ${WEEKDAY_NAME[plan.day ?? 0]}`;
   return `${formatLei(plan.amount)} on the ${ordinal(plan.day ?? 1)} of each month`;
 }
@@ -291,7 +291,7 @@ export function WeeklySummaryCard({ s, goal }: { s: WeekSummary; goal: Goal | nu
       <div className="section-head">
         <h2 id="sum-h">This week</h2>
         <span className="small subtle">
-          {formatDate(s.start).replace(/ \d{4}$/, '')} – {formatDay(today)}
+          {formatDate(s.start).replace(/ \d{4}$/, '')} to {formatDay(today)}
         </span>
       </div>
       <div className="stat-grid">
@@ -318,7 +318,7 @@ export function WeeklySummaryCard({ s, goal }: { s: WeekSummary; goal: Goal | nu
           {goalNow === goalBefore ? ' (no change yet)' : ''}
         </p>
       )}
-      {s.count === 0 && <p className="small subtle">Nothing recorded this week yet. Confirmed entries only — pending and failed ones are left out.</p>}
+      {s.count === 0 && <p className="small subtle">Nothing recorded this week yet. Only confirmed entries count. Pending and failed ones are left out.</p>}
     </section>
   );
 }
