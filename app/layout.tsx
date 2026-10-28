@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Avansul",
   description: "Strange pentru avansul casei tale.",
-  icons: { icon: "/seal-static.svg" },
+  icons: { icon: "/mascot/icon-192.png", apple: "/mascot/icon-512.png" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

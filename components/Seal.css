@@ -1,75 +1,217 @@
-/* Avansul seal mascot. Every selector is scoped under .seal so the generic
-   part names (head, body, mouth...) can't clash with app styles. */
+/* Avansul seal mascot. The poses are rendered images (public/mascot/*.webp);
+   this file only moves them around, so every selector is scoped under .seal. */
 
 .seal {
-  --seal-body: #9aa6b4;
-  --seal-body-shade: #7c8896;
-  --seal-body-light: #aeb8c5;
-  --seal-spot: #5e6a79;
-  --seal-belly: #f4efe6;
-  --seal-belly-shade: #e3dacb;
-  --seal-eye: #2b1e1a;
-  --seal-eye-shine: #ffffff;
-  --seal-nose: #2a2a2e;
-  --seal-blush: #f2b8b5;
+  --seal-fur: #8e97a6;
+  --seal-ink: #5e6a79;
   --seal-ground: rgba(30, 40, 60, 0.15);
 
+  position: relative;
   display: inline-block;
-  overflow: visible;
+  flex: none;
+  /* Bubble and z text scale with the seal. */
+  font-size: calc(var(--seal-size) * 0.07);
 }
 
-.seal .seal-c-body { fill: var(--seal-body); }
-.seal .seal-c-shade { fill: var(--seal-body-shade); }
-.seal .seal-c-light { fill: var(--seal-body-light); }
-.seal .seal-c-spot { fill: var(--seal-spot); }
-.seal .seal-c-belly { fill: var(--seal-belly); }
-.seal .seal-c-belly-shade { fill: var(--seal-belly-shade); }
-.seal .seal-c-eye { fill: var(--seal-eye); }
-.seal .seal-c-shine { fill: var(--seal-eye-shine); }
-.seal .seal-c-nose { fill: var(--seal-nose); }
-.seal .seal-c-blush { fill: var(--seal-blush); opacity: 0.45; }
-.seal .seal-c-ground { fill: var(--seal-ground); }
-
-.seal .seal-whisker {
-  fill: none;
-  stroke: var(--seal-spot);
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-.seal .seal-line {
-  fill: none;
-  stroke: var(--seal-nose);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.seal-figure,
+.seal-flip {
+  position: absolute;
+  inset: 0;
 }
 
-/* ---- pivots ----------------------------------------------------------
-   fill-box makes percentages relative to each group's own bounding box,
-   so the pivots stay right no matter where the group sits in the viewBox.
-   Not applied to every shape: spots use a transform="rotate(a cx cy)"
-   attribute, which fill-box would re-anchor to the wrong point. */
-.seal g,
-.seal .seal-eyelid-left,
-.seal .seal-eyelid-right {
-  transform-box: fill-box;
+/* The poses are drawn with the seal resting on y=702 of a 768 canvas, so
+   scaling from 91.4% keeps its belly planted while it breathes and squashes. */
+.seal-figure {
+  transform-origin: 56% 91.4%;
 }
-.seal .seal-shadow { transform-origin: 50% 50%; }
-.seal .seal-figure { transform-origin: 50% 100%; }   /* feet: squash/stretch from the ground */
-.seal .seal-torso { transform-origin: 50% 100%; }    /* breathing grows upward */
-.seal .seal-tail { transform-origin: 5% 70%; }       /* where the tail meets the body */
-.seal .seal-head { transform-origin: 50% 92%; }      /* neck */
-.seal .seal-flipper-left { transform-origin: 87% 5%; }  /* shoulder at (60,120) */
-.seal .seal-flipper-right { transform-origin: 13% 5%; } /* shoulder at (140,120) */
-.seal .seal-eye-left,
-.seal .seal-eye-right,
-.seal .seal-pupil-left,
-.seal .seal-pupil-right { transform-origin: 50% 50%; }
-.seal .seal-eyelid-left,
-.seal .seal-eyelid-right { transform-origin: 50% 0%; transform: scaleY(0); } /* lids drop from the top */
-.seal .seal-whiskers-left { transform-origin: 100% 30%; }  /* roots sit on the muzzle */
-.seal .seal-whiskers-right { transform-origin: 0% 30%; }
-.seal .seal-nose,
-.seal .seal-mouth,
-.seal .seal-muzzle,
-.seal .seal-blush { transform-origin: 50% 50%; }
+
+.seal--face-left .seal-flip {
+  transform: scaleX(-1);
+}
+
+.seal-pose {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.seal-pose[data-active] {
+  opacity: 1;
+}
+/* Head crops end in a hard horizontal cut at the chest; fade it out instead. */
+.seal--face .seal-pose {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent 100%);
+}
+
+.seal-shadow {
+  position: absolute;
+  left: 18%;
+  width: 76%;
+  top: 87%;
+  height: 8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--seal-ground), transparent);
+  transform-origin: 50% 50%;
+}
+
+/* ---- per-state motion (full-body seals only; avatars just crossfade) ---- */
+
+.seal--body.seal--idle .seal-figure { animation: seal-breathe 3.6s ease-in-out infinite; }
+.seal--body.seal--sad .seal-figure { animation: seal-breathe 5s ease-in-out infinite; }
+.seal--body.seal--sleep .seal-figure { animation: seal-breathe 5.5s ease-in-out infinite; }
+.seal--body.seal--happy .seal-figure { animation: seal-bounce 0.9s ease-in-out infinite; }
+.seal--body.seal--happy .seal-shadow { animation: seal-shadow-bounce 0.9s ease-in-out infinite; }
+.seal--body.seal--wave .seal-figure { animation: seal-rock 1.4s ease-in-out infinite; }
+.seal--body.seal--think .seal-figure { animation: seal-sway 4s ease-in-out infinite; }
+.seal--body.seal--point .seal-figure { animation: seal-nudge 1.6s ease-in-out infinite; }
+.seal--body.seal--face-left.seal--point .seal-figure { animation-name: seal-nudge-left; }
+.seal--body.seal--celebrate .seal-figure { animation: seal-hop 1.2s cubic-bezier(0.3, 0, 0.3, 1) both; }
+.seal--body.seal--celebrate .seal-shadow { animation: seal-shadow-hop 1.2s ease-in-out both; }
+
+@keyframes seal-breathe {
+  0%, 100% { transform: scale(1, 1); }
+  50% { transform: scale(0.996, 1.018); }
+}
+
+@keyframes seal-bounce {
+  0%, 100% { transform: translateY(0) scale(1.02, 0.98); }
+  45% { transform: translateY(-5%) scale(0.99, 1.02); }
+}
+@keyframes seal-shadow-bounce {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  45% { transform: scale(0.85); opacity: 0.7; }
+}
+
+@keyframes seal-rock {
+  0%, 100% { transform: rotate(-1.2deg); }
+  50% { transform: rotate(1.2deg); }
+}
+
+@keyframes seal-sway {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  50% { transform: rotate(-1.5deg) scale(0.997, 1.012); }
+}
+
+@keyframes seal-nudge {
+  0%, 100% { transform: translateX(0); }
+  40% { transform: translateX(2.5%); }
+}
+@keyframes seal-nudge-left {
+  0%, 100% { transform: translateX(0); }
+  40% { transform: translateX(-2.5%); }
+}
+
+/* One-shot: crouch, jump, hang, land with a squash, settle. */
+@keyframes seal-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  12% { transform: translateY(0) scale(1.06, 0.92); }
+  /* The celebrate render already floats with coins near the top edge, so keep
+     the jump short: at the peak the coins poke ~6% above the box. */
+  35% { transform: translateY(-7%) scale(0.96, 1.06); }
+  55% { transform: translateY(-9%) scale(1, 1); }
+  78% { transform: translateY(0) scale(1.07, 0.92); }
+  90% { transform: translateY(0) scale(0.98, 1.02); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes seal-shadow-hop {
+  0%, 12%, 78%, 100% { transform: scale(1); opacity: 1; }
+  55% { transform: scale(0.6); opacity: 0.5; }
+}
+
+/* ---- think bubble and sleep z's ---- */
+
+.seal-bubble {
+  position: absolute;
+  top: 2%;
+  left: 64%;
+  display: flex;
+  gap: 0.35em;
+  padding: 0.55em 0.75em;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0.2em 0.8em rgba(30, 40, 60, 0.12);
+}
+.seal-bubble::after {
+  /* small tail dot pointing back at the head */
+  content: "";
+  position: absolute;
+  left: 8%;
+  bottom: -0.55em;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0.1em 0.4em rgba(30, 40, 60, 0.12);
+}
+.seal-bubble i {
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: var(--seal-ink);
+  animation: seal-dot 1.2s ease-in-out infinite;
+}
+.seal-bubble i:nth-child(2) { animation-delay: 0.15s; }
+.seal-bubble i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes seal-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30% { transform: translateY(-40%); opacity: 1; }
+}
+
+.seal-zzz {
+  position: absolute;
+  left: 34%;
+  top: 40%;
+  color: var(--seal-ink);
+  font-weight: 700;
+  font-family: ui-rounded, system-ui, sans-serif;
+  pointer-events: none;
+}
+.seal-zzz i {
+  position: absolute;
+  font-style: normal;
+  opacity: 0;
+  animation: seal-z 3.6s ease-out infinite;
+}
+.seal-zzz i:nth-child(2) { animation-delay: 1.2s; font-size: 0.8em; }
+.seal-zzz i:nth-child(3) { animation-delay: 2.4s; font-size: 0.65em; }
+
+@keyframes seal-z {
+  0% { transform: translate(0, 0); opacity: 0; }
+  20% { opacity: 0.9; }
+  100% { transform: translate(2.2em, -3.2em); opacity: 0; }
+}
+
+/* ---- reduced motion: still poses only (the crossfade is not movement, so it stays) ---- */
+
+.seal--reduced .seal-figure,
+.seal--reduced .seal-shadow,
+.seal--reduced .seal-bubble i {
+  animation: none !important;
+}
+.seal--reduced .seal-zzz i {
+  animation: none;
+  opacity: 0.8;
+}
+.seal--reduced .seal-zzz i:nth-child(2) { transform: translate(0.9em, -1.2em); }
+.seal--reduced .seal-zzz i:nth-child(3) { transform: translate(1.7em, -2.3em); }
+
+@media (prefers-reduced-motion: reduce) {
+  .seal .seal-figure,
+  .seal .seal-shadow,
+  .seal .seal-bubble i {
+    animation: none !important;
+  }
+  .seal .seal-zzz i {
+    animation: none;
+    opacity: 0.8;
+  }
+  .seal .seal-zzz i:nth-child(2) { transform: translate(0.9em, -1.2em); }
+  .seal .seal-zzz i:nth-child(3) { transform: translate(1.7em, -2.3em); }
+}
