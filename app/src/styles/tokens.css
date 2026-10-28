@@ -1,5 +1,6 @@
-/* Design tokens. Direction (see docs/design-research.md): warm paper background, near-black ink
-   for primary actions, one moss-green accent reserved for money that grew and progress. */
+/* Design tokens. Direction (see docs/design-research.md): warm paper background, one moss-green
+   accent for money that grew, progress and the main action. Friendlier pass: rounder display face,
+   chunky "pressable" buttons, springy motion, and a soft tint per hub section. */
 :root {
   /* colour */
   --bg: #f5f3ee;
@@ -13,9 +14,21 @@
   --line-strong: #cfcac0;
   --on-ink: #f5f3ee;
 
-  --accent: #1e6b4a; /* moss: positive money + progress */
+  --accent: #1f7a52; /* moss: positive money + progress + primary action */
   --accent-soft: #e2efe7;
   --accent-ink: #13513a;
+  --accent-deep: #155c3c; /* the "3D" edge under primary buttons */
+  --accent-bright: #7fd3a3;
+
+  /* one soft tint per hub section, so each arc and its panel feel like a place */
+  --tint-today: #dcefe3;
+  --tint-goals: #f6e6c8;
+  --tint-activity: #dce9f7;
+  --tint-profile: #ebe2f6;
+  --tint-today-ink: #1f6b47;
+  --tint-goals-ink: #8a5a12;
+  --tint-activity-ink: #2b5797;
+  --tint-profile-ink: #5d3f99;
   --warn: #9a5b00;
   --warn-soft: #fbf0dc;
   --danger: #b3261e;
@@ -27,7 +40,8 @@
   --focus: #2b5797;
 
   /* type */
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque', var(--font);
   --fs-xs: 0.75rem;
   --fs-sm: 0.8125rem;
   --fs-md: 0.9375rem;
@@ -75,6 +89,7 @@
   --t-med: 220ms;
   --t-slow: 360ms;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* small overshoot, for presses and pops */
 }
 
 :root[data-large-text='true'] {

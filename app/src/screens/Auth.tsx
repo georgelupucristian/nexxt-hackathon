@@ -1,15 +1,20 @@
-import { AlertCircle, CalendarCheck, Flag, HardDrive, LineChart, PiggyBank } from 'lucide-react';
+import { CalendarCheck, Flag, HardDrive, LineChart, PiggyBank } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Brand } from '../components/nav';
 import { StreakRules } from '../components/sheets';
-import { Banner, Button, ProgressBar, TextField, TopBar } from '../components/ui';
+import { MascotSays, MASCOT_NAME } from '../components/mascot/MascotSays';
+import { FloatingInput } from '../components/watermelon/floating-input';
+import { Banner, Button, TopBar } from '../components/ui';
 import { AuthError } from '../data/storage';
 import { useStore } from '../data/store';
 
 export function Welcome() {
   const { enterDemo } = useStore();
   const nav = useNavigate();
+  const stagger = { hidden: {}, shown: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } };
+  const item = { hidden: { opacity: 0, y: 16 }, shown: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 380, damping: 30 } } };
   return (
     <div className="welcome">
       <header className="row row--between">
@@ -19,43 +24,34 @@ export function Welcome() {
         </Link>
       </header>
       <div className="welcome__hero">
-        <div className="preview-card" aria-hidden>
-          <div className="row row--between small" style={{ opacity: 0.7 }}>
-            <span>Example goal</span>
-            <span>62%</span>
-          </div>
-          <div style={{ fontSize: 'var(--fs-xl)', fontWeight: 700 }}>Laptop for uni</div>
-          <ProgressBar value={0.62} label="Example" onDark />
-          <div className="row row--between small" style={{ opacity: 0.7 }}>
-            <span>2.790 of 4.500 lei</span>
-            <span>100 lei every Friday</span>
-          </div>
-        </div>
-        <div className="stack-lg">
-          <h1 className="welcome__title">Pick a goal. Make a plan. Watch it add up.</h1>
-          <p className="muted" style={{ fontSize: 'var(--fs-lg)', maxWidth: '36ch' }}>
-            Kept turns what you’re saving for into a realistic weekly or monthly plan — and lets you change it whenever life does.
-          </p>
-        </div>
+        <MascotSays state="wave" size={230} layout="stack" message={`Hi! I’m ${MASCOT_NAME}. Let’s save up for something you actually want.`} />
       </div>
-      <div className="stack">
-        <Button variant="primary" block onClick={() => nav('/signup')}>
-          Create account
-        </Button>
-        <Button block onClick={() => nav('/signin')}>
-          Sign in
-        </Button>
-        <Button
-          variant="ghost"
-          block
-          onClick={() => {
-            enterDemo();
-            nav('/home');
-          }}
-        >
-          Explore with sample data
-        </Button>
-      </div>
+      <motion.div className="stack-lg" variants={stagger} initial="hidden" animate="shown">
+        <motion.h1 variants={item} className="welcome__title">
+          Saving, but make it a habit.
+        </motion.h1>
+        <motion.p variants={item} className="muted welcome__sub">
+          Pick a goal, set a plan that fits your week, and watch it add up. No bank details needed.
+        </motion.p>
+        <motion.div variants={item} className="stack">
+          <button type="button" className="btn btn--primary btn--block btn--xl" onClick={() => nav('/start')}>
+            Get started
+          </button>
+          <button type="button" className="btn btn--secondary btn--block btn--xl" onClick={() => nav('/signin')}>
+            I already have an account
+          </button>
+          <Button
+            variant="ghost"
+            block
+            onClick={() => {
+              enterDemo();
+              nav('/home');
+            }}
+          >
+            Explore with sample data
+          </Button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
@@ -100,93 +96,11 @@ export function HowItWorks() {
         Your account and data are stored in this browser on this device. There’s no Kept server and no real bank connection in this version.
       </Banner>
       {!account && (
-        <Button variant="primary" block onClick={() => nav('/signup')}>
+        <Button variant="primary" block onClick={() => nav('/start')}>
           Create account
         </Button>
       )}
     </div>
-  );
-}
-
-function AuthLayout({ title, sub, children }: { title: string; sub: string; children: React.ReactNode }) {
-  const nav = useNavigate();
-  return (
-    <div className="screen screen--bare">
-      <TopBar onBack={() => nav('/welcome')} />
-      <div className="stack" style={{ gap: 6 }}>
-        <h1>{title}</h1>
-        <p className="muted">{sub}</p>
-      </div>
-      {children}
-    </div>
-  );
-}
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-export function SignUp() {
-  const { signUp } = useStore();
-  const nav = useNavigate();
-  const [f, setF] = useState({ name: '', email: '', password: '' });
-  const [errors, setErrors] = useState<Partial<Record<'name' | 'email' | 'password' | 'form', string>>>({});
-  const [busy, setBusy] = useState(false);
-
-  function validate() {
-    const e: typeof errors = {};
-    if (!f.name.trim()) e.name = 'Tell us what to call you.';
-    if (!EMAIL_RE.test(f.email.trim())) e.email = 'Enter a valid email, like name@example.com.';
-    if (f.password.length < 8) e.password = 'Use at least 8 characters.';
-    return e;
-  }
-
-  async function submit(ev: FormEvent) {
-    ev.preventDefault();
-    const e = validate();
-    setErrors(e);
-    if (Object.keys(e).length) return;
-    setBusy(true);
-    try {
-      await signUp(f.name, f.email, f.password);
-      nav('/onboarding', { replace: true });
-    } catch (err) {
-      setErrors(err instanceof AuthError ? { [err.field]: err.message } : { form: 'Could not create your account. Please try again.' });
-      setBusy(false);
-    }
-  }
-
-  return (
-    <AuthLayout title="Create your account" sub="Takes under a minute. No bank details needed.">
-      <form className="stack-lg" onSubmit={submit} noValidate>
-        <TextField label="First name" autoComplete="given-name" value={f.name} error={errors.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={40} />
-        <TextField label="Email" type="email" autoComplete="email" inputMode="email" value={f.email} error={errors.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-        <TextField
-          label="Password"
-          type="password"
-          autoComplete="new-password"
-          value={f.password}
-          error={errors.password}
-          hint="At least 8 characters."
-          onChange={(e) => setF({ ...f, password: e.target.value })}
-        />
-        {errors.form && (
-          <div className="form-error" role="alert">
-            <AlertCircle size={18} aria-hidden /> {errors.form}
-          </div>
-        )}
-        <Banner tone="neutral" icon={HardDrive}>
-          Your account is stored securely in this browser on this device only. Signing in on another device won’t find it.
-        </Banner>
-        <Button type="submit" variant="primary" block loading={busy}>
-          Create account
-        </Button>
-        <p className="small muted" style={{ textAlign: 'center' }}>
-          Already have an account?{' '}
-          <Link to="/signin" className="strong">
-            Sign in
-          </Link>
-        </p>
-      </form>
-    </AuthLayout>
   );
 }
 
@@ -214,26 +128,29 @@ export function SignIn() {
     }
   }
 
+  const say = error
+    ? { state: 'sad' as const, text: 'Hmm, that didn’t work. Check your email and password?' }
+    : f.email && f.password
+      ? { state: 'happy' as const, text: 'Ready when you are.' }
+      : { state: 'wave' as const, text: 'Welcome back! Good to see you again.' };
+
   return (
-    <AuthLayout title="Welcome back" sub="Sign in to pick up where you left off.">
+    <div className="screen screen--bare auth">
+      <TopBar onBack={() => nav('/welcome')} />
+      <MascotSays state={say.state} message={say.text} size={120} />
       <form className="stack-lg" onSubmit={submit} noValidate>
-        <TextField label="Email" type="email" autoComplete="email" inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
-        <TextField label="Password" type="password" autoComplete="current-password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} />
-        {error && (
-          <div className="form-error" role="alert">
-            <AlertCircle size={18} aria-hidden /> {error}
-          </div>
-        )}
-        <Button type="submit" variant="primary" block loading={busy}>
-          Sign in
-        </Button>
+        <FloatingInput label="Email" type="email" autoComplete="email" inputMode="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+        <FloatingInput label="Password" type="password" autoComplete="current-password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} error={error} />
+        <motion.button type="submit" className="btn btn--primary btn--block btn--xl" disabled={busy} whileTap={{ scale: 0.97 }}>
+          {busy ? <span className="spinner" aria-label="Signing in" /> : 'Sign in'}
+        </motion.button>
         <p className="small muted" style={{ textAlign: 'center' }}>
           New here?{' '}
-          <Link to="/signup" className="strong">
-            Create an account
+          <Link to="/start" className="strong">
+            Start with a goal
           </Link>
         </p>
       </form>
-    </AuthLayout>
+    </div>
   );
 }

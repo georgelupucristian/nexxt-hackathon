@@ -2,6 +2,7 @@ import { AlertCircle, FlaskConical } from 'lucide-react';
 import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
 import { available, bestStreak, currentStreak, goalSaved, primaryGoal, progress, projectedFinish, requiredPace } from '../data/selectors';
 import { ActionError, useData, useStore } from '../data/store';
+import { useCelebrate } from './mascot/Celebration';
 import type { Frequency, Goal, Plan, Transaction } from '../data/types';
 import { formatDate, formatDay, ordinal, todayKey } from '../lib/dates';
 import { formatLei, parseLei } from '../lib/money';
@@ -23,6 +24,7 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
   const data = useData();
   const store = useStore();
   const toast = useToast();
+  const celebrate = useCelebrate();
   const amountId = useId();
   const [type, setType] = useState<Transaction['type']>(mode);
   const [raw, setRaw] = useState('');
@@ -75,13 +77,13 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
         toast('Entry updated');
       } else {
         store.addTransaction(input);
-        toast(
-          isDemo
-            ? 'Simulated transfer started — pending until the next sync'
-            : type === 'contribution'
-              ? `${formatLei(amount)} recorded`
-              : `${formatLei(amount)} withdrawal recorded`,
-        );
+        if (!isDemo && type === 'contribution') {
+          // the moment the app exists for: make it feel like something happened
+          const g = bucketId ? data.goals.find((x) => x.id === bucketId) : null;
+          celebrate({ title: `+${formatLei(amount)} saved`, sub: g ? `Towards ${g.name}. Nice and steady.` : 'Added to your unallocated savings.' });
+        } else {
+          toast(isDemo ? 'Simulated transfer started — pending until the next sync' : `${formatLei(amount)} withdrawal recorded`);
+        }
       }
       onClose();
     } catch (err) {

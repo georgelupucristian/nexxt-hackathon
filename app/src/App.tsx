@@ -1,16 +1,18 @@
+import { MotionConfig } from 'motion/react';
 import { useEffect, type ReactNode } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { AppShell } from './components/nav';
+import { HubShell } from './components/hub/HubShell';
 import { useStore } from './data/store';
 import { Activity } from './screens/Activity';
-import { HowItWorks, SignIn, SignUp, Welcome } from './screens/Auth';
+import { HowItWorks, SignIn, Welcome } from './screens/Auth';
 import { GoalDetail } from './screens/GoalDetail';
 import { GoalEditor } from './screens/GoalEditor';
 import { Goals } from './screens/Goals';
-import { Home } from './screens/Home';
 import { NotFound } from './screens/NotFound';
 import { Onboarding } from './screens/Onboarding';
 import { Profile, ProfileSection } from './screens/Profile';
+import { Start } from './screens/Start';
+import { Today } from './screens/Today';
 import { TransactionDetail } from './screens/TransactionDetail';
 
 /** Signed out → welcome. Signed in but onboarding unfinished → resume onboarding. */
@@ -35,35 +37,36 @@ function ScrollToTop() {
   return null;
 }
 
-const inApp = (el: ReactNode) => (
-  <RequireAuth>
-    <AppShell>{el}</AppShell>
-  </RequireAuth>
-);
-
 export default function App() {
-  const { account } = useStore();
+  const { account, data } = useStore();
   return (
-    <>
+    // "user" follows the OS setting; the in-app Reduce motion switch forces it on
+    <MotionConfig reducedMotion={data?.prefs.reduceMotion ? 'always' : 'user'}>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Navigate to={account ? '/home' : '/welcome'} replace />} />
         <Route path="/welcome" element={<GuestOnly><Welcome /></GuestOnly>} />
         <Route path="/how-it-works" element={<HowItWorks />} />
-        <Route path="/signup" element={<GuestOnly><SignUp /></GuestOnly>} />
+        {/* not GuestOnly: Start signs you up itself and must stay mounted for its finale */}
+        <Route path="/start" element={<Start />} />
+        <Route path="/signup" element={<Navigate to="/start" replace />} />
         <Route path="/signin" element={<GuestOnly><SignIn /></GuestOnly>} />
         <Route path="/onboarding" element={<RequireAuth allowOnboarding><Onboarding /></RequireAuth>} />
-        <Route path="/home" element={inApp(<Home />)} />
-        <Route path="/goals" element={inApp(<Goals />)} />
-        <Route path="/goals/new" element={inApp(<GoalEditor />)} />
-        <Route path="/goals/:id" element={inApp(<GoalDetail />)} />
-        <Route path="/goals/:id/edit" element={inApp(<GoalEditor />)} />
-        <Route path="/activity" element={inApp(<Activity />)} />
-        <Route path="/activity/:id" element={inApp(<TransactionDetail />)} />
-        <Route path="/profile" element={inApp(<Profile />)} />
-        <Route path="/profile/:section" element={inApp(<ProfileSection />)} />
+        {/* every signed-in screen opens as a panel over the hub */}
+        <Route element={<RequireAuth><HubShell /></RequireAuth>}>
+          <Route path="/home" element={null} />
+          <Route path="/today" element={<Today />} />
+          <Route path="/goals" element={<Goals />} />
+          <Route path="/goals/new" element={<GoalEditor />} />
+          <Route path="/goals/:id" element={<GoalDetail />} />
+          <Route path="/goals/:id/edit" element={<GoalEditor />} />
+          <Route path="/activity" element={<Activity />} />
+          <Route path="/activity/:id" element={<TransactionDetail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:section" element={<ProfileSection />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </MotionConfig>
   );
 }

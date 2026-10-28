@@ -1,7 +1,7 @@
 import { ArrowRight, Bell, CalendarCheck, CircleCheck, FlaskConical, HardDrive, PartyPopper, Plus, RefreshCw, Target, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BalanceCard, ConnectionBanner, GoalCard, SourceLine, TxRow, WeekStrip, WeeklySummaryCard } from '../components/domain';
+import { ConnectionBanner, GoalCard, SourceLine, TxRow, WeekStrip, WeeklySummaryCard } from '../components/domain';
 import { CheckInSheet, MoneySheet, StreakSheet, type MoneySheetProps } from '../components/sheets';
 import { Banner, Button, EmptyState, Sheet, useToast } from '../components/ui';
 import { activeGoals, breakdown, currentStreak, goalSaved, primaryGoal, sortTx, todayAction, weekSummary, type TodayAction } from '../data/selectors';
@@ -9,17 +9,17 @@ import { useData, useStore } from '../data/store';
 import { todayKey, toKey, weekday, relativeTime } from '../lib/dates';
 import { formatLei } from '../lib/money';
 
-function greeting(): string {
+export function greeting(): string {
   const h = new Date().getHours();
   return h < 5 ? 'Good evening' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-export function Home() {
+/** The Today panel: what used to be the Home dashboard, minus the balance (the hub orb shows it). */
+export function Today() {
   const data = useData();
   const { account } = useStore();
   const nav = useNavigate();
   const [money, setMoney] = useState<Omit<MoneySheetProps, 'onClose'>>({ open: false });
-  const [details, setDetails] = useState(false);
   const [checkIn, setCheckIn] = useState(false);
   const [streakInfo, setStreakInfo] = useState(false);
 
@@ -39,16 +39,6 @@ export function Home() {
 
   return (
     <div className="screen screen--wide">
-      <header className="page-head">
-        <div>
-          <p className="small muted">{greeting()},</p>
-          <h1 className="truncate">{account?.name}</h1>
-        </div>
-        <Link to="/profile" className="icon-btn icon-btn--filled" aria-label="Profile" style={{ textDecoration: 'none', fontWeight: 700 }}>
-          {account?.name.charAt(0).toUpperCase()}
-        </Link>
-      </header>
-
       {account?.isDemo && (
         <Banner tone="demo" icon={FlaskConical}>
           <strong>Sample data.</strong> You’re exploring with a demo account. Nothing here is real money.
@@ -72,7 +62,6 @@ export function Home() {
       <div className="home-grid">
         <div className="stack-lg">
           <WeekStrip joined={joinedKey} streak={streak} onOpen={() => setStreakInfo(true)} />
-          <BalanceCard onAdd={() => openAdd()} onDetails={() => setDetails(true)} />
           <TodayCard action={action} onAdd={openAdd} onCheckIn={() => setCheckIn(true)} />
         </div>
         <div className="stack-lg">
@@ -123,7 +112,6 @@ export function Home() {
       </div>
 
       <MoneySheet {...money} onClose={() => setMoney({ open: false })} />
-      <BalanceDetails open={details} onClose={() => setDetails(false)} />
       <CheckInSheet open={checkIn} onClose={() => setCheckIn(false)} />
       <StreakSheet open={streakInfo} onClose={() => setStreakInfo(false)} />
     </div>
@@ -225,7 +213,7 @@ function TodayCard({ action, onAdd, onCheckIn }: { action: TodayAction; onAdd: (
   );
 }
 
-function BalanceDetails({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () => void }) {
   const data = useData();
   const { sync } = useStore();
   const toast = useToast();

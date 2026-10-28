@@ -108,6 +108,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const start = useCallback((acc: Account) => {
     storage.setSession(acc.id);
+    // refs too, so an action called right after sign-up (finishOnboarding) sees the new account
+    accountRef.current = acc;
     setAccount(acc);
     const d = storage.loadData(acc.id);
     dataRef.current = d;
