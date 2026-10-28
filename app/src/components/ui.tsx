@@ -12,7 +12,7 @@ import {
   X,
   XCircle,
   type LucideIcon,
-} from 'lucide-react';
+} from '@/lib/icons';
 import {
   createContext,
   useCallback,

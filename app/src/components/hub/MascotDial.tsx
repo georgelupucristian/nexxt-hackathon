@@ -1,4 +1,4 @@
-import { Home, ListOrdered, Target, User, type LucideIcon } from 'lucide-react';
+import { Home, ListOrdered, Target, User, type LucideIcon } from '@/lib/icons';
 import { AnimatePresence, animate, motion, useMotionValue } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

@@ -1,4 +1,4 @@
-import { Compass } from 'lucide-react';
+import { Compass } from '@/lib/icons';
 import { useNavigate } from 'react-router-dom';
 import { Button, EmptyState } from '../components/ui';
 

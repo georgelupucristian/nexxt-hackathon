@@ -1,4 +1,4 @@
-import { ArrowRight, Bell, CalendarCheck, CircleCheck, FlaskConical, HardDrive, PartyPopper, Plus, RefreshCw, Target, TrendingUp } from 'lucide-react';
+import { ArrowRight, Bell, CalendarCheck, CircleCheck, FlaskConical, HardDrive, PartyPopper, Plus, RefreshCw, Target, TrendingUp } from '@/lib/icons';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ConnectionBanner, GoalCard, SourceLine, TxRow, WeekStrip, WeeklySummaryCard } from '../components/domain';

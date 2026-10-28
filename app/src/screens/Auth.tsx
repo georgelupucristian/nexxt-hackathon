@@ -1,4 +1,4 @@
-import { CalendarCheck, Flag, HardDrive, LineChart, PiggyBank } from 'lucide-react';
+import { CalendarCheck, Flag, HardDrive, LineChart, PiggyBank } from '@/lib/icons';
 import { motion } from 'motion/react';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';

@@ -2,7 +2,7 @@
 // (ui.watermelon.sh/animated-components/progressive-input-stack): each field drops onto a
 // stack as you finish the one before, and the button morphs from Next to Done. Added per-step
 // validation, input types, a password reveal toggle and an inline error line.
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff } from '@/lib/icons';
 import { AnimatePresence, motion } from 'motion/react';
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';

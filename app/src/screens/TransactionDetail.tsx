@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, Clock, FlaskConical, PenLine, Trash2, XCircle } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Clock, FlaskConical, PenLine, Trash2, XCircle } from '@/lib/icons';
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { MoneySheet } from '../components/sheets';

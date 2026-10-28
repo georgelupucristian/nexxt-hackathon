@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChevronRight, Eye, EyeOff, Flame, FlaskConical, Info, Pause, PenLine, RefreshCw, WifiOff } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, CalendarClock, ChevronRight, Eye, EyeOff, Flame, FlaskConical, Info, Pause, PenLine, RefreshCw, WifiOff } from '@/lib/icons';
 import { Link } from 'react-router-dom';
 import { breakdown, goalSaved, nextPlannedDate, planHealth, progress, weekStates, type DayState, type WeekSummary } from '../data/selectors';
 import { useData, useStore } from '../data/store';

@@ -1,4 +1,4 @@
-import { Archive, ArchiveRestore, MoreHorizontal, Minus, Pause, Pencil, Play, Plus, SlidersHorizontal, Star, Trash2, TrendingUp } from 'lucide-react';
+import { Archive, ArchiveRestore, MoreHorizontal, Minus, Pause, Pencil, Play, Plus, SlidersHorizontal, Star, Trash2, TrendingUp } from '@/lib/icons';
 import NumberFlow from '@number-flow/react';
 import { motion } from 'motion/react';
 import { useState, type ReactNode } from 'react';

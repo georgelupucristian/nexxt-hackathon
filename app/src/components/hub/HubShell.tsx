@@ -1,4 +1,4 @@
-import { ChevronDown, ListOrdered, Target, User, type LucideIcon } from 'lucide-react';
+import { ChevronDown, ListOrdered, Target, User, type LucideIcon } from '@/lib/icons';
 import { AnimatePresence, motion, useDragControls } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';

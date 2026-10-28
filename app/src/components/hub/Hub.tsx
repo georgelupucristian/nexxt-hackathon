@@ -1,12 +1,14 @@
 import NumberFlow from '@number-flow/react';
-import { ArrowRight, ChevronRight, Eye, EyeOff, FlaskConical, Info } from 'lucide-react';
+import { ArrowRight, ChevronRight, Eye, EyeOff } from '@/lib/icons';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HealthPill, planLabel, TxRow } from '../domain';
 import { hubLine } from '../mascot/lines';
 import { GoalGlyph, useToast } from '../ui';
+import { GoalStack, PlanSimulator, QuickRecord } from './Playful';
 import {
+  activeGoals,
   breakdown,
   currentStreak,
   goalSaved,
@@ -54,13 +56,11 @@ export function Hub({ onAdd, onDetails }: HubProps) {
   return (
     <div className="home2">
       <motion.header className="home2__head" {...enter(0)}>
+        <Link to="/logout" className="home2__out">
+          Sign out
+        </Link>
         <p className="home2__hello">{greeting()},</p>
         <h1 className="home2__name">{name || 'welcome'}</h1>
-        {account?.isDemo && (
-          <span className="tag tag--info">
-            <FlaskConical size={14} aria-hidden /> Sample data, not real money
-          </span>
-        )}
       </motion.header>
 
       {firstUse ? (
@@ -71,7 +71,7 @@ export function Hub({ onAdd, onDetails }: HubProps) {
         <div className="home2__grid">
           <div className="home2__col">
             <motion.div {...enter(1)}>
-              <Overview goal={goal} onDetails={onDetails} onAdd={onAdd} primaryElsewhere={hasPrimary(action)} />
+              <Overview goal={goal} onDetails={onDetails} primaryElsewhere={hasPrimary(action)} />
             </motion.div>
             <motion.div {...enter(2)}>
               <NextStep action={action} onAdd={onAdd} />
@@ -80,7 +80,12 @@ export function Hub({ onAdd, onDetails }: HubProps) {
           <div className="home2__col">
             {goal && (
               <motion.div {...enter(3)}>
-                <GoalSummary goal={goal} />
+                <GoalStack goals={[goal, ...activeGoals(data.goals).filter((g) => g.id !== goal.id)]} render={(g) => <GoalSummary goal={g} />} />
+              </motion.div>
+            )}
+            {goal && goal.plan.frequency !== 'flexible' && (
+              <motion.div {...enter(4)}>
+                <PlanSimulator goal={goal} />
               </motion.div>
             )}
             <motion.div {...enter(4)}>
@@ -100,7 +105,7 @@ const hasPrimary = (a: TodayAction) => a.kind !== 'done-today' && a.kind !== 're
 
 // ---------- what you've saved ----------
 
-function Overview({ goal, onDetails, onAdd, primaryElsewhere }: { goal: Goal | null; onDetails: () => void; onAdd: () => void; primaryElsewhere: boolean }) {
+function Overview({ goal, onDetails, primaryElsewhere }: { goal: Goal | null; onDetails: () => void; primaryElsewhere: boolean }) {
   const data = useData();
   const { setPrefs } = useStore();
   const b = breakdown(data.transactions);
@@ -143,8 +148,8 @@ function Overview({ goal, onDetails, onAdd, primaryElsewhere }: { goal: Goal | n
               <span className="goalring__pct">
                 <NumberFlow value={Math.round(pct * 100)} />%
               </span>
-              <span className="goalring__label truncate">of {goal.name}</span>
             </div>
+            <span className="goalring__label">{goal.name}</span>
           </div>
         )}
 
@@ -170,16 +175,8 @@ function Overview({ goal, onDetails, onAdd, primaryElsewhere }: { goal: Goal | n
         </dl>
       </div>
 
-      <p className="overview__note">
-        <Info size={14} aria-hidden />
-        {data.tracking === 'demo'
-          ? 'Demo connection: amounts are simulated, never real money.'
-          : 'You record money you set aside yourself. Kept keeps count; it doesn’t hold or move money.'}
-      </p>
       <div className="overview__actions">
-        <button type="button" className={`btn ${primaryElsewhere ? 'btn--secondary' : 'btn--primary'}`} onClick={() => onAdd()}>
-          Record savings
-        </button>
+        <QuickRecord goal={goal} primary={!primaryElsewhere} />
         <button type="button" className="btn btn--ghost" onClick={onDetails}>
           Details
         </button>

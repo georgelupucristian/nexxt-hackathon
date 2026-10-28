@@ -1315,3 +1315,301 @@ body:has(.party) .dial-bounds {
 .dial__label--current {
   color: #fff;
 }
+
+.home2__head {
+  position: relative;
+}
+.home2__out {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.home2__out:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* ---------- round 2: no boxed callouts, more direct manipulation ---------- */
+.goalring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 132px;
+  height: auto;
+}
+.goalring svg {
+  width: 132px;
+  height: 132px;
+}
+.goalring__center {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 132px;
+  height: 132px;
+  inset: auto;
+}
+.goalring__label {
+  max-width: 132px;
+  text-align: center;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-2);
+  line-height: 1.25;
+}
+
+/* insight and Kip's line read as text, not as tinted boxes */
+.insight,
+.insight--warn {
+  padding: 0 0 0 12px;
+  border-radius: 0;
+  background: none;
+  border-left: 3px solid var(--accent);
+  color: var(--ink);
+  font-weight: 500;
+}
+.insight--warn {
+  border-left-color: var(--warn);
+}
+.next2__kip {
+  padding: 0;
+  background: none;
+  align-items: flex-start;
+}
+.next2__says {
+  position: relative;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px 16px 16px 16px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.next2__says span {
+  color: var(--accent-ink);
+}
+
+/* quick record: the button grows into an amount field */
+.qr {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+.qr--open {
+  flex: 1 1 100%;
+  padding: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  flex-wrap: wrap;
+}
+.qr__field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.qr__input {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 0 8px;
+}
+.qr__input input {
+  width: 5.5ch;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 750;
+  color: var(--ink);
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+.qr__input span {
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.qr__picks {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.qr__pick {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 650;
+  color: var(--ink);
+  cursor: pointer;
+}
+.qr__pick:hover {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.qr__btn {
+  margin-left: auto;
+}
+.qr__icon {
+  display: inline-flex;
+}
+
+/* plan simulator */
+.sim {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.sim__top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+}
+.sim__donut {
+  flex: none;
+  width: 96px;
+  height: 96px;
+}
+.sim__track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 14;
+}
+.sim__fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+.sim__out {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sim__out dt {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+.sim__out dd {
+  margin: 0;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.sim__big {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: 750;
+}
+.sim__out .good {
+  color: var(--accent-ink);
+}
+.sim__out .warn {
+  color: var(--warn);
+}
+.sim__slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sim__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.sim__row strong {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+}
+.sim input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--accent) var(--p), var(--surface-3) var(--p));
+  outline: none;
+  cursor: pointer;
+}
+.sim input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-float);
+  transition: transform 120ms var(--ease);
+}
+.sim input[type='range']:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+.sim input[type='range']::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+}
+.warn-text {
+  margin: 0;
+  color: var(--warn);
+}
+
+/* goal stack */
+.stack3__deck {
+  position: relative;
+}
+.stack3__under {
+  position: absolute;
+  inset: 0;
+  transform: translateY(10px) scale(0.96);
+  opacity: 0.55;
+  pointer-events: none;
+  overflow: hidden;
+}
+.stack3__top {
+  position: relative;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.stack3__dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+.stack3__dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--line-strong);
+  cursor: pointer;
+}
+.stack3__dots button[aria-current] {
+  width: 20px;
+  border-radius: 4px;
+  background: var(--accent);
+}
+.stack3__dots span {
+  margin-left: 6px;
+}
+/* playful hover lift on interactive cards */
+@media (hover: hover) {
+  .goal2__head:hover,
+  .card--interactive:hover {
+    transform: translateY(-1px);
+  }
+}

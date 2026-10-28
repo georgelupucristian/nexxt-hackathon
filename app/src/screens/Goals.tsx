@@ -1,4 +1,4 @@
-import { ChevronDown, Plus, Target } from 'lucide-react';
+import { ChevronDown, Plus, Target } from '@/lib/icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalCard } from '../components/domain';

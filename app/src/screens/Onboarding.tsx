@@ -1,4 +1,4 @@
-import { ArrowLeft, Bell, BellOff, CheckCircle2, Eye, FlaskConical, Lock, PenLine, Unplug } from 'lucide-react';
+import { ArrowLeft, Bell, BellOff, CheckCircle2, Eye, FlaskConical, Lock, PenLine, Unplug } from '@/lib/icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { planLabel } from '../components/domain';

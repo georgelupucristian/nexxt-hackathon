@@ -28,7 +28,7 @@ import {
   UserRound,
   Wallet,
   type LucideIcon,
-} from 'lucide-react';
+} from '@/lib/icons';
 import type { GoalKind } from '../data/types';
 
 // One icon language for the whole app: Lucide line icons at a single stroke weight. (This used to

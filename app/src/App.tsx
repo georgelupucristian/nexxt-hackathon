@@ -36,6 +36,15 @@ function ScrollToTop() {
   return null;
 }
 
+/** /logout always works, from any state: clears the session and goes to the welcome screen. */
+function Logout() {
+  const { signOut } = useStore();
+  useEffect(() => {
+    signOut();
+  }, [signOut]);
+  return <Navigate to="/welcome" replace />;
+}
+
 export default function App() {
   const { account, data } = useStore();
   return (
@@ -44,6 +53,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Navigate to={account ? '/home' : '/welcome'} replace />} />
+        <Route path="/logout" element={<Logout />} />
         <Route path="/welcome" element={<GuestOnly><Welcome /></GuestOnly>} />
         <Route path="/how-it-works" element={<HowItWorks />} />
         {/* not GuestOnly: Start signs you up itself and must stay mounted for its finale */}

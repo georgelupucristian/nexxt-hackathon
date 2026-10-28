@@ -1,5 +1,5 @@
 import NumberFlow from '@number-flow/react';
-import { ArrowLeft, HardDrive } from 'lucide-react';
+import { ArrowLeft, HardDrive } from '@/lib/icons';
 import { Emoji3D, GOAL_EMOJI } from '../components/Emoji3D';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';

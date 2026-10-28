@@ -1,4 +1,4 @@
-import { ListOrdered, Plus } from 'lucide-react';
+import { ListOrdered, Plus } from '@/lib/icons';
 import { useMemo, useState } from 'react';
 import { TxRow } from '../components/domain';
 import { MoneySheet } from '../components/sheets';

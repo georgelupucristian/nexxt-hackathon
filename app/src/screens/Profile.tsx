@@ -16,7 +16,7 @@ import {
   Trash2,
   UserRound,
   type LucideIcon,
-} from 'lucide-react';
+} from '@/lib/icons';
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { StreakRules } from '../components/sheets';

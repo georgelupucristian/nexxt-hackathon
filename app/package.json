@@ -10,6 +10,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/react": "^1.1.10",
     "@number-flow/react": "^0.6.2",
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0",

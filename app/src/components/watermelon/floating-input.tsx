@@ -1,7 +1,7 @@
 // Adapted from Watermelon UI "Floating Input" (ui.watermelon.sh/animated-components/floating-input):
 // the label rests inside the field and floats up on focus or once there's a value. Added error
 // and hint text, a show/hide toggle for passwords, and app colours.
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from '@/lib/icons';
 import { useId, useState, type InputHTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 

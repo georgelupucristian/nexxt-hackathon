@@ -1,4 +1,4 @@
-import { AlertCircle, FlaskConical } from 'lucide-react';
+import { AlertCircle, FlaskConical } from '@/lib/icons';
 import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
 import { available, bestStreak, currentStreak, goalSaved, primaryGoal, progress, projectedFinish, requiredPace } from '../data/selectors';
 import { ActionError, useData, useStore } from '../data/store';
