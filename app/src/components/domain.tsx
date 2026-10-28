@@ -131,7 +131,7 @@ const DAY_LABEL: Record<DayState, string> = {
   missed: 'zi ratată',
   paused: 'pe sloi de gheață',
   future: 'urmează',
-  before: 'înainte să începi cu Kept',
+  before: 'înainte să începi cu Kip',
 };
 
 export function WeekStrip({ joined, streak, onOpen }: { joined: string; streak: number; onOpen: () => void }) {
@@ -143,11 +143,11 @@ export function WeekStrip({ joined, streak, onOpen }: { joined: string; streak: 
         <div>
           <h2 id="week-h" className="streak-count">
             <Flame size={18} aria-hidden />
-            {streak === 0 ? 'Începe o serie' : `${plural(streak, 'zi', 'zile')} la rând`}
+            {streak === 0 ? 'Începe un streak' : `${plural(streak, 'zi', 'zile')} la rând`}
           </h2>
           <p className="small subtle">Constanță, nu bani. Numără zilele în care ai pus bani deoparte sau ți-ai verificat planul.</p>
         </div>
-        <button type="button" className="link-btn" onClick={onOpen} aria-label="Cum funcționează seria">
+        <button type="button" className="link-btn" onClick={onOpen} aria-label="Cum funcționează streak-ul">
           <Info size={18} aria-hidden />
         </button>
       </div>

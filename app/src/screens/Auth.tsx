@@ -61,13 +61,13 @@ export function HowItWorks() {
   const nav = useNavigate();
   const steps = [
     { icon: Flag, title: 'Alege pentru ce strângi bani', body: 'Un fond de urgență, un laptop, un semestru Erasmus, orice. Pune o țintă și, dacă vrei, o dată.' },
-    { icon: CalendarCheck, title: 'Fă-ți un plan pe măsură', body: 'Săptămânal, lunar sau flexibil. Kept îți arată ce înseamnă fiecare variantă pentru data la care termini. Îl poți micșora, pune pe pauză sau schimba oricând.' },
-    { icon: PiggyBank, title: 'Notează ce economisești', body: 'Notezi singur depunerile și retragerile sau încerci conexiunea demo, marcată clar. Kept nu mută niciodată bani reali.' },
+    { icon: CalendarCheck, title: 'Fă-ți un plan pe măsură', body: 'Săptămânal, lunar sau flexibil. Kip îți arată ce înseamnă fiecare variantă pentru data la care termini. Îl poți micșora, pune pe pauză sau schimba oricând.' },
+    { icon: PiggyBank, title: 'Notează ce economisești', body: 'Notezi singur depunerile și retragerile sau încerci conexiunea demo, marcată clar. Kip nu mută niciodată bani reali.' },
     { icon: LineChart, title: 'Vezi unde ești', body: 'Un singur sold, împărțit între obiective și economii nealocate, ca aceiași bani să nu fie numărați de două ori.' },
   ];
   return (
     <div className="screen screen--bare">
-      <TopBar title="Cum funcționează Kept" onBack={() => nav(account ? '/profile' : '/welcome')} />
+      <TopBar title="Cum funcționează Kip" onBack={() => nav(account ? '/profile' : '/welcome')} />
       <ol className="stack-lg" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {steps.map(({ icon: Icon, title, body }, i) => (
           <li key={title} className="row row--top" style={{ gap: 'var(--s-4)' }}>
@@ -87,13 +87,13 @@ export function HowItWorks() {
       <section className="card stack-lg">
         <h2>Două feluri de progres</h2>
         <p className="muted">
-          <strong>Progresul financiar</strong> înseamnă bani: ce ai notat sau ce simulează conexiunea demo. <strong>Constanța</strong> e seria ta: cât de des ai făcut
+          <strong>Progresul financiar</strong> înseamnă bani: ce ai notat sau ce simulează conexiunea demo. <strong>Constanța</strong> e streak-ul ta: cât de des ai făcut
           ceva pentru economii. Le urmărim separat și nu le amestecăm niciodată.
         </p>
         <StreakRules />
       </section>
       <Banner tone="neutral" icon={HardDrive}>
-        Contul și datele tale sunt salvate în browserul de pe acest dispozitiv. În versiunea asta nu există server Kept și nici conexiune la o bancă reală.
+        Contul și datele tale sunt salvate în browserul de pe acest dispozitiv. În versiunea asta nu există server Kip și nici conexiune la o bancă reală.
       </Banner>
       {!account && (
         <Button variant="primary" block onClick={() => nav('/start')}>

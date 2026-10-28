@@ -52,7 +52,7 @@ export function Profile() {
       items: [
         { to: '/profile/tracking', label: 'Urmărire și conexiuni', icon: Link2, detail: data.tracking === 'demo' ? 'Conexiune demo' : 'Manual' },
         { to: '/profile/reminders', label: 'Mementouri', icon: Bell, detail: data.reminder.enabled ? `${shortDay(data.reminder.day)} ${data.reminder.time}` : 'Oprit' },
-        { to: '/profile/streaks', label: 'Regulile seriei', icon: Flame, detail: plural(currentStreak(data), 'zi', 'zile') },
+        { to: '/profile/streaks', label: 'Regulile streak-ului', icon: Flame, detail: plural(currentStreak(data), 'zi', 'zile') },
       ],
     },
     {
@@ -66,7 +66,7 @@ export function Profile() {
     {
       title: 'Suport',
       items: [
-        { to: '/how-it-works', label: 'Cum funcționează Kept', icon: BookOpen },
+        { to: '/how-it-works', label: 'Cum funcționează Kip', icon: BookOpen },
         { to: '/profile/help', label: 'Ajutor și întrebări frecvente', icon: LifeBuoy },
       ],
     },
@@ -110,7 +110,7 @@ export function Profile() {
         Ieși din cont
       </Button>
       <p className="xs subtle" style={{ textAlign: 'center' }}>
-        Kept 0.1 · datele stau pe acest dispozitiv
+        Kip 0.1 · datele stau pe acest dispozitiv
       </p>
       <ConfirmDialog
         open={confirmOut}
@@ -136,7 +136,7 @@ export function ProfileSection() {
     privacy: { title: 'Confidențialitate și securitate', el: <PrivacySection /> },
     accessibility: { title: 'Accesibilitate', el: <AccessibilitySection /> },
     help: { title: 'Ajutor și întrebări frecvente', el: <HelpSection /> },
-    streaks: { title: 'Regulile seriei', el: <StreakSection /> },
+    streaks: { title: 'Regulile streak-ului', el: <StreakSection /> },
   };
   const s = section ? map[section] : undefined;
   if (!s) return <Navigate to="/profile" replace />;
@@ -250,7 +250,7 @@ function TrackingSection() {
         <section className="card row row--between">
           <div className="grow">
             <h3>Simulează o eroare de conexiune</h3>
-            <p className="small muted">Următoarele sincronizări vor eșua, ca să vezi cum îți păstrează Kept ultimele date cunoscute.</p>
+            <p className="small muted">Următoarele sincronizări vor eșua, ca să vezi cum îți păstrează Kip ultimele date cunoscute.</p>
           </div>
           <Switch checked={c.simulateFailure} onChange={setSimulateFailure} label="Simulează o eroare de conexiune" />
         </section>
@@ -341,7 +341,7 @@ function RemindersSection() {
         </>
       )}
       <Banner tone="neutral" icon={Bell}>
-        Mementourile apar ca banner pe ecranul Acasă când deschizi Kept la ora aleasă sau după, până faci ceva pentru economii în ziua aia. Notificările push nu sunt disponibile în versiunea asta.
+        Mementourile apar ca banner pe ecranul Acasă când deschizi Kip la ora aleasă sau după, până faci ceva pentru economii în ziua aia. Notificările push nu sunt disponibile în versiunea asta.
       </Banner>
     </div>
   );
@@ -364,7 +364,7 @@ function PrivacySection() {
   return (
     <div className="stack-lg">
       <section className="card stack">
-        <h2>Ce păstrează Kept</h2>
+        <h2>Ce păstrează Kip</h2>
         <ul className="check-list small">
           <li>
             <HardDrive size={18} aria-hidden />
@@ -372,7 +372,7 @@ function PrivacySection() {
           </li>
           <li>
             <ShieldCheck size={18} aria-hidden />
-            <span>Parola ta nu e salvată niciodată ca text. Kept păstrează doar un hash SHA-256 cu salt.</span>
+            <span>Parola ta nu e salvată niciodată ca text. Kip păstrează doar un hash SHA-256 cu salt.</span>
           </li>
           <li>
             <Link2 size={18} aria-hidden />
@@ -391,7 +391,7 @@ function PrivacySection() {
         open={confirm}
         danger
         title="Ștergi tot?"
-        body="Contul, obiectivele, planurile, intrările și istoricul seriei dispar definitiv de pe acest dispozitiv. Nu poți anula asta."
+        body="Contul, obiectivele, planurile, intrările și istoricul streak-ului dispar definitiv de pe acest dispozitiv. Nu poți anula asta."
         confirmLabel="Șterge tot"
         onClose={() => setConfirm(false)}
         onConfirm={() => {
@@ -430,12 +430,12 @@ function AccessibilitySection() {
 
 function HelpSection() {
   const faqs = [
-    { q: 'Kept îmi păstrează sau îmi mută banii?', a: 'Nu. Kept nu mută niciodată bani: e un planificator și un jurnal de economii. Cu urmărirea manuală, adaugi ce ai pus deoparte în altă parte. Conexiunea demo doar simulează transferuri, fără bani reali.' },
-    { q: 'De ce nu contează o intrare în așteptare?', a: '„În așteptare” înseamnă că banii n-au ajuns încă. Kept numără doar intrările confirmate, așa că totalul tău nu arată niciodată bani pe care nu-i ai.' },
+    { q: 'Kip îmi păstrează sau îmi mută banii?', a: 'Nu. Kip nu mută niciodată bani: e un planificator și un jurnal de economii. Cu urmărirea manuală, adaugi ce ai pus deoparte în altă parte. Conexiunea demo doar simulează transferuri, fără bani reali.' },
+    { q: 'De ce nu contează o intrare în așteptare?', a: '„În așteptare” înseamnă că banii n-au ajuns încă. Kip numără doar intrările confirmate, așa că totalul tău nu arată niciodată bani pe care nu-i ai.' },
     { q: 'Ce se întâmplă dacă ratez o depunere plănuită?', a: 'Nimic rău. Planurile sunt doar un ghid. Data estimată de final se mută, iar tu poți ajusta planul oricând vrei.' },
     { q: 'Pot pune aceiași bani la două obiective?', a: 'Nu. Fiecare intrare aparține unui singur obiectiv sau e nealocată, așa că totalul tău e mereu: obiective + nealocat.' },
     { q: 'Am șters un obiectiv. Unde au ajuns banii lui?', a: 'Intrările lui trec la economiile nealocate. Totalul tău nu se schimbă.' },
-    { q: 'Cum folosesc Kept pe alt dispozitiv?', a: 'Versiunea asta păstrează datele doar în acest browser. Îți poți descărca datele din Confidențialitate și securitate.' },
+    { q: 'Cum folosesc Kip pe alt dispozitiv?', a: 'Versiunea asta păstrează datele doar în acest browser. Îți poți descărca datele din Confidențialitate și securitate.' },
   ];
   return (
     <div className="stack">
@@ -459,11 +459,11 @@ function StreakSection() {
     <div className="stack-lg">
       <div className="card row" style={{ gap: 'var(--s-8)' }}>
         <div className="stat">
-          <span>Seria actuală</span>
+          <span>Streak-ul actual</span>
           <strong>{plural(currentStreak(data), 'zi', 'zile')}</strong>
         </div>
         <div className="stat">
-          <span>Cea mai lungă serie</span>
+          <span>Cel mai lung streak</span>
           <strong>{plural(bestStreak(data), 'zi', 'zile')}</strong>
         </div>
       </div>

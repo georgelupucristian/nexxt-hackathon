@@ -11,7 +11,7 @@ import { Seal } from './Seal';
 
 /** What Kip says when the run grows. Encouraging, never "don't lose it". */
 function cheer(n: number): string {
-  if (n === 1) return 'Prima zi. Orice serie începe așa.';
+  if (n === 1) return 'Prima zi. Orice streak începe așa.';
   if (n === 2) return 'Două zile la rând. Se prinde obiceiul.';
   if (n < 7) return `${plural(n, 'zi', 'zile')} la rând. Sumele mici chiar se adună.`;
   if (n === 7) return 'O săptămână întreagă. Așa devine economisitul ceva firesc.';
@@ -125,7 +125,7 @@ export function StreakMoment() {
                 })}
               </div>
             </motion.div>
-            <p className="streak-moment__fine">O zi contează când economisești sau o bifezi. Zilele pe sloi de gheață nu rup seria.</p>
+            <p className="streak-moment__fine">O zi contează când economisești sau o bifezi. Zilele pe sloi de gheață nu rup streak-ul.</p>
           </div>
 
           <motion.button type="button" className="btn btn--primary btn--lg streak-moment__go" initial={{ opacity: 0, y: 12 }} animate={{ opacity: lit ? 1 : 0, y: lit ? 0 : 12 }} transition={{ delay: 1.1 }} onClick={() => setMoment(null)}>

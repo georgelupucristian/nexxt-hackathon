@@ -38,7 +38,7 @@ export function FluidTabs<T extends string>({ tabs, value, onChange, label, clas
               <motion.div
                 layoutId={pillId}
                 transition={{ type: 'spring', stiffness: 280, damping: 25, mass: 0.8 }}
-                className="absolute inset-0 rounded-full border border-white/90 bg-gradient-to-b from-white to-[#fbfaf7] shadow-[0_2px_8px_rgba(21,32,27,0.10)]"
+                className="absolute inset-0 rounded-full border border-white/90 bg-gradient-to-b from-white to-[#f6f8fc] shadow-[0_2px_8px_rgba(14,26,51,0.10)]"
               />
             )}
             <motion.div

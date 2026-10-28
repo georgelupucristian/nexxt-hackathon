@@ -171,9 +171,12 @@ export async function flowValue(counter: Locator): Promise<number> {
   return (JSON.parse(raw) as { value: number }).value;
 }
 
-/** The big "Saved" total in the vault, in lei. */
+/** Total saved across goals, in lei, from the goal card's "… lei în total" line. */
 export async function vaultTotal(page: Page): Promise<number> {
-  return flowValue(page.locator('[data-tour="vault"] .vault__amount number-flow-react'));
+  const text = (await page.locator('[data-tour="vault"] .run__meta span').first().textContent()) ?? '';
+  const m = text.match(/·\s*([\d.]+)\s*lei/);
+  if (!m) throw new Error(`no total in "${text}"`);
+  return Number(m[1].replace(/\./g, ''));
 }
 
 export async function width(locator: Locator): Promise<number> {

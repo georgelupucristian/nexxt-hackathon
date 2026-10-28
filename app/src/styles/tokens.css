@@ -1,38 +1,38 @@
-/* Kept design tokens: one system for every screen.
-   Colour has a job or it isn't used: moss = actions, progress and money you saved; amber = pending
-   or needs attention; red = failed; blue = information and simulated data. Everything else is
-   warm neutral. (Deliberately the opposite of the dark-and-hot-pink look of Step.) */
+/* Kip design tokens: one system for every screen.
+   White and navy. Navy = actions, progress and money you saved; orange only for the streak;
+   amber = pending; red = failed; a lighter blue = information and simulated data. Everything else
+   is a cool neutral that leans slightly towards the navy. (Not Step's black and hot pink.) */
 :root {
-  /* neutrals: one warm family */
-  --bg: #f7f6f2;
+  /* neutrals: white, with greys tinted towards the navy */
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f1efe9;
-  --surface-3: #e7e4dc;
-  --line: #e6e2d9;
-  --line-strong: #d3cec3;
-  --ink: #17201b;
-  --ink-2: #48524c;
-  --ink-3: #66706a; /* ≥ 4.7:1 on white and on --bg: small text stays readable */
+  --surface-2: #f3f5fa;
+  --surface-3: #e4e9f2;
+  --line: #e4e8f0;
+  --line-strong: #cdd4e2;
+  --ink: #0e1a33;
+  --ink-2: #3c4862;
+  --ink-3: #5c6781; /* ≥ 5:1 on white: small text stays readable */
   --on-ink: #ffffff;
 
-  /* moss: primary action, progress, saved money */
-  --accent: #1f7a52;
-  --accent-hover: #196746;
-  --accent-soft: #e3f1e8;
-  --accent-ink: #145238;
+  /* navy: primary action, progress, saved money */
+  --accent: #1b3a6b;
+  --accent-hover: #142e57;
+  --accent-soft: #e6ecf7;
+  --accent-ink: #132a50;
   --accent-deep: var(--accent-hover);
-  --accent-bright: #7fd3a3;
+  --accent-bright: #8fb2ee;
 
   /* status */
   --warn: #8a5a00;
   --warn-soft: #fdf3dc;
   --danger: #b3261e;
   --danger-soft: #fbe7e4;
-  --info: #2b5797;
-  --info-soft: #e6eef9;
-  --demo: #2b5797; /* simulated data reads as "information", never as money */
+  --info: #3a64b0;
+  --info-soft: #e8effb;
+  --demo: #3a64b0; /* simulated data reads as "information", never as money */
   --demo-soft: #e6eef9;
-  --focus: #2b5797;
+  --focus: #3a64b0;
 
   /* legacy section tints now all resolve to neutrals: sections are places, not colours */
   --tint-today: var(--surface-2);
@@ -81,8 +81,8 @@
   --border: 1px solid var(--line);
 
   /* elevation: cards are flat; only things that float above the page cast a shadow */
-  --shadow-float: 0 10px 30px rgba(23, 32, 27, 0.14), 0 2px 6px rgba(23, 32, 27, 0.06);
-  --shadow-sheet: 0 -8px 32px rgba(23, 32, 27, 0.14);
+  --shadow-float: 0 10px 30px rgba(14, 26, 51, 0.14), 0 2px 6px rgba(14, 26, 51, 0.06);
+  --shadow-sheet: 0 -8px 32px rgba(14, 26, 51, 0.14);
   --shadow-pop: var(--shadow-float);
 
   /* layout */

@@ -140,7 +140,7 @@
   --btn-border: var(--ink);
 }
 .btn--primary:hover:not(:disabled) {
-  --btn-bg: #24322b;
+  --btn-bg: #0e1a33;
 }
 .btn--secondary:hover:not(:disabled) {
   --btn-bg: var(--surface-2);

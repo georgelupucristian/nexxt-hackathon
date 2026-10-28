@@ -80,7 +80,7 @@ export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onSte
                 transition={spring}
                 style={{ zIndex: steps.length - position }}
                 className={cn(
-                  'absolute inset-0 flex h-[64px] items-center gap-2 rounded-2xl border-2 bg-surface px-4 shadow-[0_6px_18px_rgba(21,32,27,0.08)] transition-colors',
+                  'absolute inset-0 flex h-[64px] items-center gap-2 rounded-2xl border-2 bg-surface px-4 shadow-[0_6px_18px_rgba(14,26,51,0.08)] transition-colors',
                   isTop ? (shownError ? 'border-danger' : 'border-accent') : 'pointer-events-none border-line opacity-50',
                 )}
               >
@@ -149,7 +149,7 @@ export function ProgressiveInputStack({ steps, values, onChange, onSubmit, onSte
               onClick={() => go(current - 1)}
               transition={{ duration: 0.2, ease: 'easeOut' }}
               aria-label="Înapoi la câmpul anterior"
-              className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-surface-2 text-ink transition hover:bg-[#e4e0d7]"
+              className="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-0 bg-surface-2 text-ink transition hover:bg-[#e4e9f2]"
             >
               <ArrowLeft size={22} aria-hidden />
             </motion.button>

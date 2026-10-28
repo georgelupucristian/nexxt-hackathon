@@ -146,7 +146,7 @@ export function AmountRuler({ value, onChange, step = 1_00, min = 1_00, max = 2_
             const mid = i % 5 === 0;
             return (
               <div key={i} className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: i * GAP }}>
-                <div className={`w-[4px] rounded-full ${major ? 'mt-2 h-12 bg-ink-3' : mid ? 'mt-4 h-8 bg-[#cfcac0]' : 'mt-5 h-6 bg-[#e3dfd6]'}`} />
+                <div className={`w-[4px] rounded-full ${major ? 'mt-2 h-12 bg-ink-3' : mid ? 'mt-4 h-8 bg-[#cdd4e2]' : 'mt-5 h-6 bg-[#e4e9f2]'}`} />
                 {major && <span className="mt-1 text-[11px] font-bold text-ink-3 tabular-nums">{((i * step) / 100).toLocaleString('ro-RO')}</span>}
               </div>
             );

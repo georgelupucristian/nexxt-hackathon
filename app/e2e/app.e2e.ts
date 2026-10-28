@@ -13,9 +13,9 @@ test.describe('getting in and out', () => {
     // the demo home: vault with a non-zero total, the primary goal, streak and sleep-on-it tiles, Kip's dial
     await expect(page.locator('[data-tour="vault"]')).toBeVisible();
     await expect.poll(() => vaultTotal(page)).toBeGreaterThan(0);
-    await expect(page.locator('.tile--wide[data-tour="goal"][data-feed-goal]')).toBeVisible();
-    await expect(page.locator('.tile--streak[data-tour="streak"]')).toBeVisible();
-    await expect(page.locator('.tile--sleep[data-tour="sleep"]')).toBeVisible();
+    await expect(page.locator('.streak-orb[data-tour="streak"]')).toBeVisible();
+    await expect(page.locator('.run[data-tour="vault"] .run__track[data-tour="goal"]')).toBeVisible();
+    await expect(page.locator('.orb--sleep[data-tour="sleep"]')).toBeVisible();
     await expect(page.locator('.dial__kip')).toBeVisible();
 
     await skipTour(page);
@@ -26,7 +26,7 @@ test.describe('getting in and out', () => {
   test('sign out returns to welcome and guards the signed-in pages', async ({ page }) => {
     await demoHome(page);
 
-    const out = page.locator('.home2__out a[href="/logout"]');
+    const out = page.locator('.home4__head a[href="/logout"]');
     await expect(out).toHaveText(TEXT.signOut);
     await out.click();
 
@@ -47,7 +47,7 @@ test.describe('getting in and out', () => {
 });
 
 test.describe('first-run tour', () => {
-  const STOPS = ['[data-tour="vault"]', '[data-tour="goal"]', '[data-tour="streak"]', '[data-tour="sleep"]', '.dial__kip'];
+  const STOPS = ['[data-tour="streak"]', '[data-tour="vault"]', '[data-tour="goal"]', '[data-tour="sleep"]', '.dial__kip'];
 
   /** True when the tour's highlight frames the centre of the element this stop is about. */
   const holeFrames = (page: import('@playwright/test').Page, selector: string) =>
@@ -101,7 +101,7 @@ test.describe('first-run tour', () => {
     await expect(page.locator('.tour')).toBeHidden();
 
     // "How it works" in the header starts it again from the first stop; Escape closes it
-    await page.locator('.home2__out .home2__tour').click();
+    await page.locator('.home4__head .home2__tour').click();
     const tour = page.locator('.tour');
     await expect(tour).toBeVisible();
     await expect(tour.locator('.tour__dots i').first()).toHaveAttribute('data-on', 'true');

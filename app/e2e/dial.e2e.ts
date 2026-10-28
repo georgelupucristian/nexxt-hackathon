@@ -78,40 +78,17 @@ test.describe("Kip's dial", () => {
     await expect(page.locator('section.panel')).toHaveCount(0);
   });
 
-  test('dragging Kip onto a goal opens the money sheet for that goal', async ({ page }) => {
+  test('Kip stays put: dragging the home button does not move it', async ({ page }) => {
     await demoHome(page);
-    const tile = page.locator('.tile--wide[data-feed-goal]');
-    await tile.scrollIntoViewIfNeeded();
-    const goalId = await tile.getAttribute('data-feed-goal');
-    expect(goalId).toBeTruthy();
-
     const kip = page.locator('.dial__kip');
-    const from = (await kip.boundingBox())!;
-    const to = (await tile.boundingBox())!;
-    const start = { x: from.x + from.width / 2, y: from.y + from.height / 2 };
-    const end = { x: to.x + to.width / 2, y: to.y + to.height / 2 };
-
-    await page.mouse.move(start.x, start.y);
+    const before = (await kip.boundingBox())!;
+    await page.mouse.move(before.x + before.width / 2, before.y + before.height / 2);
     await page.mouse.down();
-    await page.mouse.move(start.x, start.y - 24, { steps: 4 }); // past the drag threshold
-    await page.mouse.move(end.x, end.y, { steps: 16 });
-
-    // while Kip hovers the goal, the goal lights up and the dial is in feeding mode
-    await expect(tile).toHaveClass(/\bis-feed-target\b/);
-    await expect(page.locator('.dial')).toHaveClass(/\bdial--feeding\b/);
-
+    await page.mouse.move(before.x - 120, before.y - 200, { steps: 12 });
+    const during = (await kip.boundingBox())!;
+    expect(during.x).toBeCloseTo(before.x, 0);
+    expect(during.y).toBeCloseTo(before.y, 0);
     await page.mouse.up();
-    await expect(tile).not.toHaveClass(/\bis-feed-target\b/);
-
-    const sheet = page.locator('.sheet-backdrop .sheet');
-    await expect(sheet).toBeVisible();
-    // "put it towards" is a custom Select; its hidden input carries the chosen goal id
-    await expect(sheet.locator('input[name="bucket"]')).toHaveValue(goalId!);
-    // a drag is not a tap: the navigation arc stayed shut
-    await expect(dialArc(page)).toHaveCount(0);
-    await expect(page).toHaveURL(/\/home$/);
-
-    await page.keyboard.press('Escape');
-    await expect(page.locator('.sheet-backdrop')).toHaveCount(0);
   });
+
 });

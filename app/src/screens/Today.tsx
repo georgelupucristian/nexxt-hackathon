@@ -133,7 +133,7 @@ function TodayCard({ action, onAdd, onCheckIn }: { action: TodayAction; onAdd: (
     case 'create-goal':
       icon = Target;
       title = 'Creează primul tău obiectiv';
-      body = 'Alege ceva pentru care vrei să economisești, iar Kept te ajută să-ți faci planul.';
+      body = 'Alege ceva pentru care vrei să economisești, iar Kip te ajută să-ți faci planul.';
       cta = { label: 'Creează un obiectiv', run: () => nav('/goals/new') };
       break;
     case 'set-plan':
@@ -186,7 +186,7 @@ function TodayCard({ action, onAdd, onCheckIn }: { action: TodayAction; onAdd: (
     case 'done-today':
       icon = CircleCheck;
       title = 'Gata pe azi';
-      body = 'Azi intră în seria ta. Nu mai ai nimic de făcut.';
+      body = 'Azi intră în streak-ul tău. Nu mai ai nimic de făcut.';
       break;
   }
   const Icon = icon;
@@ -280,7 +280,7 @@ export function BalanceDetails({ open, onClose }: { open: boolean; onClose: () =
           </div>
         ) : (
           <Banner tone="neutral" icon={HardDrive}>
-            Cifrele astea sunt ce ai adăugat tu manual. Kept nu-ți vede contul bancar.
+            Cifrele astea sunt ce ai adăugat tu manual. Kip nu-ți vede contul bancar.
           </Banner>
         )}
         <Button

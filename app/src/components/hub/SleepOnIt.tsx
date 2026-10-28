@@ -15,7 +15,7 @@ import { plural } from '../../lib/ro';
  * you pick, so the money you didn't spend is counted instead of forgotten. Same idea as Monzo's
  * 48-hour wait on its gambling block: a little friction, offered as care.
  *
- * Kept in its own localStorage key, outside the main data store, so it can't disturb the ledger.
+ * Kip in its own localStorage key, outside the main data store, so it can't disturb the ledger.
  */
 
 const NAP_MS = 48 * 60 * 60 * 1000;
@@ -90,23 +90,13 @@ export function SleepTile() {
 
   return (
     <>
-      <button type="button" className={`tile tile--sleep ${awake.length ? 'is-awake' : ''}`} data-tour="sleep" onClick={() => setOpen(true)}>
-        <span className="tile__head">
-          <span className="tile__label">Dorm pe idee</span>
-          <img className="tile__kip" src={`/mascot/${awake.length ? 'think' : 'sleep'}-face.webp`} alt="" />
+      <button type="button" className={`orb orb--sleep ${awake.length ? 'is-awake' : ''}`} data-tour="sleep" onClick={() => setOpen(true)}>
+        <span className="orb__disc">
+          <img src={`/mascot/${awake.length ? 'think' : 'sleep'}-face.webp`} alt="" />
+          {(awake.length > 0 || asleep.length > 0) && <span className="orb__badge">{awake.length || asleep.length}</span>}
         </span>
-        {awake.length ? (
-          <span className="tile__amount">
-            {awake.length} <small>de decis</small>
-          </span>
-        ) : asleep.length ? (
-          <span className="tile__amount">
-            {asleep.length} <small>la somn</small>
-          </span>
-        ) : (
-          <span className="tile__amount tile__amount--text">Vrei ceva?</span>
-        )}
-        <span className="tile__sub">{kept > 0 ? `${formatLei(kept)} necheltuiți până acum` : 'Kip așteaptă 48 h cu tine'}</span>
+        <span className="orb__name">Dorm pe idee</span>
+        <span className="orb__sub">{awake.length ? 'S-a trezit, decide' : asleep.length ? 'Kip doarme pe ea' : kept > 0 ? `${formatLei(kept)} necheltuiți` : 'Vrei ceva? 48 h'}</span>
       </button>
       <SleepSheet open={open} onClose={() => setOpen(false)} />
     </>

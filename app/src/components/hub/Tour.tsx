@@ -16,11 +16,11 @@ interface Stop {
 }
 
 const STOPS: Stop[] = [
-  { target: '[data-tour="vault"]', mood: 'wave', title: 'Pușculița ta', text: 'Aici vezi tot ce ai pus deoparte. Când economisești ceva, apasă „Adaugă economii” și scrii suma.' },
-  { target: '[data-tour="goal"]', mood: 'point', title: 'Obiectivul principal', text: 'Îți arăt cât mai ai și dacă ajungi la timp. Apasă pe el pentru plan și detalii.' },
-  { target: '[data-tour="streak"]', mood: 'happy', title: 'Seria ta', text: 'O zi contează când economisești sau doar confirmi că planul încă merge. Apasă o dată pe zi.' },
+  { target: '[data-tour="streak"]', mood: 'happy', title: 'Streak-ul tău', text: 'O zi contează când economisești sau doar bifezi ziua. Apasă cercul o dată pe zi și ține focul aprins.' },
+  { target: '[data-tour="vault"]', mood: 'wave', title: 'Obiectivul principal', text: 'Aici vezi cât ai strâns pentru el și cât ar trebui să pui pe zi ca să ajungi la timp. Eu mă bucur pe măsură ce te apropii.' },
+  { target: '[data-tour="goal"]', mood: 'point', title: 'Drumul până la țintă', text: 'Asteroidul zboară spre steag cu fiecare leu pus deoparte. Procentul de deasupra îți spune cât ai făcut.' },
   { target: '[data-tour="sleep"]', mood: 'sleep', title: 'Dorm pe idee', text: 'Vrei ceva ce nu era în plan? Spune-mi. Dorm pe idee 48 de ore, apoi te întreb dacă încă îl vrei.' },
-  { target: '.dial__kip', mood: 'celebrate', title: 'Eu sunt Kip', text: 'Apasă-mă ca să schimbi secțiunea. Sau trage-mă peste un obiectiv și pui bani direct în el.' },
+  { target: '.dial__kip', mood: 'celebrate', title: 'Eu sunt Kip', text: 'Apasă-mă oricând ca să schimbi secțiunea: Acasă, Obiective, Activitate sau Profil.' },
 ];
 
 const keyFor = (id: string) => `kept.tour.v1.${id}`;

@@ -220,7 +220,7 @@ function GoalStep({ draft, set, errors }: { draft: OnboardingDraft; set: (p: Par
 function TrackingStep({ draft, set, error }: { draft: OnboardingDraft; set: (p: Partial<OnboardingDraft>) => void; error?: string }) {
   return (
     <section className="stack-lg">
-      <StepTitle n={3} title="Cum ții evidența economiilor?" sub="Kept nu păstrează și nu mută bani. Doar ține evidența a ce pui deoparte." />
+      <StepTitle n={3} title="Cum ții evidența economiilor?" sub="Kip nu păstrează și nu mută bani. Doar ține evidența a ce pui deoparte." />
       <div className="options" role="radiogroup" aria-label="Metoda de evidență">
         <button type="button" role="radio" aria-checked={draft.tracking === 'manual'} className="option option--row" onClick={() => set({ tracking: 'manual' })}>
           <span className="option__icon" aria-hidden>
@@ -306,7 +306,7 @@ function ReminderStep({ draft, set }: { draft: OnboardingDraft; set: (p: Partial
           </Field>
           <TextField label="Ora" type="time" value={r.time} onChange={(e) => set({ reminder: { ...r, time: e.target.value || '19:00' } })} />
           <Banner tone="neutral" icon={Bell}>
-            Mementourile apar în Kept când îl deschizi la ora aleasă sau după. Versiunea asta nu trimite notificări push.
+            Mementourile apar în Kip când îl deschizi la ora aleasă sau după. Versiunea asta nu trimite notificări push.
           </Banner>
         </>
       )}

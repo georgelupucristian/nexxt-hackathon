@@ -205,7 +205,7 @@ export function Start() {
           <motion.div className="start__building" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <MascotSays state="think" message="Stai o secundă…" size={170} layout="stack" appear="none" />
             <LabeledProgressIndicator
-              labels={[`Pregătesc ${d.goalName.trim() || 'obiectivul tău'}…`, 'Îți planific săptămânile…', 'Îți încălzesc seria…', 'Gata!']}
+              labels={[`Pregătesc ${d.goalName.trim() || 'obiectivul tău'}…`, 'Îți planific săptămânile…', 'Îți încălzesc streak-ul…', 'Gata!']}
               durationMs={2600}
               onDone={() => {
                 setPhase('done');
@@ -364,7 +364,7 @@ export function Start() {
 
           {id === 'tracking' && (
             <div className="choice-list" role="radiogroup" aria-label="Cum ții evidența economiilor">
-              <Choice index={0} selected={d.tracking === 'manual'} tint="today" icon={<Emoji3D name="pencil" size={34} />} title="Notez eu ce economisesc" desc="Pui bani deoparte oriunde, apoi apeși + în Kept. Recomandat." onSelect={() => set({ tracking: 'manual' })} />
+              <Choice index={0} selected={d.tracking === 'manual'} tint="today" icon={<Emoji3D name="pencil" size={34} />} title="Notez eu ce economisesc" desc="Pui bani deoparte oriunde, apoi apeși + în Kip. Recomandat." onSelect={() => set({ tracking: 'manual' })} />
               <Choice index={1} selected={d.tracking === 'demo'} tint="profile" icon={<Emoji3D name="testtube" size={34} />} title="Încearcă o conexiune demo" desc="Vezi cum s-ar comporta un cont conectat. Totul e simulat." onSelect={() => set({ tracking: 'demo' })} />
             </div>
           )}
@@ -372,7 +372,7 @@ export function Start() {
           {id === 'reminder' && (
             <div className="stack-lg">
               <div className="choice-list" role="radiogroup" aria-label="Memento săptămânal">
-                <Choice index={0} selected={d.reminderOn} tint="activity" icon={<Emoji3D name="bell" size={34} />} title="Da, amintește-mi săptămânal" desc="Apare în Kept în ziua pe care o alegi." onSelect={() => set({ reminderOn: true })} />
+                <Choice index={0} selected={d.reminderOn} tint="activity" icon={<Emoji3D name="bell" size={34} />} title="Da, amintește-mi săptămânal" desc="Apare în Kip în ziua pe care o alegi." onSelect={() => set({ reminderOn: true })} />
                 <Choice index={1} selected={!d.reminderOn} tint="goals" icon={<Emoji3D name="sleep" size={34} />} title="Nu, mersi" desc="Îl poți porni mai târziu din Profil." onSelect={() => set({ reminderOn: false })} />
               </div>
               <AnimatePresence>

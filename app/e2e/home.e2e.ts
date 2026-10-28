@@ -22,8 +22,9 @@ test.describe('home actions', () => {
     await expect(chip).toHaveAttribute('aria-checked', 'true');
     await expect(open.locator('.qr__goal[aria-checked="true"]')).toHaveCount(1);
 
-    const goalTile = page.locator(`.tile[data-feed-goal][data-feed-name=${JSON.stringify(goalName)}]`);
-    const goalBefore = lei(await goalTile.locator('.tile__amount').textContent());
+    // other goals show as circles under the main card, with their amount under the name
+    const goalTile = page.locator('.orb', { has: page.locator('.orb__name', { hasText: goalName }) });
+    const goalBefore = lei(await goalTile.locator('.orb__sub').textContent());
     const totalBefore = await vaultTotal(page);
 
     await open.locator('.qr__input input').fill('37');
@@ -32,15 +33,15 @@ test.describe('home actions', () => {
     await expect(vault.locator('.qr--open')).toHaveCount(0);
 
     // demo transfers start pending and count once the simulated sync confirms them (~4 s)
-    await expect.poll(async () => lei(await goalTile.locator('.tile__amount').textContent()), { timeout: 15_000 }).toBe(goalBefore + 37);
+    await expect.poll(async () => lei(await goalTile.locator('.orb__sub').textContent()), { timeout: 15_000 }).toBe(goalBefore + 37);
     await expect.poll(() => vaultTotal(page), { timeout: 15_000 }).toBeGreaterThanOrEqual(totalBefore + 37);
   });
 
   test('streak check-in plays the streak moment; Continue closes it', async ({ page }) => {
     await demoHome(page);
-    const tile = page.locator('.tile--streak');
+    const tile = page.locator('.streak-orb__ring');
     await expect(tile).not.toHaveClass(/\bis-done\b/);
-    const before = int(await tile.locator('.tile__amount').textContent());
+    const before = await flowValue(tile.locator('.streak-orb__num number-flow-react'));
 
     await tile.click();
     const moment = page.locator('.streak-moment');
@@ -62,7 +63,7 @@ test.describe('home actions', () => {
     await expect(moment).toHaveCount(0);
 
     await expect(tile).toHaveClass(/\bis-done\b/);
-    expect(int(await tile.locator('.tile__amount').textContent())).toBe(before + 1);
+    expect(await flowValue(tile.locator('.streak-orb__num number-flow-react'))).toBe(before + 1);
     await expect(page.locator('.dial__kip')).toBeVisible();
   });
 
@@ -70,7 +71,7 @@ test.describe('home actions', () => {
     await demoHome(page);
     const wish = `Casti ${Date.now() % 100_000}`;
 
-    await page.locator('.tile--sleep').click();
+    await page.locator('.orb--sleep').click();
     const sheet = page.locator('.sheet-backdrop .sheet');
     await expect(sheet.locator('.sleep')).toBeVisible();
 
@@ -133,7 +134,7 @@ test.describe('home actions', () => {
     const before = await box();
     expect(before.width).toBeGreaterThan(0);
 
-    await page.locator('[data-tour="vault"] .vault__more').click();
+    await page.locator('[data-tour="vault"] .run__more').click();
     const backdrop = page.locator('.sheet-backdrop');
     await expect(backdrop.locator('.sheet')).toBeVisible();
     // the sheet locks page scrolling…

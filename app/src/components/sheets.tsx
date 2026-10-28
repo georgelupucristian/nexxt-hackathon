@@ -193,7 +193,7 @@ export function MoneySheet({ open, onClose, mode = 'contribution', goalId = null
             Conexiune demo: asta creează un transfer <strong>simulat</strong>. Nu se mișcă bani reali. Rămâne în așteptare până la următoarea sincronizare.
           </Banner>
         )}
-        {!isDemo && !editing && <p className="small subtle">Adaugi bani pe care i-ai pus deja deoparte. Kept nu mută niciodată bani.</p>}
+        {!isDemo && !editing && <p className="small subtle">Adaugi bani pe care i-ai pus deja deoparte. Kip nu mută niciodată bani.</p>}
         {error && (
           <div className="form-error" role="alert">
             <AlertCircle size={18} aria-hidden /> {error}
@@ -438,7 +438,7 @@ export function StreakSheet({ open, onClose }: { open: boolean; onClose: () => v
   const paused = data.pausedDays.includes(today);
   const doneToday = data.actions.some((a) => a.date === today);
   return (
-    <Sheet open={open} onClose={onClose} title="Cum funcționează seria">
+    <Sheet open={open} onClose={onClose} title="Cum funcționează streak-ul">
       <div className="stack-lg">
         <div className="row" style={{ gap: 'var(--s-6)' }}>
           <div className="stat">
@@ -458,7 +458,7 @@ export function StreakSheet({ open, onClose }: { open: boolean; onClose: () => v
         <div className="card card--tint stack">
           <img className="floe-pic" src="/mascot/pose-ice-floe.webp" alt="" />
           <h3>Ai nevoie de un sloi de gheață?</h3>
-          <p className="small muted">Focile se odihnesc pe sloiuri de gheață. Pune ziua de azi pe unul: Kip plutește, seria rămâne, economiile nu se schimbă.</p>
+          <p className="small muted">Focile se odihnesc pe sloiuri de gheață. Pune ziua de azi pe unul: Kip plutește, streak-ul rămâne, economiile nu se schimbă.</p>
           <Button
             size="sm"
             disabled={doneToday && !paused}
@@ -482,13 +482,13 @@ export function StreakRules() {
           <strong>O zi e completă</strong> când adaugi o depunere sau îți verifici planul. Doar să deschizi aplicația nu contează.
         </li>
         <li>
-          <strong>Seria măsoară constanța, nu banii.</strong> O serie nu-ți adaugă nimic la sold, iar o zi ratată nu-ți ia nimic din economii.
+          <strong>Streak-ul măsoară constanța, nu banii.</strong> Un streak nu-ți adaugă nimic la sold, iar o zi ratată nu-ți ia nimic din economii.
         </li>
         <li>
-          <strong>Ai ratat o zi?</strong> Seria o ia de la capăt de la următoarea acțiune. Recordul tău și toate economiile rămân.
+          <strong>Ai ratat o zi?</strong> Streak-ul o ia de la capăt de la următoarea acțiune. Recordul tău și toate economiile rămân.
         </li>
         <li>
-          <strong>Sloiurile de gheață</strong> sunt zile de odihnă. Seria te așteaptă pe ele. Folosește-le în sesiune, în vacanțe sau în săptămânile cu bani puțini.
+          <strong>Sloiurile de gheață</strong> sunt zile de odihnă. Streak-ul te așteaptă pe ele. Folosește-le în sesiune, în vacanțe sau în săptămânile cu bani puțini.
         </li>
       </ul>
       <div className="legend" aria-label="Legendă">

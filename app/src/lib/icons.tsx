@@ -1,5 +1,5 @@
 // The app's single icon set: Hugeicons (stroke-rounded), exposed under the names the code already
-// used so screens didn't need rewriting. Rounded terminals and slightly softer geometry give Kept
+// used so screens didn't need rewriting. Rounded terminals and slightly softer geometry give Kip
 // its own look instead of the default line icons every generated UI ships with.
 import { HugeiconsIcon, type IconSvgElement } from '@hugeicons/react';
 import * as H from '@hugeicons/core-free-icons';

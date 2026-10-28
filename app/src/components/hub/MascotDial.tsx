@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { SealState } from '../mascot/Seal';
 
@@ -24,7 +24,7 @@ export function sectionForPath(pathname: string): DialSection {
 }
 
 const R_MAX = 225; // arc outer radius on wide screens (px)
-const R_IN = 76; // arc inner radius: just outside Kip's disc
+const R_IN = 64; // arc inner radius: just outside Kip's disc
 const LIFT = 8; // how far the current segment grows outwards
 const GAP = 6; // px between segments, the same width from the inner edge to the outer one
 
@@ -60,10 +60,7 @@ interface Props {
 /**
  * The app's navigation. Kip sits at the bottom centre of every screen. Tap him and a half ring
  * fans out above him, four flat slices with equal gaps, the current one filled and grown outwards;
- * the screen behind softens. Hovering a slice changes Kip's face, so he reacts to where you're heading.
- *
- * Drag him instead and he becomes an action: drop him on any goal (anything marked
- * data-feed-goal) and the app asks how much to put in it. He swims back to the middle on release.
+ * the screen behind softens. Hovering a slice changes Kip's face, so he reacts to where you're heading. 
  */
 export function MascotDial({ restingMood, progress }: Props) {
   const { pathname } = useLocation();
@@ -72,10 +69,6 @@ export function MascotDial({ restingMood, progress }: Props) {
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState<DialSection | null>(null);
   const [poked, setPoked] = useState(false);
-  const [feeding, setFeeding] = useState<{ id: string; name: string } | null | false>(false);
-  // set as soon as a drag starts, so the click that ends it doesn't open the ring
-  const dragged = useRef(false);
-  const target = useRef<HTMLElement | null>(null);
   const [vw, setVw] = useState(() => window.innerWidth);
   useEffect(() => {
     const onResize = () => setVw(window.innerWidth);
@@ -98,7 +91,6 @@ export function MascotDial({ restingMood, progress }: Props) {
   }, [open]);
 
   const toggle = () => {
-    if (dragged.current) return;
     if (!open) {
       setPoked(true);
       window.setTimeout(() => setPoked(false), 900);
@@ -106,28 +98,14 @@ export function MascotDial({ restingMood, progress }: Props) {
     setOpen((o) => !o);
   };
 
-  const aim = (el: HTMLElement | null) => {
-    if (el === target.current) return;
-    target.current?.classList.remove('is-feed-target');
-    target.current = el;
-    if (el) {
-      el.classList.add('is-feed-target');
-      navigator.vibrate?.(6);
-      setFeeding({ id: el.dataset.feedGoal!, name: el.dataset.feedName ?? 'acest obiectiv' });
-    } else setFeeding(null);
-  };
-
   const go = (s: DialSection) => {
     setOpen(false);
     if (s.id !== here.id) nav(s.path);
   };
 
-  // faces only exist as close-ups, so the dial can use a few more than the full-body states:
-  // curious while you carry Kip around, mouth open when he's over a goal he can "eat" into
-  const mood: SealState | 'hungry' =
-    feeding !== false ? (feeding ? 'hungry' : 'idle') : (hover?.mood ?? (open ? (poked ? 'happy' : here.mood) : restingMood));
+  const mood: SealState = hover?.mood ?? (open ? (poked ? 'happy' : here.mood) : restingMood);
   const circ = 2 * Math.PI * 35;
-  const tag = feeding !== false ? (feeding ? `În ${feeding.name}` : 'Lasă-mă pe un obiectiv') : here.label;
+  const tag = here.label;
 
   return (
     <>
@@ -135,30 +113,7 @@ export function MascotDial({ restingMood, progress }: Props) {
         {open && <motion.div className="dial-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} onClick={() => setOpen(false)} />}
       </AnimatePresence>
       <div className="dial-bounds">
-        <motion.div
-          className={`dial ${open ? 'dial--open' : ''} ${feeding !== false ? 'dial--feeding' : ''}`}
-          drag={!open}
-          dragSnapToOrigin
-          dragElastic={0.9}
-          dragMomentum={false}
-          whileDrag={{ scale: 1.1 }}
-          onPointerDown={() => (dragged.current = false)}
-          onDragStart={() => {
-            dragged.current = true;
-            setFeeding(null);
-          }}
-          onDrag={(e) => {
-            const p = e as PointerEvent;
-            const hit = document.elementsFromPoint(p.clientX, p.clientY).find((n) => n instanceof HTMLElement && n.closest('[data-feed-goal]'));
-            aim(hit ? (hit as HTMLElement).closest<HTMLElement>('[data-feed-goal]') : null);
-          }}
-          onDragEnd={() => {
-            const goalId = target.current?.dataset.feedGoal;
-            aim(null);
-            setFeeding(false);
-            if (goalId) window.dispatchEvent(new CustomEvent('kip:feed', { detail: goalId }));
-          }}
-        >
+        <div className={`dial ${open ? 'dial--open' : ''}`}>
           <AnimatePresence>
             {open && (
               <motion.nav className="dial__arc" aria-label="Navigare principală" initial="closed" animate="open" exit="closed" style={{ width: BOX * 2, height: BOX + 4, marginLeft: -BOX, marginTop: -BOX }}>
@@ -205,7 +160,7 @@ export function MascotDial({ restingMood, progress }: Props) {
             animate={{ scale: open ? 1.05 : 1 }}
             transition={{ type: 'spring', stiffness: 420, damping: 24 }}
             aria-expanded={open}
-            aria-label={open ? 'Închide meniul' : `Meniu. Secțiunea curentă: ${here.label}. Trage-mă pe un obiectiv ca să pui bani în el.`}
+            aria-label={open ? 'Închide meniul' : `Meniu. Secțiunea curentă: ${here.label}.`}
           >
             <svg viewBox="0 0 80 80" className="dial__progress" aria-hidden>
               <circle cx="40" cy="40" r="35" className="dial__track" />
@@ -244,7 +199,7 @@ export function MascotDial({ restingMood, progress }: Props) {
               </motion.span>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
     </>
   );

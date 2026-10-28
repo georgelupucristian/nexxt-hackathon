@@ -409,7 +409,7 @@ h2 {
   transition: border-color 150ms, box-shadow 150ms, background 150ms;
 }
 .choice:hover {
-  background: #fdfcfa;
+  background: #ffffff;
 }
 .choice[aria-checked='true'] {
   border-color: var(--accent);
@@ -590,7 +590,7 @@ a.list-row:active,
 }
 
 /* ======================================================================
-   Kept design system (UX review pass).
+   Kip design system (UX review pass).
    Cards: white, 1px hairline, radius 16, no shadow. Buttons: flat, 44px+, one primary per view.
    Shadows only on things that float (dial, sheets, panels, toasts).
    ====================================================================== */
@@ -1187,16 +1187,16 @@ body:has(.party) .dial-bounds {
 .dial {
   position: absolute;
   left: 50%;
-  margin-left: -66px;
-  bottom: calc(40px + env(safe-area-inset-bottom));
-  width: 132px;
-  height: 132px;
+  margin-left: -52px;
+  bottom: calc(36px + env(safe-area-inset-bottom));
+  width: 104px;
+  height: 104px;
   pointer-events: auto;
   touch-action: none;
 }
 .dial--feeding .dial__kip {
   cursor: grabbing;
-  box-shadow: 0 16px 34px rgba(23, 32, 27, 0.28);
+  box-shadow: 0 16px 34px rgba(14, 26, 51, 0.28);
 }
 /* a light frost, not a dark curtain: you still see where you are */
 .dial-backdrop {
@@ -1249,8 +1249,8 @@ body:has(.party) .dial-bounds {
 }
 .dial__face {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 86px;
+  height: 86px;
   border-radius: 50%;
   overflow: hidden;
   background: var(--accent-soft);
@@ -1287,7 +1287,7 @@ body:has(.party) .dial-bounds {
   left: 50%;
   top: 50%;
   z-index: 1;
-  filter: drop-shadow(0 6px 18px rgba(23, 32, 27, 0.14));
+  filter: drop-shadow(0 6px 18px rgba(14, 26, 51, 0.14));
 }
 .dial__slice {
   position: absolute;
@@ -1325,7 +1325,7 @@ body:has(.party) .dial-bounds {
 }
 [data-feed-goal].is-feed-target {
   scale: 1.02;
-  box-shadow: 0 0 0 3px var(--accent), 0 12px 30px rgba(31, 122, 82, 0.2);
+  box-shadow: 0 0 0 3px var(--accent), 0 12px 30px rgba(27, 58, 107, 0.2);
 }
 
 
@@ -1700,7 +1700,7 @@ body:has(.streak-moment) .dial-bounds {
   font-weight: 600;
   text-wrap: balance;
   transform-origin: bottom center;
-  box-shadow: 0 6px 18px rgba(23, 32, 27, 0.08);
+  box-shadow: 0 6px 18px rgba(14, 26, 51, 0.08);
 }
 .streak-moment__bubble::after {
   content: '';
@@ -1914,7 +1914,7 @@ h2 {
   color: var(--ink);
   /* light like the rest of the app; a faint mint wash marks it as the money card */
   background:
-    radial-gradient(90% 80% at 100% 0%, rgba(31, 122, 82, 0.1), transparent 60%),
+    radial-gradient(90% 80% at 100% 0%, rgba(27, 58, 107, 0.1), transparent 60%),
     var(--surface);
 }
 .vault__top {
@@ -2412,7 +2412,7 @@ img.goal-glyph--kip.goal-glyph--lg {
 .tour__hole {
   position: fixed;
   border-radius: 24px;
-  box-shadow: 0 0 0 200vmax rgba(20, 28, 23, 0.55);
+  box-shadow: 0 0 0 200vmax rgba(10, 20, 40, 0.55);
   pointer-events: none;
 }
 .tour__card {
@@ -2503,4 +2503,454 @@ img.goal-glyph--kip.goal-glyph--lg {
   width: 150px;
   height: auto;
   margin: 0 auto -2px;
+}
+
+/* ---------- home v4: streak circle, the goal run, recent; then circles ---------- */
+.home4__head {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 6px;
+  font-size: var(--fs-sm);
+}
+.home4__out {
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.home4__out:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.home4__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .home4__grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'streak recent'
+      'goal recent'
+      'goal next'
+      'orbs sim';
+    align-items: start;
+    column-gap: 24px;
+  }
+  .home4__streak { grid-area: streak; }
+  .home4__goal { grid-area: goal; }
+  .home4__recent { grid-area: recent; }
+  .home4__orbs { grid-area: orbs; }
+  .home4__next { grid-area: next; }
+  .home4__sim { grid-area: sim; }
+}
+
+/* 1. streak: a big ring of this week's days around the count */
+.streak-orb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.streak-orb__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e8761a;
+}
+.streak-orb__ring {
+  position: relative;
+  width: 196px;
+  height: 196px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.streak-orb__ring:active {
+  scale: 0.97;
+}
+.streak-orb__ring > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.streak-orb__day {
+  fill: none;
+  stroke-width: 15;
+  stroke-linecap: round;
+  stroke: var(--surface-3);
+}
+.streak-orb__day.is-done,
+.streak-orb__day.is-today-done {
+  stroke: #f2830d;
+}
+.streak-orb__day.is-today {
+  stroke: #f2830d;
+  stroke-opacity: 0.35;
+  animation: today-pulse 1.6s ease-in-out infinite;
+}
+.streak-orb__day.is-paused {
+  stroke: var(--info);
+  stroke-opacity: 0.5;
+}
+.streak-orb__day.is-future,
+.streak-orb__day.is-before {
+  stroke: var(--surface-2);
+}
+@keyframes today-pulse {
+  50% {
+    stroke-opacity: 0.75;
+  }
+}
+.streak-orb__core {
+  position: absolute;
+  inset: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff6ec;
+  color: var(--ink);
+}
+.streak-orb__ring.is-done .streak-orb__core {
+  background: #fff1e0;
+}
+.streak-orb__core svg {
+  color: #f2830d;
+}
+.streak-orb__num {
+  font-size: 3.25rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.streak-orb__unit {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.streak-orb__hint {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+
+/* 2. the goal run: Kip in the corner, the amount, and an asteroid flying to the flag */
+.run {
+  position: relative;
+  overflow: hidden;
+  padding: 18px 18px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 28px;
+  background: var(--surface);
+}
+.run__name {
+  display: inline-block;
+  max-width: calc(100% - 124px);
+  padding: 5px 13px;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--accent);
+  text-decoration: none;
+  line-height: 1.25;
+}
+.run__kip {
+  position: absolute;
+  top: -22px;
+  right: -22px;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent-soft);
+  border: 1.5px solid var(--line);
+}
+.run__kip img {
+  position: absolute;
+  left: 8px;
+  bottom: -2px;
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+}
+.run__amount {
+  margin: 12px 0 0;
+  font-size: clamp(2.5rem, 12vw, 3.25rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.run__amount > span:last-child {
+  font-size: 0.42em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+.run__pace {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 8px 0 0;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: #e8761a;
+}
+.run__pace span {
+  font-weight: 500;
+  color: var(--ink-3);
+}
+.run__track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin: 26px 0 6px;
+}
+.run__lane {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  margin-right: 10px;
+}
+.run__rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 3px;
+  translate: 0 -50%;
+  background-image: repeating-linear-gradient(90deg, var(--line-strong) 0 8px, transparent 8px 14px);
+}
+.run__trail {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 7px;
+  translate: 0 -50%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 106, 43, 0), rgba(255, 120, 40, 0.45) 45%, #ff6a2b 88%, #ffb347);
+}
+.run__rock {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #fff6db 0 18%, #ffbe55 42%, #ff6a2b 74%, #c2410c);
+  box-shadow: 0 0 14px 5px rgba(255, 110, 40, 0.5);
+  animation: rock-glow 1.1s ease-in-out infinite;
+}
+.run__rock i {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffb347;
+  animation: rock-spark 0.9s linear infinite;
+}
+.run__rock i:nth-child(2) {
+  animation-delay: 0.3s;
+  margin-top: -5px;
+}
+.run__rock i:nth-child(3) {
+  animation-delay: 0.6s;
+  margin-top: 4px;
+}
+@keyframes rock-glow {
+  50% {
+    box-shadow: 0 0 20px 8px rgba(255, 110, 40, 0.6);
+  }
+}
+@keyframes rock-spark {
+  from {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-26px, -50%) scale(0.3);
+  }
+}
+.run__pct {
+  position: absolute;
+  bottom: calc(50% + 14px);
+  translate: -50% 0;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.run__flag {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -14px;
+}
+.run__flag svg path:first-child {
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.run__flag svg path:last-child {
+  fill: var(--accent);
+}
+.run__flag b {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.run__meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin: 4px 0 14px;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+.run__more {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.run .qr:not(.qr--open) .qr__btn {
+  flex: 1;
+  justify-content: center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .run__rock,
+  .run__rock i,
+  .streak-orb__day.is-today {
+    animation: none;
+  }
+}
+
+/* the smaller things, as circles */
+.orbs {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 6px 2px 10px;
+  scrollbar-width: none;
+}
+.orb {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 108px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+.orb__disc {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border: 1.5px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  overflow: visible;
+}
+.orb:active .orb__disc {
+  scale: 0.96;
+}
+.orb__disc svg {
+  position: absolute;
+  inset: 4px;
+}
+.orb__track {
+  fill: none;
+  stroke: var(--surface-3);
+  stroke-width: 7;
+}
+.orb__fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.orb__value {
+  font-size: 1.125rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.orb__name {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.orb__sub {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+.orb--sleep .orb__disc {
+  overflow: hidden;
+  background: var(--accent-soft);
+}
+.orb--sleep .orb__disc img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.orb--sleep.is-awake .orb__disc {
+  border: 2.5px solid var(--accent);
+}
+.orb__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 24px;
 }

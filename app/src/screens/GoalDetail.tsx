@@ -230,8 +230,8 @@ function GoalGauge({ pct, paused, children }: { pct: number; paused: boolean; ch
       <svg viewBox="0 0 280 280" className="goal-gauge__svg" aria-hidden>
         <defs>
           <linearGradient id="gauge-fill" x1="0" y1="1" x2="1" y2="0">
-            <stop offset="0" stopColor="#9be7bd" />
-            <stop offset="1" stopColor="#1f7a52" />
+            <stop offset="0" stopColor="#8fb2ee" />
+            <stop offset="1" stopColor="#1b3a6b" />
           </linearGradient>
           <filter id="gauge-glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="6" />

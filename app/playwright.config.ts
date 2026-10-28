@@ -20,8 +20,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   // software WebGL is CPU-heavy; a few workers is plenty for this suite
-  workers: process.env.CI ? 2 : 4,
-  timeout: 45_000,
+  workers: 2, // the mascot and flame render with software WebGL here; more parallel browsers starve each other
+  timeout: 90_000, // the navigation walk-through takes ~40 s on software WebGL
   expect: { timeout: 8_000 },
   reporter: [['list'], ['html', { outputFolder: './e2e/.report', open: 'never' }]],
   use: {

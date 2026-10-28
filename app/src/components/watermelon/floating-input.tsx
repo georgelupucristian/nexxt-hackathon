@@ -29,7 +29,7 @@ export function FloatingInput({ label, error, hint, className, type = 'text', id
           aria-describedby={describedBy}
           className={cn(
             'peer h-14 w-full rounded-2xl border-2 bg-surface px-4 pt-4 text-[17px] font-medium text-ink outline-none transition-[border-color,box-shadow] duration-200',
-            error ? 'border-danger' : 'border-line hover:border-[#cfcac0] focus:border-accent focus:shadow-[0_0_0_4px_var(--accent-soft)]',
+            error ? 'border-danger' : 'border-line hover:border-[#cdd4e2] focus:border-accent focus:shadow-[0_0_0_4px_var(--accent-soft)]',
             isPassword && 'pr-12',
             className,
           )}
