@@ -10,6 +10,7 @@ import { useData, useStore } from '../../data/store';
 import { Hub } from './Hub';
 import { MascotDial } from './MascotDial';
 import { StreakMoment } from '../mascot/StreakMoment';
+import { Tour } from './Tour';
 
 interface Panel {
   id: 'goals' | 'activity' | 'profile';
@@ -82,6 +83,7 @@ export function HubShell() {
 
       <MascotDial restingMood={kip.state} progress={pct} />
       <StreakMoment />
+      <Tour />
       <MoneySheet {...money} onClose={() => setMoney({ open: false })} />
       <BalanceDetails open={details} onClose={() => setDetails(false)} />
     </div>

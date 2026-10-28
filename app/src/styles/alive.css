@@ -1921,11 +1921,13 @@ h2 {
   position: relative;
   overflow: hidden;
   padding: 18px 18px 16px;
+  border: 1px solid var(--line);
   border-radius: 24px;
-  color: #f3f1ea;
+  color: var(--ink);
+  /* light like the rest of the app; a faint mint wash marks it as the money card */
   background:
-    radial-gradient(90% 70% at 100% 0%, rgba(84, 190, 130, 0.22), transparent 60%),
-    #14231a;
+    radial-gradient(90% 80% at 100% 0%, rgba(31, 122, 82, 0.1), transparent 60%),
+    var(--surface);
 }
 .vault__top {
   display: flex;
@@ -1935,10 +1937,10 @@ h2 {
 .vault__label {
   margin: 0;
   font-size: var(--fs-sm);
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(243, 241, 234, 0.7);
+  color: var(--ink-3);
 }
 .vault__eye {
   display: grid;
@@ -1947,8 +1949,8 @@ h2 {
   height: 34px;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
+  background: var(--surface-2);
+  color: var(--ink-2);
   cursor: pointer;
 }
 .vault__amount {
@@ -1966,7 +1968,7 @@ h2 {
   font-size: 0.42em;
   font-weight: 700;
   letter-spacing: 0;
-  color: rgba(243, 241, 234, 0.6);
+  color: var(--ink-3);
 }
 .vault__split {
   display: flex;
@@ -1974,48 +1976,29 @@ h2 {
   gap: 4px 14px;
   margin: 10px 0 16px;
   font-size: var(--fs-sm);
-  color: rgba(243, 241, 234, 0.72);
+  color: var(--ink-2);
 }
 .vault__pending {
-  color: #f5c46b;
+  color: var(--warn);
 }
 .vault__actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
 }
 .vault__actions .qr {
   flex: 1;
 }
-.vault .btn--primary,
-.vault .btn--secondary {
-  background: #9be4b8;
-  border-color: #9be4b8;
-  color: #0f1d15;
-}
-.vault .qr--open {
-  background: rgba(255, 255, 255, 0.08);
-}
-.vault .qr__input input,
-.vault .qr__input span {
-  color: #f3f1ea;
-}
-.vault .qr__goal,
-.vault .qr__pick {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: transparent;
-  color: #f3f1ea;
-}
-.vault .qr__goal[aria-checked='true'] {
-  background: #f3f1ea;
-  color: #0f1d15;
+.vault__actions:has(.qr--open) .vault__more {
+  display: none;
 }
 .vault__more {
   flex: none;
   padding: 0;
   border: 0;
   background: none;
-  color: rgba(243, 241, 234, 0.8);
+  color: var(--accent-ink);
   font: inherit;
   font-size: var(--fs-sm);
   font-weight: 700;
@@ -2140,9 +2123,6 @@ h2 {
 }
 .home3__title {
   padding-right: 76px; /* the sign-out link sits in the top right corner */
-}
-.vault .qr:not(.qr--open) {
-  justify-content: stretch;
 }
 .vault .qr:not(.qr--open) .qr__btn {
   flex: 1;
@@ -2338,3 +2318,179 @@ img.goal-glyph--kip.goal-glyph--lg {
   font-size: 1.15em;
   transform: rotate(-2deg);
 }
+
+/* quick record, open: one column. amount, where it goes, quick picks, then a full-width save */
+.qr--open {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--surface-2);
+}
+.qr--open .qr__field {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.qr--open .qr__input {
+  padding: 0 2px 6px;
+  border-bottom: 2px solid var(--line-strong);
+}
+.qr--open .qr__input:focus-within {
+  border-color: var(--accent);
+}
+.qr--open .qr__input input {
+  flex: 1;
+  min-width: 0;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.qr--open .qr__picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.qr--open .qr__btn {
+  margin-left: 0;
+  width: 100%;
+  justify-content: center;
+}
+/* sleep tile: Kip sits beside the label, never on top of the text */
+.tile--sleep .tile__label {
+  padding-right: 0;
+}
+.tile__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+.tile__head .tile__kip {
+  position: static;
+  width: 34px;
+  height: 34px;
+}
+/* the ruler's number is a button: tap it to type an exact amount */
+.ruler-readout {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: text;
+  border-bottom: 2px dashed transparent;
+}
+.ruler-readout:hover,
+.ruler-readout:focus-visible {
+  border-bottom-color: var(--line-strong);
+  outline: none;
+}
+.ruler-type {
+  padding: 0;
+  border: 0;
+  border-bottom: 2px solid var(--accent);
+  background: none;
+  text-align: right;
+  outline: none;
+  font-weight: 900;
+}
+.home2__out {
+  display: flex;
+  gap: 14px;
+}
+.home2__out a,
+.home2__tour {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+  cursor: pointer;
+}
+.home3__title {
+  padding-right: 0;
+  margin-top: 28px;
+}
+
+/* ---------- tour ---------- */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+}
+.tour__hole {
+  position: fixed;
+  border-radius: 24px;
+  box-shadow: 0 0 0 200vmax rgba(20, 28, 23, 0.55);
+  pointer-events: none;
+}
+.tour__card {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+.tour__kip {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+.tour__body {
+  flex: 1;
+  min-width: 0;
+}
+.tour__title {
+  margin: 0;
+  font-weight: 900;
+  font-size: var(--fs-lg);
+  letter-spacing: -0.01em;
+}
+.tour__text {
+  margin: 4px 0 12px;
+  color: var(--ink-2);
+}
+.tour__foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tour__dots {
+  display: flex;
+  gap: 5px;
+  margin-right: auto;
+}
+.tour__dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+.tour__dots i[data-on] {
+  width: 18px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.tour__skip {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.tour__skip { white-space: nowrap; }

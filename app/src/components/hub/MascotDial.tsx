@@ -14,9 +14,9 @@ export interface DialSection {
 // Left to right along the arc, like a tab bar read in a curve.
 export const DIAL_SECTIONS: DialSection[] = [
   { id: 'home', label: 'Home', path: '/home', mood: 'happy' },
-  { id: 'goals', label: 'Goals', path: '/goals', mood: 'point' },
+  { id: 'goals', label: 'Goals', path: '/goals', mood: 'wave' },
   { id: 'activity', label: 'Activity', path: '/activity', mood: 'think' },
-  { id: 'profile', label: 'Profile', path: '/profile', mood: 'wave' },
+  { id: 'profile', label: 'Profile', path: '/profile', mood: 'point' },
 ];
 
 export function sectionForPath(pathname: string): DialSection {

@@ -89,9 +89,11 @@ export function SleepTile() {
 
   return (
     <>
-      <button type="button" className={`tile tile--sleep ${awake.length ? 'is-awake' : ''}`} onClick={() => setOpen(true)}>
-        <img className="tile__kip" src={`/mascot/${awake.length ? 'think' : 'sleep'}-face.webp`} alt="" />
-        <span className="tile__label">Sleep on it</span>
+      <button type="button" className={`tile tile--sleep ${awake.length ? 'is-awake' : ''}`} data-tour="sleep" onClick={() => setOpen(true)}>
+        <span className="tile__head">
+          <span className="tile__label">Sleep on it</span>
+          <img className="tile__kip" src={`/mascot/${awake.length ? 'think' : 'sleep'}-face.webp`} alt="" />
+        </span>
         {awake.length ? (
           <span className="tile__amount">
             {awake.length} <small>to decide</small>

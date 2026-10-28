@@ -297,7 +297,7 @@ export function Start() {
 
           {id === 'target' && (
             <div className="stack-lg">
-              <AmountRuler label="Target amount" value={d.target} onChange={(v) => set({ target: v })} step={50_00} min={100_00} max={30_000_00} />
+              <AmountRuler label="Target amount" value={d.target} onChange={(v) => set({ target: v })} step={10_00} min={1_00} max={30_000_00} />
               <div className="chip-row" role="group" aria-label="Quick amounts">
                 {[1_000_00, 2_500_00, 5_000_00, 10_000_00].map((v) => (
                   <motion.button key={v} type="button" className="chip" aria-pressed={d.target === v} whileTap={{ scale: 0.92 }} onClick={() => set({ target: v })}>
@@ -336,7 +336,7 @@ export function Start() {
               />
               {d.frequency !== 'flexible' ? (
                 <>
-                  <AmountRuler label={d.frequency === 'weekly' ? 'Amount each week' : 'Amount each month'} value={d.amount} onChange={(v) => set({ amount: v })} step={5_00} min={5_00} max={d.frequency === 'weekly' ? 1_500_00 : 5_000_00} />
+                  <AmountRuler label={d.frequency === 'weekly' ? 'Amount each week' : 'Amount each month'} value={d.amount} onChange={(v) => set({ amount: v })} step={1_00} min={1_00} max={d.frequency === 'weekly' ? 1_500_00 : 5_000_00} />
                   <motion.div layout className={`estimate ${lateForDeadline ? 'estimate--late' : ''}`}>
                     {periods > 0 ? (
                       <>

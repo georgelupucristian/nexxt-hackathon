@@ -8,6 +8,7 @@ import { hubLine } from '../mascot/lines';
 import { useToast } from '../ui';
 import { PlanSimulator, QuickRecord } from './Playful';
 import { SleepTile } from './SleepOnIt';
+import { TOUR_EVENT } from './Tour';
 import {
   activeGoals,
   breakdown,
@@ -58,9 +59,12 @@ export function Hub({ onAdd, onDetails }: HubProps) {
   return (
     <div className="home2">
       <motion.header className="home2__head home3__head" {...enter(0)}>
-        <Link to="/logout" className="home2__out">
-          Sign out
-        </Link>
+        <span className="home2__out">
+          <button type="button" className="home2__tour" onClick={() => window.dispatchEvent(new Event(TOUR_EVENT))}>
+            How it works
+          </button>
+          <Link to="/logout">Sign out</Link>
+        </span>
         <h1 className="home3__title">
           {greeting()},<br />
           <span className="brush home3__name">{name || 'friend'}</span>
@@ -117,7 +121,7 @@ function Vault({ goal, onDetails, primaryElsewhere }: { goal: Goal | null; onDet
   const money = (v: number) => (hidden ? '••••' : formatLei(v));
 
   return (
-    <section className="vault" aria-labelledby="vault-title">
+    <section className="vault" data-tour="vault" aria-labelledby="vault-title">
       <div className="vault__top">
         <h2 id="vault-title" className="vault__label">
           Saved
@@ -278,7 +282,7 @@ function GoalTile({ goal, wide }: { goal: Goal; wide?: boolean }) {
   } else if (finish) insight = `Around ${formatDate(finish)} at this pace.`;
 
   return (
-    <Link to={`/goals/${goal.id}`} className={`tile ${wide ? 'tile--wide' : ''}`} data-feed-goal={goal.id} data-feed-name={goal.name} aria-label={`${goal.name}: ${formatLei(saved)} of ${formatLei(goal.target)}`}>
+    <Link to={`/goals/${goal.id}`} className={`tile ${wide ? 'tile--wide' : ''}`} data-tour={wide ? 'goal' : undefined} data-feed-goal={goal.id} data-feed-name={goal.name} aria-label={`${goal.name}: ${formatLei(saved)} of ${formatLei(goal.target)}`}>
       <span className="tile__label">
         {goal.name}
         {wide && <ChevronRight size={16} aria-hidden />}
@@ -310,6 +314,7 @@ function StreakTile() {
     <button
       type="button"
       className={`tile tile--streak ${todayDone ? 'is-done' : ''}`}
+      data-tour="streak"
       onClick={() => {
         if (todayDone) return;
         checkIn();
