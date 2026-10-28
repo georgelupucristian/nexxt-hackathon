@@ -1,4 +1,4 @@
-import { accountId, demoHome, enterDemo, expect, readStorage, settle, skipTour, test, TEXT, tourKey, vaultTotal } from './fixtures';
+import { accountId, demoHome, enterDemo, expect, readStorage, settle, skipTour, test, TEXT, tourKey, flowValue } from './fixtures';
 
 test.describe('getting in and out', () => {
   test('welcome → demo home loads with no console errors', async ({ page, consoleErrors }) => {
@@ -12,10 +12,12 @@ test.describe('getting in and out', () => {
 
     // the demo home: vault with a non-zero total, the primary goal, streak and sleep-on-it tiles, Kip's dial
     await expect(page.locator('[data-tour="vault"]')).toBeVisible();
-    await expect.poll(() => vaultTotal(page)).toBeGreaterThan(0);
-    await expect(page.locator('.streak-orb[data-tour="streak"]')).toBeVisible();
-    await expect(page.locator('.run[data-tour="vault"] .run__track[data-tour="goal"]')).toBeVisible();
-    await expect(page.locator('.orb--sleep[data-tour="sleep"]')).toBeVisible();
+    await expect.poll(() => flowValue(page.locator('.goalc__amount number-flow-react'))).toBeGreaterThan(0);
+    await expect(page.locator('.goalc[data-tour="vault"] .goalc__progress[data-tour="goal"]')).toBeVisible();
+    await expect(page.locator('.streak2[data-tour="streak"]')).toBeVisible();
+    await expect(page.locator('.sleeprow[data-tour="sleep"]')).toBeVisible();
+    // Kip appears once on home
+    await expect(page.locator('.home4 img[src*="/mascot/"]')).toHaveCount(1);
     await expect(page.locator('.dial__kip')).toBeVisible();
 
     await skipTour(page);
@@ -47,7 +49,7 @@ test.describe('getting in and out', () => {
 });
 
 test.describe('first-run tour', () => {
-  const STOPS = ['[data-tour="streak"]', '[data-tour="vault"]', '[data-tour="goal"]', '[data-tour="sleep"]', '.dial__kip'];
+  const STOPS = ['[data-tour="vault"]', '[data-tour="goal"]', '[data-tour="streak"]', '[data-tour="sleep"]', '.dial__kip'];
 
   /** True when the tour's highlight frames the centre of the element this stop is about. */
   const holeFrames = (page: import('@playwright/test').Page, selector: string) =>

@@ -144,22 +144,25 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
   const shift = finish && nowFinish ? Math.round(daysBetween(finish, nowFinish) / 7) : 0;
   const lateBy = finish && goal.targetDate ? Math.round(daysBetween(goal.targetDate, finish) / 7) : null;
 
-  const pct = goal.target > 0 ? Math.min(1, saved / goal.target) : 0;
-  const C = 2 * Math.PI * 46;
 
   return (
     <section className="card sim" aria-labelledby="sim-title">
       <div className="card-head">
         <h2 id="sim-title" className="h3">
-          Și dacă ai pune deoparte…
+          Proiecție
         </h2>
         <span className="small muted">{goal.name}</span>
       </div>
+      <div className="sim__slider">
+        <div className="sim__row">
+          <span className="small muted">{weekly ? 'Pe săptămână' : 'Pe lună'}</span>
+          <strong className="money">
+            <NumberFlow value={amount / 100} locales="ro-RO" format={{ maximumFractionDigits: 0 }} suffix=" lei" />
+          </strong>
+        </div>
+        <input type="range" min={min} max={max} step={step} value={amount} onChange={(e) => setAmount(+e.target.value)} aria-label={weekly ? 'Suma pe săptămână' : 'Suma pe lună'} style={{ ['--p' as string]: `${((amount - min) / (max - min)) * 100}%` }} />
+      </div>
       <div className="sim__top">
-        <svg viewBox="0 0 120 120" className="sim__donut" aria-hidden>
-          <circle cx="60" cy="60" r="46" className="sim__track" />
-          <motion.circle cx="60" cy="60" r="46" className="sim__fill" strokeDasharray={C} transform="rotate(-90 60 60)" initial={false} animate={{ strokeDashoffset: C * (1 - pct) }} transition={spring} />
-        </svg>
         <dl className="sim__out">
           <div>
             <dt>Ajungi la țintă</dt>
@@ -180,15 +183,6 @@ export function PlanSimulator({ goal }: { goal: Goal }) {
             </div>
           )}
         </dl>
-      </div>
-      <div className="sim__slider">
-        <div className="sim__row">
-          <span className="small muted">{weekly ? 'Pe săptămână' : 'Pe lună'}</span>
-          <strong className="money">
-            <NumberFlow value={amount / 100} locales="ro-RO" format={{ maximumFractionDigits: 0 }} suffix=" lei" />
-          </strong>
-        </div>
-        <input type="range" min={min} max={max} step={step} value={amount} onChange={(e) => setAmount(+e.target.value)} aria-label={weekly ? 'Suma pe săptămână' : 'Suma pe lună'} style={{ ['--p' as string]: `${((amount - min) / (max - min)) * 100}%` }} />
       </div>
       {lateBy !== null && lateBy > 0 && <p className="small warn-text">Tot ajungi la {plural(lateBy, 'săptămână', 'săptămâni')} după data țintă.</p>}
       <AnimatePresence>

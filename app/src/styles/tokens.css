@@ -1,18 +1,18 @@
 /* Kip design tokens: one system for every screen.
-   White and navy. Navy = actions, progress and money you saved; orange only for the streak;
-   amber = pending; red = failed; a lighter blue = information and simulated data. Everything else
-   is a cool neutral that leans slightly towards the navy. (Not Step's black and hot pink.) */
+   Navy on cream and white. Navy = text, actions, progress and money you saved; orange only for
+   the streak; amber = pending; red = failed; a lighter blue = information and simulated data.
+   Everything else is a quiet warm neutral. (Not Step's black and hot pink.) */
 :root {
-  /* neutrals: white, with greys tinted towards the navy */
-  --bg: #ffffff;
+  /* neutrals: a soft cream page, white cards, quiet warm greys between them */
+  --bg: #f8f7f3;
   --surface: #ffffff;
-  --surface-2: #f3f5fa;
-  --surface-3: #e4e9f2;
-  --line: #e4e8f0;
-  --line-strong: #cdd4e2;
+  --surface-2: #f3f2ee;
+  --surface-3: #e7e5df;
+  --line: #e8e6e0;
+  --line-strong: #d3d0c7;
   --ink: #0e1a33;
-  --ink-2: #3c4862;
-  --ink-3: #5c6781; /* ≥ 5:1 on white: small text stays readable */
+  --ink-2: #3d4659;
+  --ink-3: #5f6677; /* ≥ 5:1 on white and on the cream page */
   --on-ink: #ffffff;
 
   /* navy: primary action, progress, saved money */

@@ -1,49 +1,37 @@
-import { demoHome, expect, flowValue, int, lei, test, TEXT, vaultTotal } from './fixtures';
+import { demoHome, expect, flowValue, test, TEXT } from './fixtures';
 
 test.describe('home actions', () => {
-  test('quick record into a chosen goal raises that goal and the saved total', async ({ page }) => {
+  test('quick record into the main goal raises the goal card amount', async ({ page }) => {
     await demoHome(page);
-    const vault = page.locator('[data-tour="vault"]');
-    const button = vault.locator('.qr__btn');
+    const card = page.locator('[data-tour="vault"]');
+    const button = card.locator('.qr__btn');
+    const amount = () => flowValue(card.locator('.goalc__amount number-flow-react'));
 
     await button.click();
-    const open = vault.locator('.qr--open');
+    const open = card.locator('.qr--open');
     await expect(open).toBeVisible();
     await expect(button).toHaveAttribute('aria-expanded', 'true');
     await expect(open.locator('.qr__input input')).toBeFocused();
-    await expect(open.locator('.qr__pick').first()).toBeVisible();
+    // the main goal is preselected
+    await expect(open.locator('.qr__goal[role="radio"]').first()).toHaveAttribute('aria-checked', 'true');
 
-    // the primary goal is preselected; pick the second goal instead
-    const chips = open.locator('.qr__goal[role="radio"]');
-    await expect(chips.first()).toHaveAttribute('aria-checked', 'true');
-    const chip = chips.nth(1);
-    const goalName = (await chip.textContent())!.trim();
-    await chip.click();
-    await expect(chip).toHaveAttribute('aria-checked', 'true');
-    await expect(open.locator('.qr__goal[aria-checked="true"]')).toHaveCount(1);
-
-    // other goals show as circles under the main card, with their amount under the name
-    const goalTile = page.locator('.orb', { has: page.locator('.orb__name', { hasText: goalName }) });
-    const goalBefore = lei(await goalTile.locator('.orb__sub').textContent());
-    const totalBefore = await vaultTotal(page);
-
+    const before = await amount();
     await open.locator('.qr__input input').fill('37');
     await button.click(); // the same button now says Save
     await expect(page.locator('.party')).toBeVisible();
-    await expect(vault.locator('.qr--open')).toHaveCount(0);
-
-    // demo transfers start pending and count once the simulated sync confirms them (~4 s)
-    await expect.poll(async () => lei(await goalTile.locator('.orb__sub').textContent()), { timeout: 15_000 }).toBe(goalBefore + 37);
-    await expect.poll(() => vaultTotal(page), { timeout: 15_000 }).toBeGreaterThanOrEqual(totalBefore + 37);
+    await expect(card.locator('.qr--open')).toHaveCount(0);
+    // demo transfers start pending and count once the simulated sync confirms them (~4 s);
+    // the same sync also confirms the seed's pending 40 lei for this goal, hence "at least"
+    await expect.poll(amount, { timeout: 15_000 }).toBeGreaterThanOrEqual(before + 37);
   });
 
   test('streak check-in plays the streak moment; Continue closes it', async ({ page }) => {
     await demoHome(page);
-    const tile = page.locator('.streak-orb__ring');
-    await expect(tile).not.toHaveClass(/\bis-done\b/);
-    const before = await flowValue(tile.locator('.streak-orb__num number-flow-react'));
+    const tile = page.locator('.streak2');
+    await expect(tile.locator('.streak2__btn')).toBeVisible();
+    const before = await flowValue(tile.locator('.streak2__count number-flow-react'));
 
-    await tile.click();
+    await tile.locator('.streak2__btn').click();
     const moment = page.locator('.streak-moment');
     await expect(moment).toBeVisible();
     await expect(moment).toHaveAttribute('role', 'dialog');
@@ -62,8 +50,8 @@ test.describe('home actions', () => {
     await go.click();
     await expect(moment).toHaveCount(0);
 
-    await expect(tile).toHaveClass(/\bis-done\b/);
-    expect(await flowValue(tile.locator('.streak-orb__num number-flow-react'))).toBe(before + 1);
+    await expect(tile.locator('.streak2__btn')).toHaveCount(0); // today is ticked, so the button goes
+    expect(await flowValue(tile.locator('.streak2__count number-flow-react'))).toBe(before + 1);
     await expect(page.locator('.dial__kip')).toBeVisible();
   });
 
@@ -71,7 +59,7 @@ test.describe('home actions', () => {
     await demoHome(page);
     const wish = `Casti ${Date.now() % 100_000}`;
 
-    await page.locator('.orb--sleep').click();
+    await page.locator('.sleeprow').click();
     const sheet = page.locator('.sheet-backdrop .sheet');
     await expect(sheet.locator('.sleep')).toBeVisible();
 
@@ -114,7 +102,7 @@ test.describe('home actions', () => {
     await expect(row.locator('.list-row__end .money')).toHaveText(/^\+129\s*lei$/);
   });
 
-  test('"How it adds up" sheet does not change the record button width (scrollbar regression)', async ({ page }) => {
+  test('opening a sheet does not change the record button width (scrollbar regression)', async ({ page }) => {
     await demoHome(page);
     const button = page.locator('[data-tour="vault"] .qr__btn');
     const hasClassicScrollbar = await page.evaluate(() => window.innerWidth > document.documentElement.clientWidth);
@@ -134,7 +122,7 @@ test.describe('home actions', () => {
     const before = await box();
     expect(before.width).toBeGreaterThan(0);
 
-    await page.locator('[data-tour="vault"] .run__more').click();
+    await page.locator('.sleeprow').click(); // any sheet locks scrolling; this one opens from home
     const backdrop = page.locator('.sheet-backdrop');
     await expect(backdrop.locator('.sheet')).toBeVisible();
     // the sheet locks page scrolling…

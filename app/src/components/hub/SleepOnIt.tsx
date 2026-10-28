@@ -1,3 +1,4 @@
+import { ChevronRight, Moon } from '@/lib/icons';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { useCelebrate } from '../mascot/Celebration';
@@ -90,13 +91,23 @@ export function SleepTile() {
 
   return (
     <>
-      <button type="button" className={`orb orb--sleep ${awake.length ? 'is-awake' : ''}`} data-tour="sleep" onClick={() => setOpen(true)}>
-        <span className="orb__disc">
-          <img src={`/mascot/${awake.length ? 'think' : 'sleep'}-face.webp`} alt="" />
-          {(awake.length > 0 || asleep.length > 0) && <span className="orb__badge">{awake.length || asleep.length}</span>}
+      <button type="button" className={`hc sleeprow ${awake.length ? 'is-awake' : ''}`} data-tour="sleep" onClick={() => setOpen(true)}>
+        <span className="sleeprow__icon" aria-hidden>
+          <Moon size={20} />
         </span>
-        <span className="orb__name">Dorm pe idee</span>
-        <span className="orb__sub">{awake.length ? 'S-a trezit, decide' : asleep.length ? 'Kip doarme pe ea' : kept > 0 ? `${formatLei(kept)} necheltuiți` : 'Vrei ceva? 48 h'}</span>
+        <span className="sleeprow__text">
+          <span className="sleeprow__title">Dorm pe idee</span>
+          <span className="sleeprow__sub">
+            {awake.length
+              ? `${plural(awake.length, 'lucru', 'lucruri')} de decis acum`
+              : asleep.length
+                ? `${plural(asleep.length, 'dorință', 'dorințe')} în așteptare`
+                : kept > 0
+                  ? `${formatLei(kept)} necheltuiți până acum`
+                  : 'Vrei ceva scump? Așteaptă 48 h înainte să-l cumperi.'}
+          </span>
+        </span>
+        <ChevronRight size={18} aria-hidden />
       </button>
       <SleepSheet open={open} onClose={() => setOpen(false)} />
     </>

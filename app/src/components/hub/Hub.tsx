@@ -3,13 +3,12 @@ import { motion } from 'motion/react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { planLabel, TxRow } from '../domain';
-import { hubLine } from '../mascot/lines';
 import { useToast } from '../ui';
 import { PlanSimulator } from './Playful';
 import { SleepTile } from './SleepOnIt';
-import { GoalOrb, GoalRun, StreakCircle } from './HomeWidgets';
+import { GoalCard, StreakStrip } from './HomeWidgets';
 import { TOUR_EVENT } from './Tour';
-import { activeGoals, currentStreak, primaryGoal, projectedFinish, sortTx, todayAction, type TodayAction } from '../../data/selectors';
+import { currentStreak, primaryGoal, projectedFinish, sortTx, todayAction, type TodayAction } from '../../data/selectors';
 import { useData, useStore } from '../../data/store';
 import type { Goal } from '../../data/types';
 import { formatDate } from '../../lib/dates';
@@ -17,13 +16,12 @@ import { formatLei } from '../../lib/money';
 
 interface HubProps {
   onAdd: (goalId?: string | null, amount?: number) => void;
-  onDetails: () => void;
+  onDetails?: () => void; // the balance breakdown sheet; home links to Activity instead now
 }
 
 const spring = { type: 'spring', stiffness: 320, damping: 30 } as const;
 const enter = (i: number) => ({ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { ...spring, delay: 0.05 * i } });
 
-const titleCase = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /**
  * Home leads with the three things that matter most, in this order: the streak, how close the
@@ -31,13 +29,12 @@ const titleCase = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s
  * Kip's nudge for today and the plan simulator. A first-time user sees a focused start instead of a
  * dashboard of zeros. Navigation lives in Kip's dial, so nothing here competes with it.
  */
-export function Hub({ onAdd, onDetails }: HubProps) {
+export function Hub({ onAdd }: HubProps) {
   const data = useData();
   const { account } = useStore();
   const goal = primaryGoal(data.goals);
   const action = todayAction(data);
   const firstUse = data.transactions.length === 0 && !account?.isDemo;
-  const others = activeGoals(data.goals).filter((g) => g.id !== goal?.id);
 
   return (
     <div className="home2 home4">
@@ -55,33 +52,25 @@ export function Hub({ onAdd, onDetails }: HubProps) {
           <FirstUse goal={goal} onAdd={onAdd} />
         </motion.div>
       ) : (
-        // phone: one column in reading order. laptop: the same blocks placed in two columns.
+        // phone: one column in order of importance. laptop: goal and streak left, the rest right.
         <div className="home4__grid">
-          <motion.div {...enter(1)} className="home4__streak">
-            <StreakCircle />
+          <motion.div {...enter(1)} className="home4__goal">
+            {goal ? <GoalCard goal={goal} primary={!hasPrimary(action)} /> : <NextStep action={action} onAdd={onAdd} />}
           </motion.div>
-          <motion.div {...enter(2)} className="home4__goal">
-            {goal ? <GoalRun goal={goal} onDetails={onDetails} primary={!hasPrimary(action)} /> : <NextStep action={action} onAdd={onAdd} />}
+          <motion.div {...enter(2)} className="home4__streak">
+            <StreakStrip />
           </motion.div>
           <motion.div {...enter(3)} className="home4__recent">
             <Recent onAdd={onAdd} />
           </motion.div>
-          <motion.div {...enter(4)} className="home4__orbs orbs" aria-label="Mai multe">
-            {others.map((g) => (
-              <GoalOrb key={g.id} goal={g} />
-            ))}
-            <SleepTile />
-          </motion.div>
-          {goal && (
-            <motion.div {...enter(5)} className="home4__next">
-              <NextStep action={action} onAdd={onAdd} />
-            </motion.div>
-          )}
           {goal && goal.plan.frequency !== 'flexible' && (
-            <motion.div {...enter(6)} className="home4__sim">
+            <motion.div {...enter(4)} className="home4__sim">
               <PlanSimulator goal={goal} />
             </motion.div>
           )}
+          <motion.div {...enter(5)} className="home4__more">
+            <SleepTile />
+          </motion.div>
         </div>
       )}
     </div>
@@ -97,11 +86,10 @@ const hasPrimary = (a: TodayAction) => a.kind !== 'done-today' && a.kind !== 're
 
 function NextStep({ action, onAdd }: { action: TodayAction; onAdd: (goalId?: string | null, amount?: number) => void }) {
   const data = useData();
-  const { account, checkIn, sync } = useStore();
+  const { checkIn, sync } = useStore();
   const nav = useNavigate();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
-  const kip = hubLine(action, titleCase(account?.name ?? ''), currentStreak(data));
 
   let title = '';
   let body = '';
@@ -172,12 +160,6 @@ function NextStep({ action, onAdd }: { action: TodayAction; onAdd: (goalId?: str
 
   return (
     <section className="card next2" aria-labelledby="next-title">
-      <div className="next2__kip">
-        <img src={`/mascot/${kip.state}-face.webp`} alt="" />
-        <p className="next2__says">
-          <span>Kip</span> {kip.text}
-        </p>
-      </div>
       <h2 id="next-title" className="h3">
         {title}
       </h2>

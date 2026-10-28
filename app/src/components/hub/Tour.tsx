@@ -10,17 +10,17 @@ import type { SealState } from '../mascot/Seal';
  */
 interface Stop {
   target: string;
-  mood: SealState;
+  mood: SealState | 'proud' | 'wink';
   title: string;
   text: string;
 }
 
 const STOPS: Stop[] = [
-  { target: '[data-tour="streak"]', mood: 'happy', title: 'Streak-ul tău', text: 'O zi contează când economisești sau doar bifezi ziua. Apasă cercul o dată pe zi și ține focul aprins.' },
-  { target: '[data-tour="vault"]', mood: 'wave', title: 'Obiectivul principal', text: 'Aici vezi cât ai strâns pentru el și cât ar trebui să pui pe zi ca să ajungi la timp. Eu mă bucur pe măsură ce te apropii.' },
-  { target: '[data-tour="goal"]', mood: 'point', title: 'Drumul până la țintă', text: 'Asteroidul zboară spre steag cu fiecare leu pus deoparte. Procentul de deasupra îți spune cât ai făcut.' },
+  { target: '[data-tour="vault"]', mood: 'proud', title: 'Obiectivul tău', text: 'Cât ai strâns, cât mai ai și cât ar trebui să pui pe zi ca să ajungi la timp. De aici adaugi și economiile.' },
+  { target: '[data-tour="goal"]', mood: 'point', title: 'Cât ai făcut', text: 'Bara se umple cu fiecare leu pus deoparte. Liniuțele arată sferturile drumului.' },
+  { target: '[data-tour="streak"]', mood: 'idle', title: 'Streak-ul tău', text: 'O zi contează când economisești sau doar bifezi ziua. Un sloi de gheață te lasă să iei o pauză fără să-l pierzi.' },
   { target: '[data-tour="sleep"]', mood: 'sleep', title: 'Dorm pe idee', text: 'Vrei ceva ce nu era în plan? Spune-mi. Dorm pe idee 48 de ore, apoi te întreb dacă încă îl vrei.' },
-  { target: '.dial__kip', mood: 'celebrate', title: 'Eu sunt Kip', text: 'Apasă-mă oricând ca să schimbi secțiunea: Acasă, Obiective, Activitate sau Profil.' },
+  { target: '.dial__kip', mood: 'wink', title: 'Eu sunt Kip', text: 'Apasă-mă oricând ca să schimbi secțiunea: Acasă, Obiective, Activitate sau Profil.' },
 ];
 
 const keyFor = (id: string) => `kept.tour.v1.${id}`;

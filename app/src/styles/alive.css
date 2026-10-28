@@ -285,7 +285,7 @@ h2 {
 }
 .panel .screen {
   padding-top: var(--s-4);
-  padding-bottom: calc(210px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
+  padding-bottom: calc(180px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
 }
 /* the panel header already names the section */
 .panel .page-head h1 {
@@ -750,7 +750,7 @@ p {
   width: 100%;
   max-width: var(--content-wide);
   margin: 0 auto;
-  padding: calc(var(--s-6) + env(safe-area-inset-top)) var(--gutter) calc(210px + env(safe-area-inset-bottom));
+  padding: calc(var(--s-6) + env(safe-area-inset-top)) var(--gutter) calc(180px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--s-5);
@@ -2505,20 +2505,27 @@ img.goal-glyph--kip.goal-glyph--lg {
   margin: 0 auto -2px;
 }
 
-/* ---------- home v4: streak circle, the goal run, recent; then circles ---------- */
+
+/* ---------- home: goal, streak, recent, projection ---------- */
 .home4__head {
   display: flex;
   justify-content: flex-end;
   gap: 16px;
-  margin-bottom: 6px;
   font-size: var(--fs-sm);
 }
-.home4__out {
+.home4__out,
+.home2__tour {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-weight: 600;
   color: var(--ink-2);
   text-decoration: none;
+  cursor: pointer;
 }
-.home4__out:hover {
+.home4__out:hover,
+.home2__tour:hover {
   color: var(--ink);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -2526,431 +2533,351 @@ img.goal-glyph--kip.goal-glyph--lg {
 .home4__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 @media (min-width: 900px) {
   .home4__grid {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     grid-template-areas:
-      'streak recent'
       'goal recent'
-      'goal next'
-      'orbs sim';
+      'streak recent'
+      'streak sim'
+      'more sim';
     align-items: start;
-    column-gap: 24px;
+    gap: 16px 20px;
   }
-  .home4__streak { grid-area: streak; }
   .home4__goal { grid-area: goal; }
+  .home4__streak { grid-area: streak; }
   .home4__recent { grid-area: recent; }
-  .home4__orbs { grid-area: orbs; }
-  .home4__next { grid-area: next; }
   .home4__sim { grid-area: sim; }
+  .home4__more { grid-area: more; }
 }
-
-/* 1. streak: a big ring of this week's days around the count */
-.streak-orb {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.streak-orb__title {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #e8761a;
-}
-.streak-orb__ring {
-  position: relative;
-  width: 196px;
-  height: 196px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  cursor: pointer;
-}
-.streak-orb__ring:active {
-  scale: 0.97;
-}
-.streak-orb__ring > svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.streak-orb__day {
-  fill: none;
-  stroke-width: 15;
-  stroke-linecap: round;
-  stroke: var(--surface-3);
-}
-.streak-orb__day.is-done,
-.streak-orb__day.is-today-done {
-  stroke: #f2830d;
-}
-.streak-orb__day.is-today {
-  stroke: #f2830d;
-  stroke-opacity: 0.35;
-  animation: today-pulse 1.6s ease-in-out infinite;
-}
-.streak-orb__day.is-paused {
-  stroke: var(--info);
-  stroke-opacity: 0.5;
-}
-.streak-orb__day.is-future,
-.streak-orb__day.is-before {
-  stroke: var(--surface-2);
-}
-@keyframes today-pulse {
-  50% {
-    stroke-opacity: 0.75;
-  }
-}
-.streak-orb__core {
-  position: absolute;
-  inset: 26px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #fff6ec;
-  color: var(--ink);
-}
-.streak-orb__ring.is-done .streak-orb__core {
-  background: #fff1e0;
-}
-.streak-orb__core svg {
-  color: #f2830d;
-}
-.streak-orb__num {
-  font-size: 3.25rem;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-}
-.streak-orb__unit {
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  color: var(--ink-2);
-}
-.streak-orb__hint {
-  margin: 0;
-  font-size: var(--fs-sm);
-  color: var(--ink-3);
-}
-
-/* 2. the goal run: Kip in the corner, the amount, and an asteroid flying to the flag */
-.run {
-  position: relative;
-  overflow: hidden;
-  padding: 18px 18px 16px;
-  border: 1.5px solid var(--line);
-  border-radius: 28px;
+/* one card style for everything on home */
+.hc,
+.home4 .card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
   background: var(--surface);
 }
-.run__name {
-  display: inline-block;
-  max-width: calc(100% - 124px);
-  padding: 5px 13px;
-  border: 1.5px solid var(--accent);
-  border-radius: 999px;
+.hc {
+  padding: 20px;
+}
+.home4 .card:not(.card--flush) {
+  padding: 20px;
+}
+.hc__eyebrow {
+  margin: 0;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hc__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-size: var(--fs-sm);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--accent);
   text-decoration: none;
-  line-height: 1.25;
+  cursor: pointer;
 }
-.run__kip {
-  position: absolute;
-  top: -22px;
-  right: -22px;
-  width: 132px;
-  height: 132px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: var(--accent-soft);
-  border: 1.5px solid var(--line);
+.hc__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
-.run__kip img {
-  position: absolute;
-  left: 8px;
-  bottom: -2px;
-  width: 112px;
-  height: 112px;
-  object-fit: cover;
+
+/* 1. the goal */
+.goalc__name {
+  display: inline;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--ink);
+  text-decoration: none;
 }
-.run__amount {
-  margin: 12px 0 0;
-  font-size: clamp(2.5rem, 12vw, 3.25rem);
+.goalc__name svg {
+  margin-left: 2px;
+  vertical-align: -3px;
+}
+.goalc__name:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.hc__eyebrow + .goalc__name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+.hc__eyebrow + .goalc__name svg {
+  flex: none;
+  margin: 0;
+}
+/* the amount on the left, Kip on the right standing on the bar below */
+.goalc__money {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+.goalc__amount {
+  margin: 0;
+  font-size: clamp(2.5rem, 11vw, 3rem);
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.035em;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
-.run__amount > span:last-child {
+.goalc__amount > span:last-child {
   font-size: 0.42em;
   font-weight: 700;
   letter-spacing: 0;
-  color: var(--ink-3);
 }
-.run__pace {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin: 8px 0 0;
+.goalc__of {
+  margin: 6px 0 0;
   font-size: var(--fs-sm);
-  font-weight: 800;
-  color: #e8761a;
-}
-.run__pace span {
-  font-weight: 500;
   color: var(--ink-3);
 }
-.run__track {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: 40px;
-  margin: 26px 0 6px;
-}
-.run__lane {
-  position: relative;
-  flex: 1;
-  height: 100%;
-  margin-right: 10px;
-}
-.run__rail {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 3px;
-  translate: 0 -50%;
-  background-image: repeating-linear-gradient(90deg, var(--line-strong) 0 8px, transparent 8px 14px);
-}
-.run__trail {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  height: 7px;
-  translate: 0 -50%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255, 106, 43, 0), rgba(255, 120, 40, 0.45) 45%, #ff6a2b 88%, #ffb347);
-}
-.run__rock {
-  position: absolute;
-  top: 50%;
-  width: 20px;
-  height: 20px;
-  translate: -50% -50%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 38%, #fff6db 0 18%, #ffbe55 42%, #ff6a2b 74%, #c2410c);
-  box-shadow: 0 0 14px 5px rgba(255, 110, 40, 0.5);
-  animation: rock-glow 1.1s ease-in-out infinite;
-}
-.run__rock i {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #ffb347;
-  animation: rock-spark 0.9s linear infinite;
-}
-.run__rock i:nth-child(2) {
-  animation-delay: 0.3s;
-  margin-top: -5px;
-}
-.run__rock i:nth-child(3) {
-  animation-delay: 0.6s;
-  margin-top: 4px;
-}
-@keyframes rock-glow {
-  50% {
-    box-shadow: 0 0 20px 8px rgba(255, 110, 40, 0.6);
-  }
-}
-@keyframes rock-spark {
-  from {
-    opacity: 1;
-    transform: translate(0, -50%) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-26px, -50%) scale(0.3);
-  }
-}
-.run__pct {
-  position: absolute;
-  bottom: calc(50% + 14px);
-  translate: -50% 0;
-  padding: 1px 7px;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  white-space: nowrap;
-}
-.run__flag {
+.goalc__kip {
   flex: none;
+  width: 88px;
+  height: auto;
+  margin: -12px 4px -4px 0;
+}
+.goalc__progress {
+  margin-top: 10px;
+}
+.goalc__bar {
+  position: relative;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.goalc__bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.goalc__legend {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: -14px;
-}
-.run__flag svg path:first-child {
-  stroke: var(--ink);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-}
-.run__flag svg path:last-child {
-  fill: var(--accent);
-}
-.run__flag b {
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-}
-.run__meta {
-  display: flex;
-  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 4px 12px;
-  margin: 4px 0 14px;
+  gap: 12px;
+  margin-top: 8px;
   font-size: var(--fs-sm);
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
-.run__more {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-weight: 700;
+.goalc__legend strong {
+  font-size: 1rem;
+  font-weight: 900;
   color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
 }
-.run .qr:not(.qr--open) .qr__btn {
+.goalc__note {
+  margin: 12px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+.goalc__note strong {
+  color: var(--ink);
+}
+.goalc .qr {
+  margin-top: 16px;
+}
+.goalc .qr:not(.qr--open) .qr__btn {
   flex: 1;
   justify-content: center;
+  min-height: 48px;
 }
-@media (prefers-reduced-motion: reduce) {
-  .run__rock,
-  .run__rock i,
-  .streak-orb__day.is-today {
-    animation: none;
-  }
+.goalc__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 0 -10px;
+}
+/* text links still get a full 44px tap target */
+.hc__link,
+.home4__out,
+.home2__tour {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
-/* the smaller things, as circles */
-.orbs {
+/* 2. the streak: compact, no connecting lines, nothing that scolds */
+.streak2__head {
   display: flex;
-  gap: 18px;
-  overflow-x: auto;
-  padding: 6px 2px 10px;
-  scrollbar-width: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
-.orb {
-  flex: none;
+.streak2__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.streak2__count svg {
+  color: #e8761a;
+}
+.streak2__btn {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+.streak2__btn:hover {
+  border-color: var(--ink);
+}
+.streak2__weeks {
+  margin: 2px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+.streak2__label {
+  margin: 14px 0 6px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.streak2__week {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 0;
+}
+.streak2__day {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  width: 108px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--ink);
-  font: inherit;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
+  gap: 6px;
 }
-.orb__disc {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 96px;
-  height: 96px;
-  border: 1.5px solid var(--line);
-  border-radius: 50%;
-  background: var(--surface);
-  overflow: visible;
-}
-.orb:active .orb__disc {
-  scale: 0.96;
-}
-.orb__disc svg {
-  position: absolute;
-  inset: 4px;
-}
-.orb__track {
-  fill: none;
-  stroke: var(--surface-3);
-  stroke-width: 7;
-}
-.orb__fill {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 7;
-  stroke-linecap: round;
-}
-.orb__value {
-  font-size: 1.125rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-}
-.orb__name {
-  margin-top: 4px;
-  font-size: var(--fs-sm);
-  font-weight: 800;
-  line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.orb__sub {
+.streak2__w {
   font-size: var(--fs-xs);
+  font-weight: 700;
   color: var(--ink-3);
 }
-.orb--sleep .orb__disc {
-  overflow: hidden;
-  background: var(--accent-soft);
+.streak2__day.is-now .streak2__w {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
-.orb--sleep .orb__disc img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.orb--sleep.is-awake .orb__disc {
-  border: 2.5px solid var(--accent);
-}
-.orb__badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  min-width: 24px;
-  height: 24px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: var(--accent);
+/* filled + tick = done, ring = today, small grey dot = no savings or not yet */
+.streak2__dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   color: #fff;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 24px;
+}
+.streak2__dot::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.streak2__day.is-done .streak2__dot,
+.streak2__day.is-today-done .streak2__dot {
+  background: #f2830d;
+}
+.streak2__day.is-done .streak2__dot::after,
+.streak2__day.is-today-done .streak2__dot::after,
+.streak2__day.is-today .streak2__dot::after {
+  display: none;
+}
+.streak2__day.is-today .streak2__dot {
+  box-shadow: inset 0 0 0 2px #f2830d;
+}
+.streak2__day.is-paused .streak2__dot::after {
+  background: var(--info);
+}
+.streak2__day.is-future .streak2__dot::after,
+.streak2__day.is-before .streak2__dot::after {
+  background: var(--surface-3);
+}
+.streak2__note {
+  margin: 12px 0 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+/* 4. projection: slider first, then what it changes */
+.home4 .sim__out {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+.home4 .sim__top {
+  display: block;
+}
+
+/* sleep on it, as one quiet row */
+.sleeprow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+.sleeprow:hover {
+  border-color: var(--line-strong);
+}
+.sleeprow__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--accent);
+}
+.sleeprow__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sleeprow__title {
+  font-weight: 800;
+}
+.sleeprow__sub {
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+.sleeprow.is-awake {
+  border-color: var(--accent);
+}
+
+
+/* one radius family on home: cards 20, buttons and fields 14 */
+.home4 .btn,
+.home4 .qr,
+.home4 .qr__btn {
+  border-radius: 14px !important;
 }
