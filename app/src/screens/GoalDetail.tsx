@@ -1,9 +1,12 @@
 import { Archive, ArchiveRestore, MoreHorizontal, Minus, Pause, Pencil, Play, Plus, SlidersHorizontal, Star, Trash2, TrendingUp } from 'lucide-react';
-import { useState } from 'react';
+import NumberFlow from '@number-flow/react';
+import { motion } from 'motion/react';
+import { useState, type ReactNode } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { HealthPill, planLabel, TxRow } from '../components/domain';
 import { MoneySheet, PlanSheet, type MoneySheetProps } from '../components/sheets';
-import { BigAmount, ConfirmDialog, EmptyState, GoalGlyph, IconButton, ProgressBar, Sheet, TopBar, useToast } from '../components/ui';
+import { Emoji3D, GOAL_EMOJI } from '../components/Emoji3D';
+import { ConfirmDialog, EmptyState, IconButton, Sheet, TopBar, useToast } from '../components/ui';
 import { goalSaved, nextPlannedDate, progress, projectedFinish, sortTx } from '../data/selectors';
 import { useData, useStore } from '../data/store';
 import { formatDate, formatDay } from '../lib/dates';
@@ -35,28 +38,27 @@ export function GoalDetail() {
     <div className="screen">
       <TopBar title="Goal" end={<IconButton label="Goal options" icon={MoreHorizontal} onClick={() => setMenu(true)} />} />
 
-      <section className="stack-lg" aria-labelledby="goal-name">
-        <div className="row row--top">
-          <GoalGlyph kind={goal.kind} size="lg" status={goal.status} />
-          <div className="grow stack" style={{ gap: 6 }}>
-            <h1 id="goal-name" style={{ overflowWrap: 'anywhere' }}>
-              {goal.name}
-            </h1>
-            <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
-              {goal.isPrimary && goal.status === 'active' && <span className="pill pill--info">Primary</span>}
-              <HealthPill goal={goal} saved={saved} />
-            </div>
+      <section className={`goal-hero goal-hero--${goal.kind}`} aria-labelledby="goal-name">
+        <GoalGauge pct={p} paused={goal.status !== 'active'}>
+          <Emoji3D name={GOAL_EMOJI[goal.kind]} size={64} float />
+          <div className="goal-hero__amount">
+            <NumberFlow value={saved / 100} locales="ro-RO" format={{ maximumFractionDigits: 2 }} className="goal-hero__num" />
+            <span className="goal-hero__cur">lei</span>
           </div>
-        </div>
-        {goal.motivation && <p className="muted" style={{ fontStyle: 'italic' }}>“{goal.motivation}”</p>}
-
-        <div className="stack" style={{ gap: 10 }}>
-          <BigAmount value={saved} size="md" />
-          <p className="muted money">
-            of {formatLei(goal.target)} · {Math.round(p * 100)}%
+          <p className="goal-hero__of money">
+            of {formatLei(goal.target)} · <NumberFlow value={Math.round(p * 100)} />%
           </p>
-          <ProgressBar value={p} size="lg" label={`${goal.name} progress`} paused={goal.status !== 'active'} />
-          <p className="small muted">{remaining > 0 ? `${formatLei(remaining)} to go` : 'Target reached — nice work.'}</p>
+        </GoalGauge>
+        <div className="goal-hero__title">
+          <h1 id="goal-name" style={{ overflowWrap: 'anywhere' }}>
+            {goal.name}
+          </h1>
+          <div className="row" style={{ gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {goal.isPrimary && goal.status === 'active' && <span className="pill pill--info">Primary</span>}
+            <HealthPill goal={goal} saved={saved} />
+          </div>
+          <p className="small muted">{remaining > 0 ? `${formatLei(remaining)} to go` : 'Target reached. Nice work.'}</p>
+          {goal.motivation && <p className="muted" style={{ fontStyle: 'italic' }}>“{goal.motivation}”</p>}
         </div>
 
         {goal.status === 'paused' && (
@@ -70,25 +72,16 @@ export function GoalDetail() {
         )}
 
         {!archived && (
-          <div className="action-circles">
-            <button type="button" className="action-circle" onClick={() => setMoney({ open: true, mode: 'contribution', goalId: goal.id })}>
-              <span className="action-circle__icon">
-                <Plus size={22} aria-hidden />
-              </span>
-              Add
-            </button>
-            <button type="button" className="action-circle action-circle--light" disabled={saved <= 0} onClick={() => setMoney({ open: true, mode: 'withdrawal', goalId: goal.id })}>
-              <span className="action-circle__icon">
-                <Minus size={22} aria-hidden />
-              </span>
-              Withdraw
-            </button>
-            <button type="button" className="action-circle action-circle--light" onClick={() => setPlanOpen(true)}>
-              <span className="action-circle__icon">
-                <SlidersHorizontal size={20} aria-hidden />
-              </span>
-              Adjust plan
-            </button>
+          <div className="goal-hero__actions">
+            <motion.button type="button" className="btn btn--primary btn--xl grow" whileTap={{ scale: 0.97 }} onClick={() => setMoney({ open: true, mode: 'contribution', goalId: goal.id })}>
+              <Plus size={20} aria-hidden /> Add money
+            </motion.button>
+            <motion.button type="button" className="btn btn--secondary btn--xl grow" whileTap={{ scale: 0.97 }} disabled={saved <= 0} onClick={() => setMoney({ open: true, mode: 'withdrawal', goalId: goal.id })}>
+              <Minus size={20} aria-hidden /> Withdraw
+            </motion.button>
+            <motion.button type="button" className="btn btn--secondary btn--xl goal-hero__tune" whileTap={{ scale: 0.95 }} onClick={() => setPlanOpen(true)} aria-label="Adjust plan" title="Adjust plan">
+              <SlidersHorizontal size={20} aria-hidden />
+            </motion.button>
           </div>
         )}
       </section>
@@ -223,6 +216,35 @@ export function GoalDetail() {
       />
       <MoneySheet {...money} onClose={() => setMoney({ open: false })} />
       <PlanSheet open={planOpen} onClose={() => setPlanOpen(false)} goal={goal} />
+    </div>
+  );
+}
+
+/** Bevel-style gauge: a 270° arc that fills with a soft glow, with the goal's numbers inside. */
+function GoalGauge({ pct, paused, children }: { pct: number; paused: boolean; children: ReactNode }) {
+  const r = 120;
+  const len = 2 * Math.PI * r * 0.75;
+  return (
+    <div className="goal-gauge">
+      <svg viewBox="0 0 280 280" className="goal-gauge__svg" aria-hidden>
+        <defs>
+          <linearGradient id="gauge-fill" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0" stopColor="#9be7bd" />
+            <stop offset="1" stopColor="#1f7a52" />
+          </linearGradient>
+          <filter id="gauge-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+        </defs>
+        <g transform="rotate(135 140 140)">
+          <circle cx="140" cy="140" r={r} fill="none" stroke="var(--surface-3)" strokeWidth="16" strokeLinecap="round" strokeDasharray={`${len} 999`} />
+          {!paused && (
+            <motion.circle cx="140" cy="140" r={r} fill="none" stroke="url(#gauge-fill)" strokeWidth="16" strokeLinecap="round" filter="url(#gauge-glow)" opacity="0.5" strokeDasharray={`${len} 999`} initial={{ strokeDashoffset: len }} animate={{ strokeDashoffset: len * (1 - Math.max(pct, 0.01)) }} transition={{ type: 'spring', stiffness: 40, damping: 15, delay: 0.2 }} />
+          )}
+          <motion.circle cx="140" cy="140" r={r} fill="none" stroke={paused ? 'var(--ink-3)' : 'url(#gauge-fill)'} strokeWidth="16" strokeLinecap="round" strokeDasharray={`${len} 999`} initial={{ strokeDashoffset: len }} animate={{ strokeDashoffset: len * (1 - Math.max(pct, 0.01)) }} transition={{ type: 'spring', stiffness: 40, damping: 15, delay: 0.2 }} />
+        </g>
+      </svg>
+      <div className="goal-gauge__inner">{children}</div>
     </div>
   );
 }

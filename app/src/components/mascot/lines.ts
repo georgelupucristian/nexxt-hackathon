@@ -19,7 +19,7 @@ export function hubLine(action: TodayAction, name: string, streak: number, hour 
     case 'set-plan':
       return { state: 'think', text: `${action.goal.name} needs a plan. Want to set one in Goals?` };
     case 'planned-contribution':
-      return { state: 'point', text: `Today’s plan: ${formatLei(action.amount)} for ${action.goal.name}. Tap + once it’s set aside.` };
+      return { state: 'think', text: `Psst, ${name}, you haven’t added savings today. ${formatLei(action.amount)} for ${action.goal.name}?` };
     case 'fix-connection':
       return { state: 'sad', text: 'The demo sync didn’t go through. Your numbers are safe. Retry from Today.' };
     case 'goal-reached':

@@ -1,4 +1,5 @@
 import { CalendarHeart, ListOrdered, Target, User, type LucideIcon } from 'lucide-react';
+import type { EmojiName } from '../Emoji3D';
 
 export type SectionId = 'today' | 'goals' | 'activity' | 'profile';
 
@@ -7,16 +8,17 @@ export interface Section {
   label: string;
   path: string;
   icon: LucideIcon;
+  emoji: EmojiName;
   /** centre of the arc, degrees clockwise from 12 o'clock */
   angle: number;
 }
 
 // Four arcs around the savings orb. Today sits on top because it's what you open most.
 export const SECTIONS: Section[] = [
-  { id: 'today', label: 'Today', path: '/today', icon: CalendarHeart, angle: 0 },
-  { id: 'goals', label: 'Goals', path: '/goals', icon: Target, angle: 90 },
-  { id: 'activity', label: 'Activity', path: '/activity', icon: ListOrdered, angle: 180 },
-  { id: 'profile', label: 'Profile', path: '/profile', icon: User, angle: 270 },
+  { id: 'today', label: 'Today', path: '/today', icon: CalendarHeart, emoji: 'calendar', angle: 0 },
+  { id: 'goals', label: 'Goals', path: '/goals', icon: Target, emoji: 'target', angle: 90 },
+  { id: 'activity', label: 'Activity', path: '/activity', icon: ListOrdered, emoji: 'chart', angle: 180 },
+  { id: 'profile', label: 'Profile', path: '/profile', icon: User, emoji: 'profile', angle: 270 },
 ];
 
 export function sectionFor(pathname: string): Section | null {

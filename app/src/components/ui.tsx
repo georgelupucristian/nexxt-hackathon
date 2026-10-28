@@ -29,6 +29,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import type { GoalKind, GoalStatus, Transaction } from '../data/types';
 import { splitLei } from '../lib/money';
+import { Emoji3D, GOAL_EMOJI } from './Emoji3D';
 
 // ---------- Buttons ----------
 
@@ -226,10 +227,9 @@ export const GOAL_ICON: Record<GoalKind, LucideIcon> = {
 };
 
 export function GoalGlyph({ kind, size, status }: { kind: GoalKind; size?: 'lg'; status?: GoalStatus }) {
-  const Icon = GOAL_ICON[kind];
   return (
-    <span className={`goal-glyph ${size === 'lg' ? 'goal-glyph--lg' : ''} ${status && status !== 'active' ? 'goal-glyph--paused' : ''}`} aria-hidden>
-      <Icon size={size === 'lg' ? 26 : 22} />
+    <span className={`goal-glyph goal-glyph--${kind} ${size === 'lg' ? 'goal-glyph--lg' : ''} ${status && status !== 'active' ? 'goal-glyph--paused' : ''}`} aria-hidden>
+      <Emoji3D name={GOAL_EMOJI[kind]} size={size === 'lg' ? 38 : 30} />
     </span>
   );
 }

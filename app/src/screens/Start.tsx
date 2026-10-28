@@ -1,5 +1,6 @@
 import NumberFlow from '@number-flow/react';
-import { ArrowLeft, Bell, FlaskConical, HardDrive, Laptop, PenLine, Plane, ShieldCheck, Sparkles, Target } from 'lucide-react';
+import { ArrowLeft, HardDrive } from 'lucide-react';
+import { Emoji3D, GOAL_EMOJI } from '../components/Emoji3D';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
@@ -70,11 +71,11 @@ function load(): Draft {
   }
 }
 
-const KINDS: { kind: GoalKind; title: string; desc: string; name: string; icon: typeof Laptop; tint: string }[] = [
-  { kind: 'emergency', title: 'Emergency fund', desc: 'A cushion for surprises', name: 'Emergency fund', icon: ShieldCheck, tint: 'today' },
-  { kind: 'tech', title: 'Laptop or tech', desc: 'New laptop, phone, gear', name: 'New laptop', icon: Laptop, tint: 'activity' },
-  { kind: 'travel', title: 'Travel or exchange', desc: 'Erasmus, trips, flights', name: 'Exchange semester', icon: Plane, tint: 'goals' },
-  { kind: 'custom', title: 'Something else', desc: 'Name your own goal', name: '', icon: Target, tint: 'profile' },
+const KINDS: { kind: GoalKind; title: string; desc: string; name: string; tint: string }[] = [
+  { kind: 'emergency', title: 'Emergency fund', desc: 'A cushion for surprises', name: 'Emergency fund', tint: 'today' },
+  { kind: 'tech', title: 'Laptop or tech', desc: 'New laptop, phone, gear', name: 'New laptop', tint: 'activity' },
+  { kind: 'travel', title: 'Travel or exchange', desc: 'Erasmus, trips, flights', name: 'Exchange semester', tint: 'goals' },
+  { kind: 'custom', title: 'Something else', desc: 'Name your own goal', name: '', tint: 'profile' },
 ];
 
 const DEADLINES = [
@@ -274,7 +275,7 @@ export function Start() {
                     index={i}
                     selected={d.kind === k.kind}
                     tint={k.tint}
-                    icon={<k.icon size={22} />}
+                    icon={<Emoji3D name={GOAL_EMOJI[k.kind]} size={34} />}
                     title={k.title}
                     desc={k.desc}
                     onSelect={() => {
@@ -359,16 +360,16 @@ export function Start() {
 
           {id === 'tracking' && (
             <div className="choice-list" role="radiogroup" aria-label="How you’ll track savings">
-              <Choice index={0} selected={d.tracking === 'manual'} tint="today" icon={<PenLine size={22} />} title="I’ll record what I save" desc="Put money aside anywhere, then tap + in Kept. Recommended." onSelect={() => set({ tracking: 'manual' })} />
-              <Choice index={1} selected={d.tracking === 'demo'} tint="profile" icon={<FlaskConical size={22} />} title="Try a demo connection" desc="See how a linked account would behave. Everything is simulated." onSelect={() => set({ tracking: 'demo' })} />
+              <Choice index={0} selected={d.tracking === 'manual'} tint="today" icon={<Emoji3D name="pencil" size={34} />} title="I’ll record what I save" desc="Put money aside anywhere, then tap + in Kept. Recommended." onSelect={() => set({ tracking: 'manual' })} />
+              <Choice index={1} selected={d.tracking === 'demo'} tint="profile" icon={<Emoji3D name="testtube" size={34} />} title="Try a demo connection" desc="See how a linked account would behave. Everything is simulated." onSelect={() => set({ tracking: 'demo' })} />
             </div>
           )}
 
           {id === 'reminder' && (
             <div className="stack-lg">
               <div className="choice-list" role="radiogroup" aria-label="Weekly reminder">
-                <Choice index={0} selected={d.reminderOn} tint="activity" icon={<Bell size={22} />} title="Yes, nudge me weekly" desc="Shows up in Kept on the day you pick." onSelect={() => set({ reminderOn: true })} />
-                <Choice index={1} selected={!d.reminderOn} tint="goals" icon={<Sparkles size={22} />} title="No thanks" desc="You can turn it on later in Profile." onSelect={() => set({ reminderOn: false })} />
+                <Choice index={0} selected={d.reminderOn} tint="activity" icon={<Emoji3D name="bell" size={34} />} title="Yes, nudge me weekly" desc="Shows up in Kept on the day you pick." onSelect={() => set({ reminderOn: true })} />
+                <Choice index={1} selected={!d.reminderOn} tint="goals" icon={<Emoji3D name="sleep" size={34} />} title="No thanks" desc="You can turn it on later in Profile." onSelect={() => set({ reminderOn: false })} />
               </div>
               <AnimatePresence>
                 {d.reminderOn && (

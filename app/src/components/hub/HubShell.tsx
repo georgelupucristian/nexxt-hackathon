@@ -4,9 +4,12 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { MoneySheet, type MoneySheetProps } from '../sheets';
 import { BalanceDetails } from '../../screens/Today';
-import { primaryGoal } from '../../data/selectors';
-import { useData } from '../../data/store';
+import { KipToast } from '../mascot/KipToast';
+import { hubLine } from '../mascot/lines';
+import { currentStreak, primaryGoal, todayAction } from '../../data/selectors';
+import { useData, useStore } from '../../data/store';
 import { Hub } from './Hub';
+import { NavIsland } from './NavIsland';
 import { HUB, polar, sectionFor, SECTIONS, type Section, type SectionId } from './sections';
 
 type Origin = { x: number; y: number };
@@ -21,7 +24,11 @@ export function HubShell() {
   const outlet = useOutlet();
   const nav = useNavigate();
   const data = useData();
+  const { account } = useStore();
   const section = sectionFor(location.pathname);
+  const action = todayAction(data);
+  const line = hubLine(action, account?.name ?? 'there', currentStreak(data));
+  const openAdd = (goalId: string | null = primaryGoal(data.goals)?.id ?? null, presetAmount?: number) => setMoney({ open: true, mode: 'contribution', goalId, presetAmount });
   const svgRef = useRef<SVGSVGElement>(null);
   const origins = useRef<Partial<Record<SectionId, Origin>>>({});
   const [money, setMoney] = useState<Omit<MoneySheetProps, 'onClose'>>({ open: false });
@@ -63,7 +70,7 @@ export function HubShell() {
           ref={svgRef}
           active={section?.id ?? null}
           onOpen={open}
-          onAdd={() => setMoney({ open: true, mode: 'contribution', goalId: primaryGoal(data.goals)?.id ?? null })}
+          onAdd={openAdd}
           onDetails={() => setDetails(true)}
         />
       </motion.div>
@@ -75,6 +82,20 @@ export function HubShell() {
           </SectionPanel>
         )}
       </AnimatePresence>
+
+      <KipToast
+        line={line}
+        topic={action.kind}
+        hidden={!!section || money.open}
+        action={
+          action.kind === 'planned-contribution'
+            ? { label: `Add ${Math.round(action.amount / 100)} lei`, run: () => openAdd(action.goal.id, action.amount) }
+            : action.kind === 'create-goal'
+              ? { label: 'Create a goal', run: () => nav('/goals/new') }
+              : undefined
+        }
+      />
+      <NavIsland />
 
       <MoneySheet {...money} onClose={() => setMoney({ open: false })} />
       <BalanceDetails open={details} onClose={() => setDetails(false)} />
