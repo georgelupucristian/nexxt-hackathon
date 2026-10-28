@@ -285,7 +285,7 @@ h2 {
 }
 .panel .screen {
   padding-top: var(--s-4);
-  padding-bottom: calc(170px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
+  padding-bottom: calc(210px + env(safe-area-inset-bottom)); /* room for Kip at the bottom */
 }
 /* the panel header already names the section */
 .panel .page-head h1 {
@@ -750,7 +750,7 @@ p {
   width: 100%;
   max-width: var(--content-wide);
   margin: 0 auto;
-  padding: calc(var(--s-6) + env(safe-area-inset-top)) var(--gutter) calc(170px + env(safe-area-inset-bottom));
+  padding: calc(var(--s-6) + env(safe-area-inset-top)) var(--gutter) calc(210px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: var(--s-5);
@@ -1187,10 +1187,10 @@ body:has(.party) .dial-bounds {
 .dial {
   position: absolute;
   left: 50%;
-  margin-left: -44px;
-  bottom: calc(44px + env(safe-area-inset-bottom));
-  width: 88px;
-  height: 88px;
+  margin-left: -66px;
+  bottom: calc(40px + env(safe-area-inset-bottom));
+  width: 132px;
+  height: 132px;
   pointer-events: auto;
   touch-action: none;
 }
@@ -1249,8 +1249,8 @@ body:has(.party) .dial-bounds {
 }
 .dial__face {
   position: relative;
-  width: 72px;
-  height: 72px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   overflow: hidden;
   background: var(--accent-soft);
@@ -1313,7 +1313,7 @@ body:has(.party) .dial-bounds {
 .dial__word {
   position: absolute;
   translate: -50% -50%;
-  font-size: 0.9375rem;
+  font-size: 1.125rem;
   font-weight: 800;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -2482,3 +2482,25 @@ img.goal-glyph--kip.goal-glyph--lg {
   cursor: pointer;
 }
 .tour__skip { white-space: nowrap; }
+.dial__here {
+  font-size: 14px;
+}
+/* feature poses */
+.sleep__pose {
+  display: block;
+  width: 170px;
+  height: auto;
+  margin: -6px auto 0;
+}
+.floe-pic {
+  display: block;
+  width: 200px;
+  height: auto;
+  margin: 0 auto 4px;
+}
+.empty2__kip {
+  display: block;
+  width: 150px;
+  height: auto;
+  margin: 0 auto -2px;
+}

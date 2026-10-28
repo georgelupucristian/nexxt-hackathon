@@ -456,6 +456,7 @@ export function StreakSheet({ open, onClose }: { open: boolean; onClose: () => v
         </div>
         <StreakRules />
         <div className="card card--tint stack">
+          <img className="floe-pic" src="/mascot/pose-ice-floe.webp" alt="" />
           <h3>Ai nevoie de un sloi de gheață?</h3>
           <p className="small muted">Focile se odihnesc pe sloiuri de gheață. Pune ziua de azi pe unul: Kip plutește, seria rămâne, economiile nu se schimbă.</p>
           <Button

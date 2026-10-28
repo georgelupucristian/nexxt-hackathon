@@ -100,7 +100,8 @@ function SectionPanel({ panel, origin, onClose, pathname, children }: { panel: P
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !document.querySelector('.sheet-backdrop')) onClose();
+      // one Escape closes one layer: a sheet or Kip's open menu goes first, the panel next time
+      if (e.key === 'Escape' && !document.querySelector('.sheet-backdrop, .dial--open')) onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);

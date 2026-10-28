@@ -158,6 +158,11 @@ function SleepSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <Sheet open={open} onClose={onClose} title="Dorm pe idee">
       <div className="sleep">
+        <img
+          className="sleep__pose"
+          src={sleeping.some((w) => w.wakeAt <= now) ? '/mascot/pose-awake-asking.webp' : '/mascot/pose-sleep-on-it.webp'}
+          alt=""
+        />
         <p className="sleep__intro">
           Vrei ceva ce nu era în plan? Spune-i lui Kip. Doarme pe idee 48 de ore, apoi te întreabă dacă încă îl vrei. Dacă nu, banii merg la un obiectiv.
         </p>

@@ -369,6 +369,7 @@ function Recent({ onAdd }: { onAdd: () => void }) {
         </ul>
       ) : (
         <div className="empty2">
+          <img className="empty2__kip" src="/mascot/pose-peek.webp" alt="" />
           <p className="h3">Încă nimic aici</p>
           <p className="muted small">Când pui bani deoparte, apasă „Adaugă economii” și scrie suma. Fiecare intrare apare aici cu data, obiectivul și starea ei.</p>
           <button type="button" className="btn btn--secondary btn--sm" onClick={onAdd}>

@@ -23,23 +23,29 @@ export function sectionForPath(pathname: string): DialSection {
   return DIAL_SECTIONS.find((s) => pathname === s.path || pathname.startsWith(`${s.path}/`)) ?? DIAL_SECTIONS[0];
 }
 
-const R_OUT = 150; // arc outer radius (px)
-const R_IN = 64; // arc inner radius: just outside the open mascot disc
+const R_MAX = 225; // arc outer radius on wide screens (px)
+const R_IN = 76; // arc inner radius: just outside Kip's disc
 const LIFT = 8; // how far the current segment grows outwards
 const GAP = 6; // px between segments, the same width from the inner edge to the outer one
-const BOX = R_OUT + LIFT; // half-width of the arc's box; Kip's centre sits at (BOX, BOX)
+
+// On a phone the half ring is as wide as the screen allows; on a laptop it gets its full size.
+const outerRadius = (vw: number) => Math.max(150, Math.min(R_MAX, Math.floor(vw / 2) - 10 - LIFT));
 
 const rad = (deg: number) => ((deg - 90) * Math.PI) / 180;
-const pt = (r: number, deg: number) => ({ x: BOX + r * Math.cos(rad(deg)), y: BOX + r * Math.sin(rad(deg)) });
 // A fixed angle gap is wider at the rim than at the hub. Offsetting each edge by the angle that
 // equals GAP/2 at that radius keeps both sides of every gap parallel, so all gaps look the same.
 const inset = (r: number) => (Math.asin(GAP / 2 / r) * 180) / Math.PI;
-function segment(a0: number, a1: number, rOut: number): string {
-  const p0 = pt(rOut, a0 + inset(rOut));
-  const p1 = pt(rOut, a1 - inset(rOut));
-  const p2 = pt(R_IN, a1 - inset(R_IN));
-  const p3 = pt(R_IN, a0 + inset(R_IN));
-  return `M ${p0.x} ${p0.y} A ${rOut} ${rOut} 0 0 1 ${p1.x} ${p1.y} L ${p2.x} ${p2.y} A ${R_IN} ${R_IN} 0 0 0 ${p3.x} ${p3.y} Z`;
+function geometry(rOut: number) {
+  const box = rOut + LIFT; // half-width of the arc's box; Kip's centre sits at (box, box)
+  const pt = (r: number, deg: number) => ({ x: box + r * Math.cos(rad(deg)), y: box + r * Math.sin(rad(deg)) });
+  const segment = (a0: number, a1: number, r: number) => {
+    const p0 = pt(r, a0 + inset(r));
+    const p1 = pt(r, a1 - inset(r));
+    const p2 = pt(R_IN, a1 - inset(R_IN));
+    const p3 = pt(R_IN, a0 + inset(R_IN));
+    return `M ${p0.x} ${p0.y} A ${r} ${r} 0 0 1 ${p1.x} ${p1.y} L ${p2.x} ${p2.y} A ${R_IN} ${R_IN} 0 0 0 ${p3.x} ${p3.y} Z`;
+  };
+  return { box, pt, segment };
 }
 // the top half only: four 45° slices from 9 o'clock to 3 o'clock
 const slice = (i: number) => ({ a0: -90 + i * 45, a1: -45 + i * 45, mid: -67.5 + i * 45 });
@@ -70,6 +76,14 @@ export function MascotDial({ restingMood, progress }: Props) {
   // set as soon as a drag starts, so the click that ends it doesn't open the ring
   const dragged = useRef(false);
   const target = useRef<HTMLElement | null>(null);
+  const [vw, setVw] = useState(() => window.innerWidth);
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const R_OUT = outerRadius(vw);
+  const { box: BOX, pt, segment } = geometry(R_OUT);
 
   useEffect(() => {
     setOpen(false);
@@ -108,8 +122,10 @@ export function MascotDial({ restingMood, progress }: Props) {
     if (s.id !== here.id) nav(s.path);
   };
 
-  const mood: SealState =
-    feeding !== false ? (feeding ? 'celebrate' : 'idle') : (hover?.mood ?? (open ? (poked ? 'happy' : here.mood) : restingMood));
+  // faces only exist as close-ups, so the dial can use a few more than the full-body states:
+  // curious while you carry Kip around, mouth open when he's over a goal he can "eat" into
+  const mood: SealState | 'hungry' =
+    feeding !== false ? (feeding ? 'hungry' : 'idle') : (hover?.mood ?? (open ? (poked ? 'happy' : here.mood) : restingMood));
   const circ = 2 * Math.PI * 35;
   const tag = feeding !== false ? (feeding ? `În ${feeding.name}` : 'Lasă-mă pe un obiectiv') : here.label;
 
@@ -186,7 +202,7 @@ export function MascotDial({ restingMood, progress }: Props) {
             type="button"
             className="dial__kip"
             onClick={toggle}
-            animate={{ scale: open ? 1.3 : 1 }}
+            animate={{ scale: open ? 1.05 : 1 }}
             transition={{ type: 'spring', stiffness: 420, damping: 24 }}
             aria-expanded={open}
             aria-label={open ? 'Închide meniul' : `Meniu. Secțiunea curentă: ${here.label}. Trage-mă pe un obiectiv ca să pui bani în el.`}
