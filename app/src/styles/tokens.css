@@ -1,0 +1,95 @@
+/* Design tokens. Direction (see docs/design-research.md): warm paper background, near-black ink
+   for primary actions, one moss-green accent reserved for money that grew and progress. */
+:root {
+  /* colour */
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface-2: #eeebe4;
+  --surface-3: #e4e0d7;
+  --ink: #15201b;
+  --ink-2: #4f5a54;
+  --ink-3: #7d8681;
+  --line: #e3dfd6;
+  --line-strong: #cfcac0;
+  --on-ink: #f5f3ee;
+
+  --accent: #1e6b4a; /* moss: positive money + progress */
+  --accent-soft: #e2efe7;
+  --accent-ink: #13513a;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --danger: #b3261e;
+  --danger-soft: #fbe6e3;
+  --info: #2b5797;
+  --info-soft: #e5edf8;
+  --demo: #6a4bb3; /* simulated data — distinct from every real-money colour */
+  --demo-soft: #eee8fa;
+  --focus: #2b5797;
+
+  /* type */
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.9375rem;
+  --fs-lg: 1.0625rem;
+  --fs-xl: 1.375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.375rem;
+  --fs-hero: 3rem;
+  --lh-tight: 1.15;
+  --lh: 1.45;
+
+  /* space (4pt grid) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --gutter: 20px;
+
+  /* shape */
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+  --border: 1px solid var(--line);
+  --shadow-sheet: 0 -8px 40px rgba(21, 32, 27, 0.14);
+  --shadow-pop: 0 10px 30px rgba(21, 32, 27, 0.12);
+
+  /* layout */
+  --content: 560px;
+  --content-wide: 1040px;
+  --tabbar-h: 68px;
+  --touch: 44px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+
+  /* motion */
+  --t-fast: 120ms;
+  --t-med: 220ms;
+  --t-slow: 360ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root[data-large-text='true'] {
+  font-size: 112.5%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-med: 0ms;
+    --t-slow: 0ms;
+  }
+}
+:root[data-reduce-motion='true'] {
+  --t-fast: 0ms;
+  --t-med: 0ms;
+  --t-slow: 0ms;
+}
