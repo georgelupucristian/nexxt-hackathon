@@ -18,14 +18,19 @@ const spring = { type: 'spring', stiffness: 240, damping: 20, mass: 1.05 } as co
  * with quick picks, so recording takes one tap and a number instead of a full sheet.
  */
 export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boolean }) {
+  const data = useData();
   const { addTransaction } = useStore();
+  // you choose where the money goes; the primary goal is only the starting suggestion
+  const choices = data.goals.filter((g) => g.status === 'active');
+  const [target, setTarget] = useState<string | null>(goal?.id ?? null);
+  const chosen = choices.find((g) => g.id === target) ?? null;
   const celebrate = useCelebrate();
   const toast = useToast();
   const [open, setOpen] = useState(false);
   const [raw, setRaw] = useState('');
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
-  const picks = [...new Set([goal?.plan.amount || 0, 25_00, 50_00, 100_00].filter((v) => v > 0))].slice(0, 3);
+  const picks = [...new Set([chosen?.plan.amount || 0, 25_00, 50_00, 100_00].filter((v) => v > 0))].slice(0, 3);
 
   useEffect(() => {
     if (!open) return;
@@ -41,8 +46,8 @@ export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boo
       return;
     }
     try {
-      addTransaction({ type: 'contribution', amount, goalId: goal?.id ?? null, date: todayKey(), note: '' });
-      celebrate({ title: `+${formatLei(amount)} saved`, sub: goal ? `Towards ${goal.name}.` : 'Added to your savings.' });
+      addTransaction({ type: 'contribution', amount, goalId: chosen?.id ?? null, date: todayKey(), note: '' });
+      celebrate({ title: `+${formatLei(amount)} saved`, sub: chosen ? `Towards ${chosen.name}.` : 'Kept as savings without a goal.' });
       setRaw('');
       setOpen(false);
     } catch (e) {
@@ -69,6 +74,16 @@ export function QuickRecord({ goal, primary }: { goal: Goal | null; primary: boo
                 }}
               />
               <span>lei</span>
+            </div>
+            <div className="qr__goals" role="radiogroup" aria-label="Save towards">
+              {choices.map((g) => (
+                <button key={g.id} type="button" role="radio" aria-checked={target === g.id} className="qr__goal" onClick={() => setTarget(g.id)}>
+                  {g.name}
+                </button>
+              ))}
+              <button type="button" role="radio" aria-checked={target === null} className="qr__goal" onClick={() => setTarget(null)}>
+                No goal
+              </button>
             </div>
             <div className="qr__picks">
               {picks.map((p) => (

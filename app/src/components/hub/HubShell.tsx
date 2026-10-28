@@ -9,6 +9,7 @@ import { currentStreak, goalSaved, primaryGoal, todayAction } from '../../data/s
 import { useData, useStore } from '../../data/store';
 import { Hub } from './Hub';
 import { MascotDial } from './MascotDial';
+import { StreakMoment } from '../mascot/StreakMoment';
 
 interface Panel {
   id: 'goals' | 'activity' | 'profile';
@@ -73,6 +74,7 @@ export function HubShell() {
       </AnimatePresence>
 
       <MascotDial restingMood={kip.state} progress={pct} />
+      <StreakMoment />
       <MoneySheet {...money} onClose={() => setMoney({ open: false })} />
       <BalanceDetails open={details} onClose={() => setDetails(false)} />
     </div>
