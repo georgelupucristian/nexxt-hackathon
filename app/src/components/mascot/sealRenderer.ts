@@ -32,14 +32,15 @@ type Motion = {
 };
 
 const MOTION: Record<SealState, Motion> = {
-  idle: { breath: 1.2, breathSpeed: 1.9, sway: 0.9, swaySpeed: 0.9, fidget: true },
-  happy: { breath: 0.7, breathSpeed: 2.6, sway: 0.9, swaySpeed: 2.2, fidget: false, bounce: 0.75 },
-  celebrate: { breath: 0.6, breathSpeed: 2.6, sway: 0.8, swaySpeed: 2.4, fidget: false },
-  wave: { breath: 0.8, breathSpeed: 2.2, sway: 1.5, swaySpeed: 3.2, fidget: false },
-  think: { breath: 0.8, breathSpeed: 1.6, sway: 0.9, swaySpeed: 0.7, fidget: false },
-  point: { breath: 0.8, breathSpeed: 2, sway: 0.3, swaySpeed: 1, fidget: false, nudge: 1.6 },
-  sleep: { breath: 1.8, breathSpeed: 1.2, sway: 0, swaySpeed: 0, fidget: false },
-  sad: { breath: 0.7, breathSpeed: 1.3, sway: 0.4, swaySpeed: 0.6, fidget: false, settle: 0.025 },
+  idle: { breath: 1, breathSpeed: 1.9, sway: 0.35, swaySpeed: 0.8, fidget: true },
+  happy: { breath: 0.7, breathSpeed: 2.4, sway: 0.3, swaySpeed: 1.4, fidget: false, bounce: 1.1 },
+  celebrate: { breath: 0.6, breathSpeed: 2.4, sway: 0.3, swaySpeed: 1.4, fidget: false },
+  // the wave is in the pose itself; rocking the whole body on top of it looked seasick
+  wave: { breath: 0.6, breathSpeed: 1.8, sway: 0.15, swaySpeed: 1, fidget: false },
+  think: { breath: 0.7, breathSpeed: 1.5, sway: 0.3, swaySpeed: 0.6, fidget: false },
+  point: { breath: 0.7, breathSpeed: 1.8, sway: 0.15, swaySpeed: 0.8, fidget: false, nudge: 2.4 },
+  sleep: { breath: 1.5, breathSpeed: 1.1, sway: 0, swaySpeed: 0, fidget: false },
+  sad: { breath: 0.6, breathSpeed: 1.2, sway: 0.2, swaySpeed: 0.5, fidget: false, settle: 0.02 },
 };
 
 const VERT = `#version 300 es
@@ -241,7 +242,7 @@ export class SealRenderer {
         if (r < 0.4) this.hop(0.75, 0.1);
         else if (r < 0.75) this.lean.v += rand(-2.5, 2.5);
         else this.squash.v += 3; // little shuffle in place
-        this.nextAuto = this.time + rand(2.5, 5);
+        this.nextAuto = this.time + rand(6, 11);
       } else {
         this.nextAuto = Infinity;
       }

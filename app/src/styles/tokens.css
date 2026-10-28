@@ -1,59 +1,64 @@
-/* Design tokens. Direction (see docs/design-research.md): warm paper background, one moss-green
-   accent for money that grew, progress and the main action. Friendlier pass: rounder display face,
-   chunky "pressable" buttons, springy motion, and a soft tint per hub section. */
+/* Kept design tokens — one system for every screen.
+   Colour has a job or it isn't used: moss = actions, progress and money you saved; amber = pending
+   or needs attention; red = failed; blue = information and simulated data. Everything else is
+   warm neutral. (Deliberately the opposite of the dark-and-hot-pink look of Step.) */
 :root {
-  /* colour */
-  --bg: #f5f3ee;
+  /* neutrals: one warm family */
+  --bg: #f7f6f2;
   --surface: #ffffff;
-  --surface-2: #eeebe4;
-  --surface-3: #e4e0d7;
-  --ink: #15201b;
-  --ink-2: #4f5a54;
-  --ink-3: #7d8681;
-  --line: #e3dfd6;
-  --line-strong: #cfcac0;
-  --on-ink: #f5f3ee;
+  --surface-2: #f1efe9;
+  --surface-3: #e7e4dc;
+  --line: #e6e2d9;
+  --line-strong: #d3cec3;
+  --ink: #17201b;
+  --ink-2: #48524c;
+  --ink-3: #66706a; /* ≥ 4.7:1 on white and on --bg: small text stays readable */
+  --on-ink: #ffffff;
 
-  --accent: #1f7a52; /* moss: positive money + progress + primary action */
-  --accent-soft: #e2efe7;
-  --accent-ink: #13513a;
-  --accent-deep: #155c3c; /* the "3D" edge under primary buttons */
+  /* moss: primary action, progress, saved money */
+  --accent: #1f7a52;
+  --accent-hover: #196746;
+  --accent-soft: #e3f1e8;
+  --accent-ink: #145238;
+  --accent-deep: var(--accent-hover);
   --accent-bright: #7fd3a3;
 
-  /* one soft tint per hub section, so each arc and its panel feel like a place */
-  --tint-today: #dcefe3;
-  --tint-goals: #f6e6c8;
-  --tint-activity: #dce9f7;
-  --tint-profile: #ebe2f6;
-  --tint-today-ink: #1f6b47;
-  --tint-goals-ink: #8a5a12;
-  --tint-activity-ink: #2b5797;
-  --tint-profile-ink: #5d3f99;
-  --warn: #9a5b00;
-  --warn-soft: #fbf0dc;
+  /* status */
+  --warn: #8a5a00;
+  --warn-soft: #fdf3dc;
   --danger: #b3261e;
-  --danger-soft: #fbe6e3;
+  --danger-soft: #fbe7e4;
   --info: #2b5797;
-  --info-soft: #e5edf8;
-  --demo: #6a4bb3; /* simulated data — distinct from every real-money colour */
-  --demo-soft: #eee8fa;
+  --info-soft: #e6eef9;
+  --demo: #2b5797; /* simulated data reads as "information", never as money */
+  --demo-soft: #e6eef9;
   --focus: #2b5797;
 
-  /* type */
+  /* legacy section tints now all resolve to neutrals: sections are places, not colours */
+  --tint-today: var(--surface-2);
+  --tint-goals: var(--surface-2);
+  --tint-activity: var(--surface-2);
+  --tint-profile: var(--surface-2);
+  --tint-today-ink: var(--ink);
+  --tint-goals-ink: var(--ink);
+  --tint-activity-ink: var(--ink);
+  --tint-profile-ink: var(--ink);
+
+  /* type scale (one display face for headings and big numbers, one text face) */
   --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Bricolage Grotesque', var(--font);
-  --fs-xs: 0.75rem;
-  --fs-sm: 0.8125rem;
-  --fs-md: 0.9375rem;
-  --fs-lg: 1.0625rem;
-  --fs-xl: 1.375rem;
-  --fs-2xl: 1.75rem;
-  --fs-3xl: 2.375rem;
-  --fs-hero: 3rem;
+  --fs-xs: 0.8125rem; /* 13: captions, labels — nothing smaller */
+  --fs-sm: 0.875rem; /* 14: secondary text */
+  --fs-md: 0.9375rem; /* 15: body */
+  --fs-lg: 1.0625rem; /* 17: card titles */
+  --fs-xl: 1.375rem; /* 22: section titles */
+  --fs-2xl: 1.75rem; /* 28: page titles */
+  --fs-3xl: 2.25rem; /* 36: key amounts */
+  --fs-hero: 2.75rem;
   --lh-tight: 1.15;
-  --lh: 1.45;
+  --lh: 1.5;
 
-  /* space (4pt grid) */
+  /* space: 4pt grid */
   --s-1: 4px;
   --s-2: 8px;
   --s-3: 12px;
@@ -65,20 +70,23 @@
   --s-12: 48px;
   --gutter: 20px;
 
-  /* shape */
+  /* radius scale: controls 10, inputs/buttons 12, cards 16, pills only for status */
   --r-sm: 10px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
   --r-pill: 999px;
   --border: 1px solid var(--line);
-  --shadow-sheet: 0 -8px 40px rgba(21, 32, 27, 0.14);
-  --shadow-pop: 0 10px 30px rgba(21, 32, 27, 0.12);
+
+  /* elevation: cards are flat; only things that float above the page cast a shadow */
+  --shadow-float: 0 10px 30px rgba(23, 32, 27, 0.14), 0 2px 6px rgba(23, 32, 27, 0.06);
+  --shadow-sheet: 0 -8px 32px rgba(23, 32, 27, 0.14);
+  --shadow-pop: var(--shadow-float);
 
   /* layout */
   --content: 560px;
-  --content-wide: 1040px;
-  --tabbar-h: 68px;
+  --content-wide: 1120px;
+  --tabbar-h: 0px;
   --touch: 44px;
   --icon-sm: 16px;
   --icon-md: 20px;
@@ -86,10 +94,10 @@
 
   /* motion */
   --t-fast: 120ms;
-  --t-med: 220ms;
-  --t-slow: 360ms;
+  --t-med: 200ms;
+  --t-slow: 320ms;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* small overshoot, for presses and pops */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 :root[data-large-text='true'] {

@@ -12,7 +12,6 @@ import { NotFound } from './screens/NotFound';
 import { Onboarding } from './screens/Onboarding';
 import { Profile, ProfileSection } from './screens/Profile';
 import { Start } from './screens/Start';
-import { Today } from './screens/Today';
 import { TransactionDetail } from './screens/TransactionDetail';
 
 /** Signed out → welcome. Signed in but onboarding unfinished → resume onboarding. */
@@ -55,7 +54,8 @@ export default function App() {
         {/* every signed-in screen opens as a panel over the hub */}
         <Route element={<RequireAuth><HubShell /></RequireAuth>}>
           <Route path="/home" element={null} />
-          <Route path="/today" element={<Today />} />
+          {/* Today now lives on Home */}
+          <Route path="/today" element={<Navigate to="/home" replace />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/goals/new" element={<GoalEditor />} />
           <Route path="/goals/:id" element={<GoalDetail />} />

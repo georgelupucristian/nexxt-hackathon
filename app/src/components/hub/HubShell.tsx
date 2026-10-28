@@ -1,23 +1,33 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ListOrdered, Target, User, type LucideIcon } from 'lucide-react';
 import { AnimatePresence, motion, useDragControls } from 'motion/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { MoneySheet, type MoneySheetProps } from '../sheets';
 import { BalanceDetails } from '../../screens/Today';
-import { KipToast } from '../mascot/KipToast';
 import { hubLine } from '../mascot/lines';
-import { currentStreak, primaryGoal, todayAction } from '../../data/selectors';
+import { currentStreak, goalSaved, primaryGoal, todayAction } from '../../data/selectors';
 import { useData, useStore } from '../../data/store';
 import { Hub } from './Hub';
-import { NavIsland } from './NavIsland';
-import { HUB, polar, sectionFor, SECTIONS, type Section, type SectionId } from './sections';
+import { MascotDial } from './MascotDial';
+
+interface Panel {
+  id: 'goals' | 'activity' | 'profile';
+  label: string;
+  path: string;
+  icon: LucideIcon;
+}
+const PANELS: Panel[] = [
+  { id: 'goals', label: 'Goals', path: '/goals', icon: Target },
+  { id: 'activity', label: 'Activity', path: '/activity', icon: ListOrdered },
+  { id: 'profile', label: 'Profile', path: '/profile', icon: User },
+];
+const panelFor = (pathname: string) => PANELS.find((p) => pathname === p.path || pathname.startsWith(`${p.path}/`)) ?? null;
 
 type Origin = { x: number; y: number };
 
 /**
- * Layout for every signed-in screen. The hub always stays mounted underneath; a section route
- * (/today, /goals/..., /activity/..., /profile/...) opens as a panel that grows out of its arc
- * while the hub sinks back, and shrinks into the arc again on close.
+ * Layout for every signed-in screen. Home stays mounted underneath; Goals, Activity and Profile
+ * open as a panel that grows out of Kip's dial (where you tapped) and shrink back into it on close.
  */
 export function HubShell() {
   const location = useLocation();
@@ -25,112 +35,76 @@ export function HubShell() {
   const nav = useNavigate();
   const data = useData();
   const { account } = useStore();
-  const section = sectionFor(location.pathname);
-  const action = todayAction(data);
-  const line = hubLine(action, account?.name ?? 'there', currentStreak(data));
-  const openAdd = (goalId: string | null = primaryGoal(data.goals)?.id ?? null, presetAmount?: number) => setMoney({ open: true, mode: 'contribution', goalId, presetAmount });
-  const svgRef = useRef<SVGSVGElement>(null);
-  const origins = useRef<Partial<Record<SectionId, Origin>>>({});
+  const panel = panelFor(location.pathname);
   const [money, setMoney] = useState<Omit<MoneySheetProps, 'onClose'>>({ open: false });
   const [details, setDetails] = useState(false);
+  const goal = primaryGoal(data.goals);
+  const pct = goal && goal.target > 0 ? Math.min(1, goalSaved(data.transactions, goal.id) / goal.target) : 0;
+  const kip = hubLine(todayAction(data), account?.name ?? '', currentStreak(data));
 
-  // Deep links and the browser back button open panels without a tap, so work out where
-  // each arc is on screen and launch from there.
-  const originFor = (id: SectionId): Origin => {
-    const known = origins.current[id];
-    if (known) return known;
-    const svg = svgRef.current;
-    const s = SECTIONS.find((x) => x.id === id)!;
-    if (!svg) return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    const r = svg.getBoundingClientRect();
-    const p = polar((HUB.ringIn + HUB.ringOut) / 2, s.angle);
-    return { x: r.left + (p.x / 400) * r.width, y: r.top + (p.y / 400) * r.height };
+  const openAdd = (goalId: string | null = goal?.id ?? null, presetAmount?: number) => setMoney({ open: true, mode: 'contribution', goalId, presetAmount });
+
+  // panels grow out of the dial, wherever the user has dragged it
+  const dialCenter = (): Origin => {
+    const el = document.querySelector('.dial__kip');
+    if (!el) return { x: window.innerWidth - 48, y: window.innerHeight - 48 };
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   };
-
-  const open = (s: Section, at: Origin) => {
-    origins.current[s.id] = at;
-    navigator.vibrate?.(6);
-    nav(s.path);
-  };
-
-  const close = () => nav('/home');
 
   return (
     <div className="hub-shell">
       <motion.div
         className="hub-stage"
-        // no blur here: filtering a layer with live WebGL canvases is what makes cheap phones stutter
-        animate={section ? { scale: 0.9, opacity: 0.35 } : { scale: 1, opacity: 1 }}
+        animate={panel ? { scale: 0.94, opacity: 0.4 } : { scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 30 }}
-        aria-hidden={section ? true : undefined}
-        // inert keeps keyboard focus out of the hub while a panel covers it
-        {...(section ? { inert: '' } : {})}
+        aria-hidden={panel ? true : undefined}
+        {...(panel ? { inert: '' } : {})}
       >
-        <Hub
-          ref={svgRef}
-          active={section?.id ?? null}
-          onOpen={open}
-          onAdd={openAdd}
-          onDetails={() => setDetails(true)}
-        />
+        <Hub onAdd={openAdd} onDetails={() => setDetails(true)} />
       </motion.div>
 
       <AnimatePresence>
-        {section && (
-          <SectionPanel key={section.id} section={section} origin={originFor(section.id)} onClose={close} pathname={location.pathname}>
+        {panel && (
+          <SectionPanel key={panel.id} panel={panel} origin={dialCenter()} onClose={() => nav('/home')} pathname={location.pathname}>
             {outlet}
           </SectionPanel>
         )}
       </AnimatePresence>
 
-      <KipToast
-        line={line}
-        topic={action.kind}
-        hidden={!!section || money.open}
-        action={
-          action.kind === 'planned-contribution'
-            ? { label: `Add ${Math.round(action.amount / 100)} lei`, run: () => openAdd(action.goal.id, action.amount) }
-            : action.kind === 'create-goal'
-              ? { label: 'Create a goal', run: () => nav('/goals/new') }
-              : undefined
-        }
-      />
-      <NavIsland />
-
+      <MascotDial restingMood={kip.state} progress={pct} />
       <MoneySheet {...money} onClose={() => setMoney({ open: false })} />
       <BalanceDetails open={details} onClose={() => setDetails(false)} />
     </div>
   );
 }
 
-function SectionPanel({ section, origin, onClose, pathname, children }: { section: Section; origin: Origin; onClose: () => void; pathname: string; children: ReactNode }) {
+function SectionPanel({ panel, origin, onClose, pathname, children }: { panel: Panel; origin: Origin; onClose: () => void; pathname: string; children: ReactNode }) {
   const drag = useDragControls();
   const [vw, vh] = [window.innerWidth, window.innerHeight];
-  // transform + opacity only, so the launch stays on the compositor (no repaint per frame)
+  // transform + opacity only, so the launch stays on the compositor
   const from = { opacity: 0, scale: 0.08, x: origin.x - vw / 2, y: origin.y - vh / 2 };
-  const Icon = section.icon;
+  const Icon = panel.icon;
   const scroller = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      // a sheet inside the panel handles its own Escape first
       if (e.key === 'Escape' && !document.querySelector('.sheet-backdrop')) onClose();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  // moving between screens inside a section starts each one at the top
   useEffect(() => {
     scroller.current?.scrollTo({ top: 0 });
   }, [pathname]);
 
   return (
     <motion.section
-      className={`panel panel--${section.id}`}
+      className="panel"
       role="dialog"
       aria-modal="true"
-      aria-label={section.label}
+      aria-label={panel.label}
       initial={from}
       animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
       exit={{ ...from, transition: { type: 'spring', stiffness: 380, damping: 36 } }}
@@ -147,23 +121,20 @@ function SectionPanel({ section, origin, onClose, pathname, children }: { sectio
       <header className="panel__head" onPointerDown={(e) => drag.start(e)}>
         <span className="panel__grabber" aria-hidden />
         <span className="panel__title">
-          <span className="panel__icon" aria-hidden>
-            <Icon size={18} />
-          </span>
-          {section.label}
+          <Icon size={20} aria-hidden />
+          {panel.label}
         </span>
-        <motion.button type="button" className="panel__close" onClick={onClose} whileTap={{ scale: 0.9 }} aria-label={`Close ${section.label}`}>
+        <button type="button" className="panel__close" onClick={onClose} aria-label={`Close ${panel.label}`}>
           <ChevronDown size={22} aria-hidden />
-        </motion.button>
+        </button>
       </header>
-      <motion.div ref={scroller} className="panel__body" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.12 } }} exit={{ opacity: 0, transition: { duration: 0.08 } }}>
+      <div ref={scroller} className="panel__body">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.div key={pathname} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ type: 'spring', stiffness: 420, damping: 36 }}>
             {children}
           </motion.div>
         </AnimatePresence>
-      </motion.div>
+      </div>
     </motion.section>
   );
 }
-
