@@ -29,6 +29,19 @@
   transform: scaleX(-1);
 }
 
+/* WebGL mode: the canvas draws the seal (it's padded around the box so hops
+   aren't clipped); the <img> stack is only the fallback. */
+.seal-canvas {
+  position: absolute;
+  pointer-events: none;
+}
+.seal--gl .seal-figure {
+  display: none;
+}
+.seal--gl .seal-shadow {
+  opacity: 0; /* the renderer fades it in once the seal is on screen */
+}
+
 .seal-pose {
   position: absolute;
   inset: 0;
@@ -62,17 +75,17 @@
 
 /* ---- per-state motion (full-body seals only; avatars just crossfade) ---- */
 
-.seal--body.seal--idle .seal-figure { animation: seal-breathe 3.6s ease-in-out infinite; }
-.seal--body.seal--sad .seal-figure { animation: seal-breathe 5s ease-in-out infinite; }
-.seal--body.seal--sleep .seal-figure { animation: seal-breathe 5.5s ease-in-out infinite; }
-.seal--body.seal--happy .seal-figure { animation: seal-bounce 0.9s ease-in-out infinite; }
-.seal--body.seal--happy .seal-shadow { animation: seal-shadow-bounce 0.9s ease-in-out infinite; }
-.seal--body.seal--wave .seal-figure { animation: seal-rock 1.4s ease-in-out infinite; }
-.seal--body.seal--think .seal-figure { animation: seal-sway 4s ease-in-out infinite; }
-.seal--body.seal--point .seal-figure { animation: seal-nudge 1.6s ease-in-out infinite; }
-.seal--body.seal--face-left.seal--point .seal-figure { animation-name: seal-nudge-left; }
-.seal--body.seal--celebrate .seal-figure { animation: seal-hop 1.2s cubic-bezier(0.3, 0, 0.3, 1) both; }
-.seal--body.seal--celebrate .seal-shadow { animation: seal-shadow-hop 1.2s ease-in-out both; }
+.seal--body:not(.seal--gl).seal--idle .seal-figure { animation: seal-breathe 3.6s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--sad .seal-figure { animation: seal-breathe 5s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--sleep .seal-figure { animation: seal-breathe 5.5s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--happy .seal-figure { animation: seal-bounce 0.9s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--happy .seal-shadow { animation: seal-shadow-bounce 0.9s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--wave .seal-figure { animation: seal-rock 1.4s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--think .seal-figure { animation: seal-sway 4s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--point .seal-figure { animation: seal-nudge 1.6s ease-in-out infinite; }
+.seal--body:not(.seal--gl).seal--face-left.seal--point .seal-figure { animation-name: seal-nudge-left; }
+.seal--body:not(.seal--gl).seal--celebrate .seal-figure { animation: seal-hop 1.2s cubic-bezier(0.3, 0, 0.3, 1) both; }
+.seal--body:not(.seal--gl).seal--celebrate .seal-shadow { animation: seal-shadow-hop 1.2s ease-in-out both; }
 
 @keyframes seal-breathe {
   0%, 100% { transform: scale(1, 1); }

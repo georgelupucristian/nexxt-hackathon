@@ -20,7 +20,9 @@ Demo-ul mascotei: http://localhost:3000/mascot-demo
 
 ## Mascota: foca
 
-Imagini 3D generate cu AI (Nano Banana 2.1, pornind de la `assets/mascot/source/reference.png`), cate una pe stare. Componenta face crossfade intre ele si adauga miscare discreta din CSS.
+Imagini 3D generate cu AI (Nano Banana 2.1, pornind de la `assets/mascot/source/reference.png`), cate una pe stare.
+
+Ca sa nu para o poza statica, `components/sealRenderer.ts` deseneaza poza in WebGL2 pe o plasa deformabila: burta respira, corpul se leagana iar capul vine putin in urma, iar la fiecare schimbare de stare foca se ghemuieste, schimba poza in punctul cel mai jos si sare inapoi. In idle mai face din cand in cand o saritura mica sau se apleaca. Pentru avatare (pana la 72px), reduced motion sau browsere fara WebGL2 se folosesc direct imaginile.
 
 ```tsx
 import { Seal } from "@/components/Seal";
@@ -35,6 +37,7 @@ import { Seal } from "@/components/Seal";
 | `state` | `SealState` | `"idle"` | vezi tabelul de mai jos |
 | `size` | `number` | `120` | latura in px. Pana la 72px se afiseaza doar capul (avatar). |
 | `direction` | `"left" \| "right"` | `"right"` | doar pentru `point` (oglindeste imaginea) |
+| `appear` | `"pop" \| "slide" \| "none"` | `"pop"` | cum apare la montare: iese din sol, aluneca pe burta din stanga, sau e deja acolo |
 | `reducedMotion` | `boolean` | `false` | forteaza pozele statice; `prefers-reduced-motion` din OS e respectat oricum |
 | `onCelebrateEnd` | `() => void` | | apelat cand `celebrate` s-a terminat si foca e din nou in idle |
 | `title` | `string` | `"Foca Avansul"` | eticheta accesibila; `""` = decorativa |
@@ -42,16 +45,16 @@ import { Seal } from "@/components/Seal";
 
 | stare | cand o folosim | miscare |
 |---|---|---|
-| `idle` | implicit | respiratie lenta |
-| `happy` | actiune reusita | sare usor pe loc |
-| `celebrate` | depunere lunara reusita, milestone atins | o singura saritura de ~1.2s cu monede, apoi revine singura in idle |
-| `wave` | onboarding, salut | se leagana |
-| `think` | se incarca, calculeaza | se apleaca + bula "..." |
-| `point` | arata spre un element din UI | se impinge spre directie |
-| `sleep` | nimic nu cere atentia userului | respiratie foarte lenta + "z" |
-| `sad` | plata esuata (rar, bland) | respiratie lenta |
+| `idle` | implicit | respira, se leagana, mici sarituri/aplecari la intamplare |
+| `happy` | actiune reusita | topaie pe loc |
+| `celebrate` | depunere lunara reusita, milestone atins | o saritura mare cu monede (~1.3s), apoi revine singura in idle |
+| `wave` | onboarding, salut | se leagana in ritmul salutului |
+| `think` | se incarca, calculeaza | se leagana incet + bula "..." |
+| `point` | arata spre un element din UI | se impinge periodic spre directie |
+| `sleep` | nimic nu cere atentia userului | respiratie adanca si lenta + "z" |
+| `sad` | plata esuata (rar, bland) | respira incet, putin lasata in jos |
 
-La saritura din `celebrate`, monedele ies cu ~6% peste marginea de sus a componentei, deci nu o pune intr-un container cu `overflow: hidden`.
+Canvas-ul iese cu 30% peste marginea de sus si 14% in lateral fata de cutia componentei (loc pentru sarituri si pentru intrarea `slide`), deci nu pune foca intr-un container cu `overflow: hidden`.
 
 ### Fisiere
 
