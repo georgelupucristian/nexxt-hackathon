@@ -32,12 +32,3 @@ html:has(.hub-shell) {
 .install-app__icon img { display: block; width: 44px; height: 44px; border-radius: 12px; }
 .install-app strong { display: block; }
 .install-app .btn { flex: none; display: inline-flex; align-items: center; gap: 6px; }
-
-/* Kip's button keeps its own compositor layer, so the blurred backdrop and the panel zoom opening
-   behind it don't repaint it (a brief flicker in the installed app on Android) */
-.dial__kip {
-  will-change: transform;
-  backface-visibility: hidden;
-  -webkit-tap-highlight-color: transparent;
-}
-.dial__face img { backface-visibility: hidden; }

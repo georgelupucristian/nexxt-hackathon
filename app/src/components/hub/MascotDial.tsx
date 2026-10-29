@@ -60,25 +60,10 @@ interface Props {
  * fans out above him, four flat slices with equal gaps, the current one filled and grown outwards;
  * the screen behind softens. Hovering a slice changes Kip's face, so he reacts to where you're heading. 
  */
-// every face the dial can show, fetched and decoded up front: swapping to a face that isn't decoded
-// yet paints an empty frame first
-const DIAL_FACES = ['happy', 'wave', 'think', 'point', 'idle', 'proud', 'sleep', 'celebrate', 'sad', 'wink'];
-let facesWarm = false;
-function warmFaces() {
-  if (facesWarm || typeof Image === 'undefined') return;
-  facesWarm = true;
-  for (const f of DIAL_FACES) {
-    const img = new Image();
-    img.src = `/mascot/${f}-face.webp`;
-    img.decode?.().catch(() => undefined);
-  }
-}
-
 export function MascotDial({ restingMood }: Props) {
   const { pathname } = useLocation();
   const nav = useNavigate();
   const here = sectionForPath(pathname);
-  useEffect(warmFaces, []);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState<DialSection | null>(null);
   const [poked, setPoked] = useState(false);
@@ -186,11 +171,8 @@ export function MascotDial({ restingMood }: Props) {
                   alt=""
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  // the old face stays fully visible until the new one has faded in on top of it, so the
-                  // button never shows through mid-swap (it read as a flicker in the installed app)
-                  exit={{ opacity: 0, transition: { delay: 0.16, duration: 0 } }}
+                  exit={{ opacity: 0 }}
                   transition={{ duration: 0.16 }}
-                  decoding="sync"
                   draggable={false}
                 />
               </AnimatePresence>
