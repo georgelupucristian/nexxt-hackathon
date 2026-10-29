@@ -1,0 +1,153 @@
+/* The streak moment, in the streak card's language: Google's animated Noto flame (CC BY 4.0) for a
+   saved day, Noto's snowflake for a frozen day, and a link joining the days of the run. */
+
+/* hero: the flame behind, Kip in front of it */
+.smh {
+  position: relative;
+  width: 240px;
+  height: 200px;
+  margin: 4px auto 0;
+}
+.smh__flame {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  width: 168px;
+  height: 168px;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 10px 24px rgba(242, 98, 13, 0.32));
+}
+.smh__kip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+/* the week */
+.smw {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: min(100%, 380px);
+  margin: 18px auto 0;
+  padding: 0;
+  list-style: none;
+}
+.smw__day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.smw__w {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.smw__day.is-today .smw__w {
+  color: #f2620d;
+}
+.smw__dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+/* the link to the next day, from this circle's edge to the next one's */
+.smw__day.has-link::after {
+  content: '';
+  position: absolute;
+  bottom: 18px;
+  left: calc(50% + 19px);
+  right: calc(-50% + 19px);
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #ffb347, #f2830d);
+}
+.smw__day.link-ice::after {
+  background: linear-gradient(90deg, #9fd0ff, #cfe8ff);
+}
+/* the link into today fills when today catches fire */
+.smw__day.link-new::after {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.smw.is-burning .smw__day.link-new::after {
+  transform: scaleX(1);
+}
+
+.smw__day.is-done .smw__dot,
+.smw__day.is-today-done .smw__dot {
+  background: #fff3e4;
+  box-shadow:
+    0 0 0 2px #ffd3a1,
+    0 4px 0 #f6c58f;
+}
+.smw__day.is-paused .smw__dot {
+  background: #eaf5ff;
+  box-shadow:
+    0 0 0 2px #b9dcff,
+    0 4px 0 #a9cdf0;
+}
+.smw__day.is-today .smw__dot {
+  box-shadow:
+    0 0 0 3px #f2830d,
+    0 4px 0 #f6c58f;
+}
+.smw__day.is-future .smw__dot,
+.smw__day.is-before .smw__dot {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+}
+.smw__day.is-missed .smw__dot {
+  background: var(--surface-3);
+  opacity: 0.7;
+}
+.smw__icon {
+  width: 30px;
+  height: 30px;
+  margin-top: -3px;
+  pointer-events: none;
+}
+.smw__icon--ice {
+  width: 28px;
+  height: 28px;
+  margin-top: 0;
+}
+.smw__legend {
+  width: 18px;
+  height: 18px;
+  vertical-align: -3px;
+  margin-right: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smw__day.link-new::after {
+    transition: none;
+  }
+}
+
+/* the home streak card: a frozen day, white and frosty on the orange card (this file loads
+   before alive.css, so these selectors are one class stronger) */
+.streakd .streakd__day.is-paused .streakd__dot {
+  border-color: #fff;
+  background: #eaf5ff;
+  box-shadow: 0 3px 0 rgba(60, 110, 170, 0.3);
+}
+.streakd__dot .streakd__dayice {
+  width: 22px;
+  height: 22px;
+  margin-top: 0;
+}
+
+.smw__fine {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}

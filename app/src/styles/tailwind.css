@@ -1,0 +1,28 @@
+/* Tailwind for the Watermelon components only. No preflight: base.css already
+   resets the page, and Tailwind's reset would restyle every existing screen. */
+@layer theme, base, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* Expose the app's tokens to Tailwind so components use the same palette. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-struct: var(--struct);
+  --color-struct-soft: var(--struct-soft);
+  --color-struct-ink: var(--struct-ink);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-progress: var(--progress);
+  --color-reward-bg: var(--reward-bg);
+  --color-reward-text: var(--reward-text);
+  --color-danger: var(--danger);
+  --font-sans: var(--font);
+  --font-display: var(--font-display);
+}

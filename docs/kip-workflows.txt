@@ -1,0 +1,380 @@
+KIP: HOW EVERYTHING WORKS
+Demo workflow vs real business workflow, for the pitch and the presentation
+Last updated: 29 Oct 2026
+
+=====================================================================
+0. ONE-LINE SUMMARY
+=====================================================================
+Kip is a savings app for students. You pick a goal, put aside a small
+amount every day, keep a streak, save with friends and unlock clubs
+with partner discounts. Kip never holds the money: in the real product
+it sits in the student's own savings account at a licensed Romanian
+bank: whichever bank they already use, with Libra Internet Bank and
+Raiffeisen Bank as recommended partners. Kip is the app on top.
+
+Live: https://listo-solutions.ro (on a laptop it shows inside a phone frame)
+Language: English. Currency: lei (RON).
+
+=====================================================================
+1. DEMO vs REAL, AT A GLANCE
+=====================================================================
+                    | DEMO (what the video shows)        | REAL PRODUCT (what we pitch)
+--------------------+------------------------------------+-----------------------------------
+Sign-in             | phone number + code 123456,        | phone number + SMS code
+                    | no SMS is sent                     | (e.g. Twilio Verify)
+Identity check      | none                               | the bank's own online KYC (Libra:
+                    |                                    | ID card + selfie, under 5 minutes)
+Where money sits    | Stripe sandbox (test money), in    | a savings account IN THE STUDENT'S
+                    | Kip's Stripe test balance          | NAME at their own bank (any bank;
+                    |                                    | Libra or Raiffeisen recommended)
+How money moves in  | card payment through Stripe        | open-banking transfer (PSD2) or a
+                    | Checkout, test card 4242...        | standing order from the student's
+                    |                                    | current account. Card optional.
+Collection rhythm   | weekly or monthly, on a day the    | daily "reserve" + one weekly sweep
+                    | student picks                      | into savings (section 5)
+Withdrawals         | simulated (recorded, no payout)    | the bank moves money from savings
+                    |                                    | back to the current account
+Balances            | Kip's database (ledger)            | read from the bank's API (PSD2 AIS)
+Friends, streaks,   | real: real database, real test     | same, at scale
+clubs               | accounts                           |
+Club promotions     | fictional companies, codes are     | real partner companies, real codes
+                    | simulated                          |
+
+=====================================================================
+2. THE STUDENT'S JOURNEY (WHAT THE APP DOES TODAY)
+=====================================================================
+2.1 Welcome
+- Full-screen video of Kip, "Saving on a student budget? Totally doable."
+- Buttons: Get started / I already have an account / Try with demo data.
+
+2.2 Onboarding (one question per screen, Kip asks in a speech bubble)
+1. Age range
+2. Why you're saving (multi-select)
+3. How much per day (5 / 10 / 15 / 20 lei), with the monthly total
+4. What that becomes in 3 months
+5. How much you already have saved (counts toward the goal from day 1;
+   no money moves; starts at 0)
+6. Phone number, then the 6-digit code
+7. Name
+8. Where your money comes from (family, part-time job, scholarship...)
+9. Notifications
+10. Face ID / fingerprint to lock the app on this phone (optional)
+11. Contacts: "So you can find friends who already save" (optional)
+    and "Friends can find me by my number" (can be turned off later)
+12. Your plan, then home
+NO CARD IS ASKED FOR DURING SIGN-UP.
+
+2.3 Home
+- Streak card: days in a row, this week as 7 circles (fire = saved day,
+  snowflake = frozen day).
+- Goals card: saved this month, lei per day to finish on time, a ring
+  with Kip, the list of goals (personal and shared).
+- "Save money" button.
+- Recent activity (a manual entry can be undone).
+- Clubs row ("Clubs: 2 of 3 slots").
+- "Sleep on it": park something you want to buy for 48 hours.
+- Kip's button at the bottom: Home / Goals / Activity / Profile.
+- Header: Friends (people icon), notifications, "?" replays the tour.
+- A first-run tour (8 stops) explains each part with small animations.
+
+2.4 Goals
+- New goal wizard: just me / with friends, what for, how much,
+  by when, then a plan Kip works out.
+- Goal page: progress, Deposit / Withdraw, plan, icon, pause,
+  archive, delete.
+- Plan: every week or every month, which day, how much each time.
+
+2.5 Putting money in (demo)
+- "Save money" opens "Move money into your savings":
+  "It goes from your card into your Kip savings, not to us. Take it out
+  anytime." plus "Where's my money?".
+- The card is asked for ONLY here, the first time the student chooses
+  to move money. "Your card is only used to move money into your
+  savings."
+- Stripe Checkout: "Transfer to your Kip savings", "Kip takes no fee".
+  The first collection happens on the chosen day.
+  * Chosen day is today: the money moves today.
+  * Chosen day is later: Stripe only SAVES THE CARD ("Kip saves your
+    card to move money into your own savings. Nothing is charged today.
+    Your first X lei goes in on <date>."). The server then starts the
+    weekly or monthly transfer exactly on that day.
+  * Why: an earlier version delayed the first charge with a Stripe
+    "trial", and Stripe always labels a trial "N days free", which made
+    it look like a free trial of a product. Saving the card instead
+    removes any "free"/"trial" wording.
+- The name shown at the top of Stripe's page is the Stripe account's
+  public business name; it must be set to "Kip" in the Stripe dashboard
+  (Settings > Business > Public details).
+- Stripe confirms through a webhook; the money appears in the app by
+  itself, then Kip celebrates.
+- Extra deposits: now (saved card) or with the next collection.
+- Withdraw: "Move money back to your card" (simulated in the demo).
+
+=====================================================================
+3. STREAKS AND FREEZES
+=====================================================================
+- ONE rule for the whole app (computed on the server): a day counts
+  only if that day's deposits reach the student's daily amount
+  (min 1 leu). Depositing 10x the amount is still one day. Withdrawals
+  don't touch the streak. There is NO "tap to check in" button.
+- 1-day Freeze: everyone has at most 1. If you miss a day, it's used
+  automatically and the streak survives (a frozen day doesn't grow
+  the streak). It recharges 7 days after it was used.
+- Saving a friend: if a friend missed a day and has no freeze, they are
+  "In danger" for 24h and can tap "Ask for a freeze". You can give them
+  YOUR 1-day Freeze ("If you give them your freeze, you'll have no
+  protection until <date>"). It only works if the friend saves within
+  24h; otherwise it comes back to you. Max 2 rescues per person per 30
+  days.
+- 1-week Freeze (earned every 45 days in a row): designed; demo only.
+
+=====================================================================
+4. SOCIAL: FRIENDS, SHARED GOALS, CLUBS
+=====================================================================
+4.1 Friends (real, on the live database)
+- Found by phone number. Contact matching sends only numbers, never
+  names, and never stores the numbers of people without Kip.
+- "Add" sends a request; you're friends only after they accept.
+  No limit on friends; max 50 requests per day (anti-spam).
+- Friends see ONLY: name, avatar, streak, saved today yes/no, freeze
+  status. NEVER amounts.
+- Cheers: "Well done!", "You've got this!", "I'm here if you need me"
+  (max 3 a day per friend).
+- Invite link: when a friend joins with your link, your 1-day Freeze
+  recharges right away. (We dropped "2 bonus streak days": a streak
+  should only grow from real saving.)
+- Remove and block.
+
+4.2 Shared goals (real, on the live database)
+- Created from "New goal" > "With friends": pick up to 4 friends.
+- Friends get an invite (Join / No thanks) and their share (equal by
+  default, editable).
+- A contribution is EXTRA money, separate from personal savings: a new
+  deposit made for the shared goal.
+- Money never moves between people. Each person's contributions stay
+  theirs; each can withdraw only their own. Leaving gives yours back.
+- Everyone sees the total % and each member's % of their own share,
+  never other people's amounts. Celebration at 25/50/75/100%.
+- More friends can be invited later (up to 5 people).
+- Paying one organiser at 100% (e.g. booking the trip) is out of scope;
+  it needs real person-to-person payments.
+- Where it shows: in the same goals list as personal goals (home and
+  Goals), marked with the members' avatars and "With Ana, Mihai". No
+  separate tab. Invites arrive in Friends > Requests (Join / No thanks).
+- Colonies (2 to 5 friends, max 3 per person) are separate: a group that
+  keeps a shared streak. A shared goal does not need a colony.
+
+4.3 Clubs (real, on the live database)
+- 6 clubs made by our team: Travel, Erasmus, Tech, First apartment,
+  My car, Emergency fund. Students can't create clubs.
+- Slots grow ONLY with the current streak:
+  at sign-up 1 / 14 days 2 / 30 days 3 / 60 days 4 / 90 days 5 /
+  150 days 6.
+- Unlock a slot: Kip celebrates, "You unlocked a new club! Pick where
+  you go."
+- Streak breaks (missed day, no freeze): the streak starts again from
+  day 1. Clubs above what the new streak allows are PAUSED for 30 days,
+  with everything kept. Save 14 days in a row within those 30 days and
+  you keep them all ("You're back!"). Otherwise they move to "Clubs you
+  can rejoin", still showing their promotions and "N more days to
+  rejoin". Blame-free wording, never "you lost".
+- Monthly promotions from several companies per club (demo: fictional
+  names). New ones every 1st of the month, marked "New". Members claim
+  a code once. Non-members see every promotion in full, with "3 more
+  streak days to join" instead of Claim.
+- How many clubs you're in is private.
+
+=====================================================================
+5. THE MONEY MECHANICS IN THE REAL PRODUCT
+=====================================================================
+5.1 Opening the savings account (no manual work for us)
+1. In Kip: "Open your savings account" deep-links into Libra's online
+   onboarding.
+2. Libra does the KYC itself: ID card, selfie, check against the
+   population register. Under 5 minutes, done by the student.
+3. Back in Kip, the student connects the account (PSD2 consent). Kip
+   reads the balance (AIS) and can start transfers the student has
+   approved (PIS / standing order).
+4. Phase 2, with a contract: one sub-account per goal, created
+   automatically through Libra's API.
+
+5.2 The weekly "reserve and sweep" (the holding mechanic)
+Goal: no daily transfer fees, no nagging, and the student never owes Kip
+anything.
+- Every day: the daily amount is RESERVED on the student's own current
+  account (blocked funds or a "notice pot" in the student's name at the
+  bank). The money stays the student's, at the bank, but is set aside.
+  A day lights the streak when its reserve succeeds.
+- Once a week (sweep day, e.g. Sunday): all reserved money for the week
+  moves in ONE transfer into the student's savings account. One
+  transfer a week means low or no fees (batching).
+- Not enough money on a day (e.g. planned 40 lei this week, only 30
+  on the account): Kip does NOT send "pay Kip" reminders again and again.
+    * The reserve is tried once that day. If it fails, that day isn't
+      lit, one quiet note appears in the app ("Not enough today, we'll
+      try again tomorrow"), and nothing carries over as a debt.
+    * Days that were reserved still sweep normally (30 lei moves, not 0).
+    * The student can lower the amount or skip a week in one tap.
+    * The freeze still protects the streak for one missed day.
+- Streak breaks (missed day, no freeze): Kip does NOT start asking for
+  money for each day. It sweeps right away everything reserved so far
+  in that streak into the savings account, then a new streak starts
+  clean. Missed days are never collected later.
+- Hold length: the reserve lasts until the weekly sweep (up to 7 days).
+  The exact maximum depends on what Libra allows (possibly 4 to 5
+  days). If it's shorter, the sweep simply runs more often (e.g. twice
+  a week).
+- The demo doesn't do this yet. It collects weekly or monthly by card
+  through Stripe, and Stripe retries a failed charge automatically on
+  later days ("Change card" is offered). In a demo version, Stripe card
+  authorisations (holds lasting about 7 days) could stand in for the
+  daily reserve, captured once a week. Not built.
+
+5.3 Withdrawals
+- Real: the bank moves money from savings back to the current account.
+  Optional 48h "cool-off" friction in the app before big withdrawals.
+- Demo: recorded, no payout.
+
+5.4 Parents (designed, partly built in the backend)
+- A parent can match the student's saving (e.g. 1:1 up to 150 lei a
+  month). Real: the parent sends a RoPay or bank transfer straight to the
+  student's IBAN; Kip records the pledge and checks it through AIS.
+
+=====================================================================
+6. BUSINESS MODEL
+=====================================================================
+Kip never takes money from the student's savings and charges no fee on
+deposits. Revenue:
+1. Club promotions: partner companies (travel, tech, driving schools,
+   furniture...) pay an affiliate commission per claimed code or
+   purchase. Clubs are segmented by goal, so offers are relevant.
+2. Introducer fee from the bank per savings account opened through Kip.
+   Students are a young segment banks want, and we bring them already
+   saving.
+3. Later: Kip Plus, a small subscription (more club slots, extra
+   freezes, deeper insights).
+
+=====================================================================
+7. WHICH BANK: ANY BANK, TWO RECOMMENDED PARTNERS
+=====================================================================
+The student keeps the bank they already use. Kip is not tied to one
+bank:
+- ANY Romanian bank with open banking (PSD2): Banca Transilvania, BCR,
+  ING, Raiffeisen, CEC, UniCredit, Libra, Revolut and others. Kip reads
+  the savings balance (AIS) and the money moves through a standing
+  order the student sets once, or a transfer they approve (PIS). Works
+  everywhere, no deal needed.
+- RECOMMENDED PARTNERS: Libra Internet Bank and Raiffeisen Bank. With a
+  partner deal we get the full experience: the daily reserve and the
+  automatic weekly sweep (section 5.2), one savings sub-account per
+  goal, and opening the account from inside Kip in minutes. Plain open
+  banking can't place holds or create sub-accounts, so with other banks
+  saving is a simple weekly transfer.
+- In the app: "Which bank do you use?" Pick any. Kip suggests Libra or
+  Raiffeisen for the full Kip experience, never forces it.
+
+Why Libra Internet Bank as the first partner:
+- Already works with fintechs on RON: gives RON IBANs to Wise, Paysera,
+  ZEN, iCard, TransferGo, Ebury; has a dedicated fintech desk
+  (librabank.ro/fintech).
+- Has PSD2 APIs for reading balances and starting transfers.
+- Fast online onboarding (under 5 minutes, ID checked in real time),
+  which suits students.
+- Honest status: nothing signed, no contact yet. Libra's standard
+  fintech product is built for licensed firms, so Kip needs a custom
+  deal: the pitch proposes a pilot with 100 students.
+- Backup: Raiffeisen Bank Romania. Under-25 zero fees, 8-minute digital
+  onboarding, and it presents this hackathon (mentors on site), so it is
+  also worth naming in the pitch. It has no fintech partnership
+  programme yet.
+
+=====================================================================
+8. LEGAL AND REGULATORY (SHORT)
+=====================================================================
+- Holding client money would make Kip a credit institution, payment
+  institution (Law 209/2019, PSD2) or e-money institution
+  (Law 210/2019): a BNR licence and EUR 125k to 350k+ capital. Kip avoids
+  this by NEVER holding money: introducer and software provider; in
+  phase 2, an outsourced tech provider to the bank under the banking
+  outsourcing rules.
+- Payment initiation / account information needs a licensed AISP/PISP
+  or the bank's own contract.
+- KYC/AML: done by the bank.
+- GDPR: friends see no amounts; contact matching stores no numbers of
+  non-users; amounts and club counts stay private.
+- Users must be 18+ (minors excluded in this version).
+
+=====================================================================
+9. TECHNOLOGY (FOR THE TECH SLIDE)
+=====================================================================
+- App: React + TypeScript PWA (installable), phone-first, on Vercel.
+- Backend: Supabase (Postgres with row-level security on every table,
+  server-side functions, scheduled jobs).
+- Payments: Stripe sandbox (Checkout, recurring collections, webhooks
+  that confirm money exactly once, test clocks).
+- Server rules: friends, freezes, streaks, clubs and money limits are
+  checked on the server, not just in the app.
+- Tests: about 100 app tests and 85+ backend tests, 170+ database
+  security tests (one user can't see or change another's data; one
+  Stripe event can never be counted twice), Playwright end-to-end tests
+  on phone sizes, an accessibility audit, CI on GitHub Actions.
+- Docs in the repo: architecture, assumptions and limits, testing,
+  test accounts, clubs and social schemas.
+
+=====================================================================
+10. TEST ACCOUNTS (LIVE, CODE 123456 FOR ALL)
+=====================================================================
+Alex   0700000100  main account: 27-day streak, clubs Erasmus + Travel
+                   (3rd slot in 3 days), friends with Mihai and Ioana,
+                   a pending request from Ana, has a 1-day Freeze
+Ana    0700000101  "In danger" (missed yesterday, no freeze), clubs
+                   paused, comeback 13/14
+Mihai  0700000102  22 days, has a 1-day Freeze, one free club slot
+Ioana  0700000103  29 days
+Radu   0700000104  7 days, Tech club lost ("7 more days to rejoin"),
+                   has a real Stripe test plan running
+Elena  0700000105  53 days, 3 clubs, a weekly plan (199 lei every
+                   Monday, first on 2 Nov) started through the card-only
+                   Checkout
+No payment plan yet (good for showing the first "Move money into your
+savings" in the video): Alex, Mihai, Ioana.
+Colony "Foculetul": Alex, Ana, Mihai, Ioana. Shared goal "Vama Veche",
+2,000 lei, at 46%.
+Reset everything to this starting state (Supabase SQL, service role):
+  select public.social_demo_reset();
+Stripe test card: 4242 4242 4242 4242, any future date, any CVC.
+"Try with demo data" on Welcome = an offline demo, no account needed.
+
+=====================================================================
+11. SUGGESTED 3-MINUTE DEMO (VIDEO)
+=====================================================================
+0:00 Problem: students want to save but don't stick with it.
+0:15 Welcome video, onboarding in a few taps, no card asked.
+0:40 Home as Alex: streak with fire, goals, clubs row.
+1:00 Save money: pick the weekly day and amount, Stripe Checkout
+     (test card), the money appears by itself, Kip celebrates.
+1:30 Friends: Ana is "In danger", Alex gives her his freeze; switch to
+     Ana's phone: "Alex gave you his freeze", she saves, saved.
+2:00 Clubs: Alex claims a Travel promotion; Ana's paused clubs and the
+     comeback counter.
+2:20 Shared goal "Vama Veche": each pays their own share, the % rises.
+2:35 Where the money really goes: a savings account at their own bank (Libra or Raiffeisen recommended) in the
+     student's name, weekly reserve and sweep, Kip never holds money.
+2:50 Business model + tech in one slide. End on Kip.
+
+=====================================================================
+12. HONEST LIMITATIONS
+=====================================================================
+- No bank partner signed yet (Libra and Raiffeisen are targets; any PSD2 bank works for basic saving); payments are Stripe sandbox (test money).
+- In the demo the money sits in Kip's Stripe test balance. That's only
+  OK because it's test money; the real product uses the student's own
+  bank account.
+- The daily reserve + weekly sweep is designed, not built.
+- SMS codes are fixed (123456) in the sandbox.
+- Promotions use fictional companies.
+- The 1-week Freeze, colony challenges, leaderboards and club sessions
+  are designed but not live.
+- Shared goals: paying in by real card is wired but only tested through
+  the test-account path; after leaving a shared goal, the money returned
+  can't yet be withdrawn from the app (the server supports it).
+- "Which bank do you use?" is described here, not built in the app.

@@ -1,0 +1,498 @@
+/* The home tour (components/hub/Tour.tsx). Loaded last: it replaces the old card tour in alive.css.
+   The page dims and softens around a spotlight with a gold ring; Kip stands next to it in a full-body
+   pose and talks through a speech bubble; a lesson-style progress bar sits at the top. Everything is
+   a flat sticker: white faces, navy outlines, a hard lip underneath. Gold only on the main button and
+   the spotlight, sea blue for progress and the demonstrations' marks, orange stays with the streak. */
+
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  touch-action: none;
+  overscroll-behavior: contain;
+  font-family: var(--font);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* the dimmed, slightly blurred page, with the spotlight cut out (clip-path set from Tour.tsx) */
+.tour__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 17, 36, 0.56);
+  -webkit-backdrop-filter: blur(3px) saturate(0.85);
+  backdrop-filter: blur(3px) saturate(0.85);
+}
+
+/* the spotlight's ring: a gold line, a soft glow, and a sonar ring that keeps going out */
+.tour .tour__hole {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 0 0 8px rgba(255, 176, 32, 0.2),
+    0 0 34px 6px rgba(255, 176, 32, 0.32);
+  pointer-events: none;
+}
+.tour .tour__hole::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 2px solid var(--gold);
+  border-radius: inherit;
+  animation: tour-sonar 2.4s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+}
+@keyframes tour-sonar {
+  0% {
+    inset: -3px;
+    opacity: 0.85;
+  }
+  75%,
+  100% {
+    inset: -18px;
+    opacity: 0;
+  }
+}
+
+/* ---------- progress, lesson style ---------- */
+.tour__hud {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  translate: -50% 0;
+  box-sizing: border-box;
+  width: min(520px, calc(100% - 24px));
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: 0 4px 0 rgba(3, 8, 20, 0.45);
+}
+.tour__segs {
+  flex: 1;
+  display: flex;
+  gap: 5px;
+  min-width: 0;
+}
+.tour__seg {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.tour__seg i {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--struct);
+  transform-origin: left center;
+}
+/* the little highlight along the top of a filled segment */
+.tour__seg i::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+}
+.tour .tour__skip {
+  flex: none;
+  margin-right: -10px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #3d4659;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tour .tour__skip:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.tour .tour__skip:focus-visible {
+  outline: 2px solid var(--struct);
+  outline-offset: 1px;
+}
+
+/* ---------- Kip and his bubble ---------- */
+.tour__group {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+}
+.tour__group--side {
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 6px;
+}
+.tour__group--side[data-kip='end'] {
+  flex-direction: row-reverse;
+}
+/* peek: Kip hangs on to the top edge of the bubble */
+.tour__group--peek {
+  flex-direction: column;
+  align-items: flex-end;
+}
+.tour__group--peek[data-kip='start'] {
+  align-items: flex-start;
+}
+.tour__group--peek .tour__kipwrap {
+  z-index: 2;
+  margin: 0 20px -14px;
+}
+.tour__kipwrap {
+  position: relative;
+  flex: none;
+}
+.tour .tour__kip {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  background: none;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(3, 8, 20, 0.5));
+  animation: tour-bob 3.2s ease-in-out infinite;
+  user-select: none;
+}
+.tour__kip[data-flip] {
+  transform: scaleX(-1);
+}
+@keyframes tour-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -3px;
+  }
+}
+
+.tour__bubble {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  padding: 15px 16px 14px;
+  border: 2px solid var(--text);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 5px 0 var(--text);
+  transform-origin: left bottom;
+}
+.tour__bubble[data-tail='end'] {
+  transform-origin: right bottom;
+}
+.tour__group--peek .tour__bubble {
+  transform-origin: center top;
+}
+/* the tail, pointing at Kip at about the height of his face */
+.tour__bubble[data-tail='start']::before,
+.tour__bubble[data-tail='end']::before {
+  content: '';
+  position: absolute;
+  bottom: clamp(18px, calc(var(--kip-h, 96px) * 0.52), calc(100% - 40px));
+  width: 15px;
+  height: 15px;
+  background: #ffffff;
+  transform: rotate(45deg);
+}
+.tour__bubble[data-tail='start']::before {
+  left: -9.5px;
+  border-left: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
+}
+.tour__bubble[data-tail='end']::before {
+  right: -9.5px;
+  border-right: 2px solid var(--text);
+  border-top: 2px solid var(--text);
+}
+
+.tour__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-stretch: 112%;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.tour__brush {
+  font-family: var(--font-brush);
+  font-weight: 400;
+  font-stretch: normal;
+  letter-spacing: 0.01em;
+  color: var(--struct);
+}
+.tour__line {
+  margin: 6px 0 14px;
+  font-size: 0.96875rem;
+  font-weight: 500;
+  line-height: 1.38;
+  color: #3d4659;
+  text-wrap: pretty;
+}
+.tour__foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tour__back {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--line-strong);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 3px 0 var(--line-strong);
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+.tour__back:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--line-strong);
+}
+/* the gold tactile button: a solid face on a darker lip it presses into */
+.tour__next {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  margin-left: auto;
+  padding: 0 18px 0 20px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--gold);
+  color: var(--text);
+  box-shadow: 0 4px 0 var(--gold-lip);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 80ms ease, box-shadow 80ms ease, background-color 120ms;
+}
+.tour__next:hover {
+  background: #ffbd45;
+}
+.tour__next:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--gold-lip);
+}
+.tour__next:focus-visible,
+.tour__back:focus-visible {
+  outline: 3px solid var(--struct);
+  outline-offset: 3px;
+}
+
+/* ---------- the demonstrations, drawn over the real element ---------- */
+.tour__stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+.tour__stage > * {
+  position: absolute;
+}
+
+/* the ghost finger: white, outlined in navy, its tip exactly on the point it presses */
+.tour__tap {
+  width: 0;
+  height: 0;
+}
+.tour__finger {
+  position: absolute;
+  left: -19px;
+  top: -4px;
+  display: block;
+  color: #fff;
+  transform-origin: 19px 4px;
+  filter: drop-shadow(1.5px 0 0 #0e1a33) drop-shadow(-1.5px 0 0 #0e1a33) drop-shadow(0 1.5px 0 #0e1a33) drop-shadow(0 -1.5px 0 #0e1a33)
+    drop-shadow(0 6px 6px rgba(3, 8, 20, 0.35));
+}
+.tour__finger svg {
+  display: block;
+  transform: rotate(-12deg);
+  transform-origin: 19px 4px;
+}
+.tour__ripple {
+  position: absolute;
+  left: -22px;
+  top: -22px;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  background: rgba(255, 176, 32, 0.22);
+}
+
+.tour__pop {
+  position: absolute;
+  display: block;
+  translate: -50% -50%;
+}
+.tour__spin {
+  display: block;
+}
+.tour__chip {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 2px solid var(--text);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 3px 0 var(--text);
+}
+.tour__chip--blue {
+  background: var(--struct);
+  color: #fff;
+}
+
+/* a flat gold coin */
+.tour__coin {
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  box-sizing: border-box;
+  border: 2px solid var(--gold-lip);
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: inset 0 0 0 2px var(--gold-light);
+}
+.tour__coin--big {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-width: 2.5px;
+}
+.tour__flame img {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+.tour__spark {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--gold-light);
+}
+.tour__glow {
+  translate: -50% -50%;
+  box-sizing: border-box;
+  border: 3px solid #fff;
+  border-radius: 50%;
+}
+.tour__tick {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  color: #f2830d;
+  box-shadow: 0 2px 0 rgba(160, 60, 0, 0.3);
+}
+
+/* the sub-highlight that hops between the ring and the two figures */
+.tour__mark {
+  box-sizing: border-box;
+  border: 2.5px solid var(--struct);
+  background: rgba(31, 93, 246, 0.07);
+  box-shadow: 0 0 0 4px rgba(31, 93, 246, 0.14);
+}
+.tour__ping {
+  box-sizing: border-box;
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+}
+
+.tour__clock {
+  overflow: visible;
+}
+.tour__clock-track {
+  fill: none;
+  stroke: rgba(31, 93, 246, 0.16);
+  stroke-width: 3;
+}
+.tour__clock-hand {
+  fill: none;
+  stroke: var(--struct);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.tour__z {
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  color: var(--struct);
+}
+
+/* the four sections fanning out of Kip's button */
+.tour__slice svg {
+  display: block;
+  overflow: visible;
+}
+.tour__slice path {
+  fill: #ffffff;
+  stroke: var(--text);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.tour__slice.is-here path {
+  fill: var(--struct);
+}
+.tour__sliceicon {
+  position: absolute;
+  display: grid;
+  translate: -50% -50%;
+  color: var(--text);
+}
+.tour__slice.is-here .tour__sliceicon {
+  color: #fff;
+}
+
+@media (max-width: 719px) {
+  .tour__title {
+    font-size: 1.1875rem;
+  }
+  .tour__line {
+    font-size: 0.9375rem;
+  }
+}
+
+/* still: no sonar, no bobbing (the demonstrations show their end state instead of looping) */
+.tour--still .tour__hole::after,
+.tour--still .tour__kip {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour .tour__hole::after,
+  .tour__kip {
+    animation: none;
+  }
+}

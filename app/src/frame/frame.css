@@ -1,0 +1,199 @@
+/* The laptop phone frame (src/frame/PhoneFrame.tsx). Everything is scoped to .kipframe-page (the
+   outer page drawing the phone) or .kip-embedded (the app inside it), so on a phone none of it applies. */
+
+/* ---------- the app inside the phone ---------- */
+/* phones draw scrollbars over the content; a desktop one would take 15px of the 390 */
+.kip-embedded,
+.kip-embedded * {
+  scrollbar-width: none;
+}
+.kip-embedded ::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- the page around it ---------- */
+html.kipframe-page,
+html.kipframe-page body {
+  height: 100%;
+  overflow: hidden;
+  scrollbar-gutter: auto;
+}
+html.kipframe-page body {
+  /* Kip's light blue, with the faintest wash of its blue and its amber */
+  background:
+    radial-gradient(64vmax 52vmax at 8% -6%, rgb(31 93 246 / 0.11), transparent 70%),
+    radial-gradient(56vmax 46vmax at 104% 108%, rgb(255 176 32 / 0.13), transparent 70%),
+    #eaf4ff;
+}
+
+.kipframe {
+  position: fixed;
+  inset: 0;
+  user-select: none;
+}
+
+.kipframe__mark {
+  position: absolute;
+  top: 26px;
+  left: 32px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  font-stretch: 115%;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* holds the phone at its scaled size, in whole pixels */
+.kipframe__stage {
+  position: absolute;
+}
+
+/* the metal band */
+.kipframe__device {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  padding: 3px;
+  border-radius: 69px;
+  transform-origin: 0 0;
+  background: linear-gradient(145deg, #646b78 0%, #2b3039 14%, #171a20 46%, #22262e 82%, #565d6a 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.09),
+    0 1px 2px rgb(14 26 51 / 0.12),
+    0 30px 60px -18px rgb(14 26 51 / 0.32),
+    0 70px 120px -40px rgb(31 93 246 / 0.28);
+}
+
+/* side keys: action and volume on the left, power on the right */
+.kipframe__key {
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(90deg, #3c424d, #20242b);
+}
+.kipframe__key--action,
+.kipframe__key--up,
+.kipframe__key--down {
+  left: -2.5px;
+  border-radius: 2px 0 0 2px;
+}
+.kipframe__key--action {
+  top: 172px;
+  height: 30px;
+}
+.kipframe__key--up {
+  top: 232px;
+  height: 58px;
+}
+.kipframe__key--down {
+  top: 304px;
+  height: 58px;
+}
+.kipframe__key--power {
+  right: -2.5px;
+  top: 262px;
+  height: 92px;
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(270deg, #3c424d, #20242b);
+}
+
+/* the black glass around the screen */
+.kipframe__glass {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  border-radius: 66px;
+  background: #050609;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.05);
+}
+
+.kipframe__screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 55px;
+  background: var(--kipframe-bar);
+  /* keeps the rounded clip on the iframe in Safari too */
+  isolation: isolate;
+  transition: background-color 180ms ease;
+}
+
+.kipframe__status {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 126px 1fr;
+  align-items: center;
+  padding-top: 3px;
+  color: var(--ink);
+  transition: color 180ms ease;
+}
+.kipframe__status--dark {
+  color: #fff;
+}
+/* Reaches 2px over the top of the app: scaled, the app's first row of pixels comes out lighter
+   (each of its layers is antialiased on its own there), and that row is the bar's colour anyway.
+   It starts inside the bar, so none of its own edges lands on the seam. */
+.kipframe__status::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -2px;
+  height: 6px;
+  background: var(--kipframe-bar);
+  transition: background-color 180ms ease;
+}
+.kipframe__time {
+  justify-self: center;
+  padding-left: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', var(--font);
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.kipframe__icons {
+  grid-column: 3;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 8px;
+}
+.kipframe__icons svg {
+  display: block;
+  fill: currentColor;
+}
+
+.kipframe__island {
+  position: absolute;
+  z-index: 2;
+  top: 11px;
+  left: 50%;
+  width: 122px;
+  height: 35px;
+  margin-left: -61px;
+  border-radius: 18px;
+  background: #000;
+}
+
+.kipframe__underlay {
+  position: absolute;
+  inset: 0;
+  background: #050609;
+}
+
+/* transparent: an opaque iframe background would show along its scaled edges */
+.kipframe__app {
+  position: relative;
+  display: block;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kipframe__screen,
+  .kipframe__status,
+  .kipframe__status::after {
+    transition: none;
+  }
+}

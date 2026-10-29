@@ -1,0 +1,81 @@
+/* Clubs and promotions: the app's glass cards, goal colours on the tiles, amber for actions.
+   Progress here is always the calm green/blue bar, never red. */
+.clubs { gap: var(--s-4); }
+.clubs__lede { color: var(--text-2); font-size: var(--fs-sm); margin-top: -8px; }
+.clubs__h2 { font-size: var(--fs-lg); font-weight: 800; margin: var(--s-2) 0 var(--s-2); }
+.clubs__h2row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.club-stack { display: flex; flex-direction: column; gap: var(--s-3); }
+.club-note { color: var(--text-2); font-size: var(--fs-xs); }
+.club-kip { object-fit: contain; flex: none; }
+
+.club-tile { display: inline-grid; place-items: center; border-radius: 14px; flex: none; }
+
+.club-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-2); }
+.club-row { padding: 12px 14px; border-radius: 22px; }
+.club-row__link { display: flex; align-items: center; gap: 12px; color: inherit; text-decoration: none; }
+a.club-row { display: flex; align-items: center; gap: 12px; }
+.club-row__name { font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.club-row__sub { color: var(--text-2); font-size: var(--fs-xs); margin-top: 2px; }
+.club-row__foot { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.club-row__foot .btn { align-self: flex-start; }
+
+.club-pill { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: var(--r-pill); }
+.club-pill--active { background: var(--progress-soft); color: var(--progress); }
+.club-pill--paused { background: var(--struct-soft); color: var(--struct-ink); }
+.club-pill--lost { background: var(--surface-3); color: var(--text-2); }
+
+.club-card { padding: 16px; border-radius: 24px; display: flex; flex-direction: column; gap: 12px; }
+.club-card__row { display: flex; gap: 12px; align-items: center; }
+.club-card h2 { font-size: var(--fs-lg); font-weight: 800; line-height: var(--lh-tight); }
+.club-card p { font-size: var(--fs-sm); color: var(--ink-2); margin-top: 4px; }
+.club-card .btn--ghost { align-self: flex-start; }
+.club-card--moment { background: linear-gradient(140deg, var(--reward-bg), rgba(255, 255, 255, 0.7)); }
+.club-comeback { display: flex; flex-direction: column; gap: 6px; }
+.club-comeback__label { font-size: var(--fs-sm); }
+.club-paused-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.club-paused-list a { display: flex; align-items: center; gap: 8px; color: inherit; font-weight: 600; font-size: var(--fs-sm); text-decoration: none; }
+.club-paused-list .club-note { margin-left: auto; }
+.club-suggest { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 16px; background: rgba(255, 255, 255, 0.75); font-size: var(--fs-sm); font-weight: 600; }
+
+.club-hero { padding: 20px 16px; border-radius: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.club-hero h1 { font-size: var(--fs-2xl); font-weight: 800; }
+.club-hero p { color: var(--ink-2); font-size: var(--fs-sm); max-width: 32ch; }
+.club-hero__facts { display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-sm); font-weight: 600; }
+.club-hero__facts span { display: inline-flex; align-items: center; gap: 6px; justify-content: center; }
+.club-hero__action { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.club-hero__lock, .promo__lock { display: flex; align-items: center; gap: 8px; justify-content: center; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); color: var(--ink-2); font-size: var(--fs-sm); font-weight: 600; width: 100%; }
+
+.promo { padding: 14px; border-radius: 22px; display: flex; flex-direction: column; gap: 10px; }
+.promo__head { display: flex; gap: 12px; align-items: flex-start; }
+.promo__logo { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: var(--text); flex: none; }
+.promo__company { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: var(--fs-xs); color: var(--text-2); font-weight: 700; }
+.promo__title { font-weight: 700; margin-top: 2px; }
+.promo__club { font-size: var(--fs-xs); color: var(--struct-ink); font-weight: 600; }
+.promo__new { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: var(--r-pill); background: var(--accent); color: var(--text); }
+.promo__discount { flex: none; font-weight: 800; font-size: var(--fs-sm); padding: 4px 10px; border-radius: 12px; background: var(--reward-bg); color: var(--reward-text); max-width: 9.5em; text-align: center; }
+.promo__desc { font-size: var(--fs-sm); color: var(--ink-2); }
+.promo__meta { display: grid; gap: 4px; font-size: var(--fs-xs); margin: 0; }
+.promo__meta div { display: flex; gap: 8px; }
+.promo__meta dt { color: var(--text-2); min-width: 6.5em; }
+.promo__meta dd { margin: 0; color: var(--ink-2); }
+.promo__code { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-radius: 14px; background: var(--progress-soft); font-size: var(--fs-sm); }
+.promo__code strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0.04em; margin-left: 4px; }
+
+.club-home { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 20px; color: inherit; text-decoration: none; font-weight: 700; font-size: var(--fs-sm); margin-top: var(--s-2); }
+.clubs__title { font-size: var(--fs-xl); font-weight: 800; }
+
+/* club rows: a clear name, a "new" badge instead of a third line, numbers that read at a glance */
+.club-row__name { font-size: 1.0625rem; font-weight: 800; letter-spacing: -0.01em; }
+.club-row__badge {
+  display: inline-flex; align-items: center; gap: 4px; flex: none;
+  padding: 4px 9px; border-radius: 999px;
+  background: var(--reward-bg); color: var(--reward-text);
+  font-size: 0.75rem; font-weight: 800; white-space: nowrap;
+}
+.club-row__foot--progress { gap: 8px; }
+.club-progress { display: flex; align-items: center; gap: 10px; }
+.club-progress .progress { flex: 1; }
+.club-progress__num { font-weight: 800; font-size: 0.875rem; font-variant-numeric: tabular-nums; color: var(--text); }
+.club-progress__num small { font-weight: 600; color: var(--text-2); font-size: 0.75rem; }
+.club-row__left { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem; color: var(--text-2); }
+.club-row__left b { color: var(--struct); font-weight: 800; }

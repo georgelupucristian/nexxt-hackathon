@@ -1,0 +1,47 @@
+# Kip's money backend: type-check the Edge Functions, run the Deno unit tests, then run the
+# database tests against a throwaway Postgres built from supabase/migrations.
+# Needs no secrets: nothing here talks to Stripe or to the live Supabase project.
+name: backend
+
+on:
+  push:
+    paths: ['supabase/**', '.github/workflows/backend.yml']
+  pull_request:
+    paths: ['supabase/**', '.github/workflows/backend.yml']
+  workflow_dispatch:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.6
+
+      - name: Type-check every Edge Function
+        run: deno check supabase/functions/*/index.ts
+
+      - name: Unit tests (plan maths, return URLs, withdraw limit, webhook mapping and order)
+        run: deno test --allow-env --allow-read supabase/functions
+
+      # The database tests need the real Supabase Postgres (auth schema, roles, pg_cron), so CI
+      # starts just the database container. It applies every migration and seed.sql from scratch,
+      # which also proves the migrations still build a working schema.
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.107.0
+
+      - name: Start Postgres with the migrations
+        run: supabase db start
+
+      - name: Database tests (RLS, grants, Stripe idempotency, webhook claims, ledger consistency)
+        run: |
+          command -v psql >/dev/null || { sudo apt-get update && sudo apt-get install -y postgresql-client; }
+          supabase/tests/run.sh
+
+      - name: Stop Postgres
+        if: always()
+        run: supabase stop --no-backup

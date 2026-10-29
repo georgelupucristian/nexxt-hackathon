@@ -1,0 +1,151 @@
+/* Kip design tokens: one system for every screen.
+   The palette is the spec's eight tokens (Friends, Colonies & Freezes), and every older token below
+   points at one of them, so swapping a value here repaints the whole app:
+     --bg        #EAF4FF  the light blue page
+     --text      #0F2540  navy text, also the text on gold
+     --text-2    #5E6A79  secondary text (4.95:1 on the page, 5.5:1 on white)
+     --struct    #1F5FD6  structure: links, selected states, focus, the onboarding bar
+     --progress  #0B7A57  progress, and only progress (bars, the goal gauge, "a pus azi")
+     --accent    #FFB020  gold: the one main money action ("Depune"), navy text on it,
+                          #B86E00 bottom edge
+     --reward-bg #FFF4D6  / --reward-text #7A4B00: freezes, streak rewards, milestones
+   Orange belongs to the streak flame only. Red only for real errors, never on money or progress.
+   Each goal adds its own soft colour (src/lib/goalLook.ts), used for that goal and nothing else. */
+:root {
+  /* ---- the spec's palette ---- */
+  --bg: #eaf4ff;
+  --text: #0f2540; /* 13.9:1 on the page, 15.5:1 on white, 8.5:1 on gold */
+  --text-2: #5e6a79; /* 4.95:1 on the page, 5.5:1 on white, 5.2:1 on surface-2, 4.5:1 on surface-3 */
+  --struct: #1f5fd6; /* 5.7:1 on white, 5.2:1 on the page; white on it 5.7:1 */
+  --progress: #0b7a57; /* 5.3:1 on white, 4.8:1 on the page, 4.6:1 on progress-soft; white on it 5.3:1 */
+  --accent: #ffb020; /* never text: navy on it */
+  --accent-edge: #b86e00;
+  --reward-bg: #fff4d6;
+  --reward-text: #7a4b00; /* 6.8:1 on --reward-bg, 6.7:1 on the page */
+
+  /* neutrals: a light blue page, white cards, quiet cool blues between them */
+  --surface: #ffffff;
+  --surface-2: #f3f8ff;
+  --surface-3: #e0ebfc; /* a hair lighter than before so --text-2 on it stays at 4.5:1 */
+  --line: #d6e4f7;
+  --line-strong: #b9cde9;
+  --ink: var(--text);
+  --ink-2: #33415c; /* a step between text and text-2: 9.2:1 on the page */
+  --ink-3: var(--text-2);
+  --on-ink: #ffffff;
+
+  /* structure (was --accent before the gold took that name): the blue family */
+  --struct-hover: #1747c4;
+  --struct-soft: #dfe9ff;
+  --struct-ink: #1747c4; /* text in the structure colour: 6.9:1 on the page, 6.3:1 on struct-soft */
+  --struct-deep: var(--struct-hover);
+  --struct-bright: #8fb0ff;
+  --progress-soft: #dcf3ea;
+
+  /* gold: the main action and money highlights, navy text on it */
+  --gold: var(--accent);
+  --gold-top: #ffc552;
+  --gold-lip: var(--accent-edge);
+  --gold-soft: var(--reward-bg);
+  --gold-light: #ffd27a;
+
+  /* status */
+  --warn: #8a5a00;
+  --warn-soft: #fdf3dc;
+  --danger: #b3261e;
+  --danger-soft: #fbe7e4;
+  /* information uses the structure family instead of a second, almost-the-same blue */
+  --info: var(--struct-ink);
+  --info-soft: var(--struct-soft);
+  --demo: var(--struct-ink); /* simulated data reads as "information", never as money */
+  --demo-soft: var(--struct-soft);
+  --focus: var(--struct);
+
+  /* the streak flame, and nothing else */
+  --flame: #f2830d;
+  --flame-deep: #d9620b;
+
+  /* legacy section tints now all resolve to neutrals: sections are places, not colours */
+  --tint-today: var(--surface-2);
+  --tint-goals: var(--surface-2);
+  --tint-activity: var(--surface-2);
+  --tint-profile: var(--surface-2);
+  --tint-today-ink: var(--ink);
+  --tint-goals-ink: var(--ink);
+  --tint-activity-ink: var(--ink);
+  --tint-profile-ink: var(--ink);
+
+  /* One heavy grotesk for everything (Archivo: black weight for headings and money, regular for
+     reading), and one brush face used for a single word at a time, never for sentences. */
+  --font: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-brush: 'Knewave', 'Archivo', cursive;
+  --fs-xs: 0.8125rem; /* 13: captions and labels, nothing smaller */
+  --fs-sm: 0.875rem; /* 14: secondary text */
+  --fs-md: 0.9375rem; /* 15: body */
+  --fs-lg: 1.0625rem; /* 17: card titles */
+  --fs-xl: 1.375rem; /* 22: section titles */
+  --fs-2xl: 1.75rem; /* 28: page titles */
+  --fs-3xl: 2.25rem; /* 36: key amounts */
+  --fs-hero: 2.75rem;
+  --lh-tight: 1.15;
+  --lh: 1.5;
+
+  /* space: 4pt grid */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --gutter: 20px;
+
+  /* radius scale: controls 10, inputs/buttons 12, cards 16, pills only for status */
+  --r-sm: 10px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+  --border: 1px solid var(--line);
+
+  /* elevation: cards are flat; only things that float above the page cast a shadow */
+  --shadow-float: 0 10px 30px rgba(14, 26, 51, 0.14), 0 2px 6px rgba(14, 26, 51, 0.06);
+  --shadow-sheet: 0 -8px 32px rgba(14, 26, 51, 0.14);
+  --shadow-pop: var(--shadow-float);
+
+  /* layout */
+  --content: 560px;
+  --content-wide: 1120px;
+  --tabbar-h: 0px;
+  --touch: 44px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+
+  /* motion */
+  --t-fast: 120ms;
+  --t-med: 200ms;
+  --t-slow: 320ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+:root[data-large-text='true'] {
+  font-size: 112.5%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-med: 0ms;
+    --t-slow: 0ms;
+  }
+}
+:root[data-reduce-motion='true'] {
+  --t-fast: 0ms;
+  --t-med: 0ms;
+  --t-slow: 0ms;
+}

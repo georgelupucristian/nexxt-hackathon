@@ -1,0 +1,343 @@
+/* The celebration after a saving (src/components/mascot/Celebration.tsx): a full screen in the
+   spirit of Duolingo's lesson-complete screen. The root keeps the old `.party` class (the streak
+   moment and the dial look for it), so every rule here is scoped under `.party.celebrate` to win
+   over the older overlay styles in alive.css whatever the import order. */
+
+.party.celebrate {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-4);
+  padding: max(20px, env(safe-area-inset-top)) var(--gutter) calc(20px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* the page, with a soft patch of sea light behind Kip */
+  background:
+    radial-gradient(80vmax 46vmax at 50% 30%, var(--struct-soft) 0%, rgba(223, 233, 255, 0) 70%),
+    var(--bg);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  cursor: default;
+  text-align: center;
+}
+
+.party.celebrate .celebrate__stage {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+.party.celebrate .celebrate__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* ---------- Kip and his line ---------- */
+.party.celebrate .celebrate__bubble {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 4px;
+  max-width: 28ch;
+  padding: 10px 16px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  line-height: 1.3;
+  text-wrap: balance;
+  transform-origin: bottom center;
+  box-shadow: 0 6px 18px rgba(14, 26, 51, 0.08);
+}
+.party.celebrate .celebrate__bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 13px;
+  height: 13px;
+  margin-left: -6.5px;
+  background: var(--surface);
+  border-right: 2px solid var(--line);
+  border-bottom: 2px solid var(--line);
+  transform: rotate(45deg);
+}
+
+.party.celebrate .celebrate__hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 250px;
+  height: 222px;
+}
+.party.celebrate .celebrate__hero .seal {
+  position: relative;
+  z-index: 1;
+}
+.party.celebrate .celebrate__glow {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 230px;
+  height: 230px;
+  margin: -115px 0 0 -115px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(143, 176, 255, 0.55) 0%, rgba(143, 176, 255, 0.18) 48%, rgba(143, 176, 255, 0) 70%);
+  pointer-events: none;
+}
+
+/* four-point sparkles that twinkle a few times around Kip, then rest */
+.party.celebrate .celebrate__spark {
+  position: absolute;
+  z-index: 2;
+  background: currentColor;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  opacity: 0;
+  transform: scale(0);
+  animation: celebrate-twinkle 1.6s cubic-bezier(0.34, 1.4, 0.64, 1) 4 both;
+  pointer-events: none;
+}
+@keyframes celebrate-twinkle {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+  70% {
+    opacity: 0.85;
+    transform: scale(0.75) rotate(70deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(90deg);
+  }
+}
+
+/* ---------- headline ---------- */
+.party.celebrate .celebrate__title {
+  margin: var(--s-2) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 7.4vw, 2.25rem);
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--struct);
+  text-wrap: balance;
+}
+.party.celebrate .celebrate__sub {
+  margin: var(--s-2) 0 0;
+  max-width: 32ch;
+  color: var(--ink-2);
+  font-size: var(--fs-lg);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+
+/* ---------- stat tiles: a coloured header strip over a white body ---------- */
+.party.celebrate .celebrate__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin: var(--s-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.party.celebrate .celebrate__tile {
+  --tile: var(--struct);
+  --tile-ink: #fff;
+  --tile-deep: var(--struct);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 2px solid var(--tile);
+  border-radius: 16px;
+  background: var(--tile);
+  overflow: hidden;
+}
+.party.celebrate .celebrate__tile--streak {
+  --tile: var(--flame);
+  --tile-ink: var(--ink); /* navy on orange is 6.2:1; white would be 2.8:1 */
+  --tile-deep: var(--flame-deep);
+}
+.party.celebrate .celebrate__tile--goal {
+  /* --tile and --tile-deep come from the goal's look (goalLook.ts), set inline */
+  --tile-ink: var(--ink);
+}
+.party.celebrate .celebrate__tile-head {
+  padding: 5px 2px 4px;
+  color: var(--tile-ink);
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  /* Archivo's narrower cut keeps "TOTAL STRÂNS" on one line in a phone-width tile */
+  font-stretch: 74%;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.party.celebrate .celebrate__tile-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 52px;
+  padding: 10px 6px;
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--tile-deep);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 4.6vw, 1.3rem);
+  font-weight: 850;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.party.celebrate .celebrate__tile-body svg {
+  flex: none;
+}
+.party.celebrate .celebrate__tile-body small {
+  font-size: 0.7em;
+  font-weight: 750;
+}
+.party.celebrate .celebrate__flame {
+  color: var(--flame);
+}
+
+/* ---------- Continue: big, full width, with a darker lip it presses into ---------- */
+.party.celebrate .celebrate__go {
+  flex: none;
+  width: 100%;
+  max-width: 420px;
+  min-height: 54px;
+  margin-bottom: 4px; /* room for the lip */
+  border: 0;
+  border-radius: 16px;
+  background: var(--struct);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 #1238a0;
+  cursor: pointer;
+  transition:
+    transform 90ms var(--ease),
+    box-shadow 90ms var(--ease),
+    background var(--t-fast);
+}
+.party.celebrate .celebrate__go:hover {
+  background: var(--struct-hover);
+}
+.party.celebrate .celebrate__go:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #1238a0;
+}
+.party.celebrate .celebrate__go:focus-visible {
+  outline: 3px solid var(--struct-bright);
+  outline-offset: 3px;
+  border-radius: 16px;
+}
+
+/* short screens: a smaller Kip so Continue stays in reach */
+@media (max-height: 640px) {
+  .party.celebrate .celebrate__hero {
+    width: 200px;
+    height: 170px;
+  }
+  .party.celebrate .celebrate__hero .seal {
+    transform: scale(0.8);
+  }
+  .party.celebrate .celebrate__tiles {
+    margin-top: var(--s-4);
+  }
+}
+
+/* the narrowest phones (320 px): a little less margin, and the tiles drop their icons */
+@media (max-width: 340px) {
+  .party.celebrate {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .party.celebrate .celebrate__tile-head {
+    letter-spacing: 0;
+  }
+  .party.celebrate .celebrate__tile-body svg {
+    display: none;
+  }
+}
+
+/* reduced motion: sparkles sit still, the button doesn't move */
+@media (prefers-reduced-motion: reduce) {
+  .party.celebrate .celebrate__spark {
+    animation: none;
+    opacity: 0.9;
+    transform: none;
+  }
+  .party.celebrate .celebrate__go,
+  .party.celebrate .celebrate__go:active {
+    transform: none;
+    transition: none;
+  }
+}
+:root[data-reduce-motion='true'] .party.celebrate .celebrate__spark {
+  animation: none;
+  opacity: 0.9;
+  transform: none;
+}
+:root[data-reduce-motion='true'] .party.celebrate .celebrate__go,
+:root[data-reduce-motion='true'] .party.celebrate .celebrate__go:active {
+  transform: none;
+  transition: none;
+}
+
+/* ---------- Kip's colours: navy headline with the amount in gold, gold Continue ---------- */
+.party.celebrate .celebrate__title {
+  color: var(--ink);
+}
+.party.celebrate .celebrate__amount {
+  color: #a35f00;
+}
+.party.celebrate .celebrate__tile {
+  border-radius: 18px;
+  box-shadow: 0 3px 0 color-mix(in oklab, var(--tile) 70%, black 12%);
+}
+.party.celebrate .celebrate__tile--total {
+  --tile: var(--gold);
+  --tile-ink: var(--ink);
+  --tile-deep: var(--ink);
+}
+.party.celebrate .celebrate__tile-body {
+  border-radius: 15px;
+  color: var(--ink);
+}
+.party.celebrate .celebrate__go {
+  background: linear-gradient(180deg, var(--gold-top) 0%, var(--gold) 100%);
+  color: var(--ink);
+  box-shadow: 0 5px 0 var(--gold-lip), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+  border-radius: 20px;
+  font-weight: 900;
+}
+.party.celebrate .celebrate__go:hover {
+  background: linear-gradient(180deg, #ffcb5e 0%, #ffb52a 100%);
+}
+.party.celebrate .celebrate__go:active {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 var(--gold-lip);
+}

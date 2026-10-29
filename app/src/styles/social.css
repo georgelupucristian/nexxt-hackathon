@@ -1,0 +1,757 @@
+/* Friends, colonies, freezes and shared goals. Same cards, rows and buttons as the rest of Kip;
+   only the spec's tokens: navy text, --struct for structure, --progress for progress only, gold for
+   "Depune", the reward pair for freezes and "În pericol". No red, no amounts of anyone else. */
+
+.soc-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.soc-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.soc-streak img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+.soc-streak--big img {
+  width: 30px;
+  height: 30px;
+}
+.soc-streak--big b {
+  font-size: var(--fs-2xl);
+  line-height: 1;
+}
+
+.soc-today {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-2);
+}
+.soc-today--yes {
+  color: var(--progress);
+}
+.soc-today--frozen {
+  color: var(--struct-ink);
+}
+.soc-today img {
+  width: 14px;
+  height: 14px;
+}
+
+.soc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.soc-badge--danger {
+  background: var(--reward-bg);
+  color: var(--reward-text);
+  box-shadow: inset 0 0 0 1px #f3d89a;
+}
+.soc-badge--freeze {
+  background: var(--struct-soft);
+  color: var(--struct-ink);
+}
+.soc-badge img {
+  width: 14px;
+  height: 14px;
+}
+.soc-freezedot {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--struct-soft);
+}
+.soc-freezedot img {
+  width: 15px;
+  height: 15px;
+}
+
+.soc-demo {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+/* the viewer's own freeze, top of /prieteni and on Profile */
+.soc-freezechip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  background: var(--reward-bg);
+  color: var(--reward-text);
+}
+.soc-freezechip img {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.soc-freezechip__title {
+  font-weight: 800;
+  color: var(--text);
+}
+.soc-freezechip__title b {
+  font-size: var(--fs-lg);
+}
+.soc-freezechip__sub {
+  font-size: var(--fs-sm);
+  color: var(--reward-text);
+}
+
+/* ---------- tabs, search, sort ---------- */
+.soc-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--surface-3);
+}
+.soc-tabs button {
+  position: relative;
+  min-height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.soc-tabs button[aria-selected='true'] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 2px 0 var(--line-strong);
+}
+.soc-tabs__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: var(--struct);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.soc-search {
+  position: relative;
+}
+.soc-search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-2);
+  pointer-events: none;
+}
+.soc-search input {
+  padding-left: 42px;
+}
+.soc-sort {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.soc-sort span {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-2);
+  margin-right: 2px;
+}
+.soc-sort button {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+.soc-sort button[aria-pressed='true'] {
+  border-color: var(--struct);
+  background: var(--struct-soft);
+  color: var(--struct-ink);
+}
+
+/* ---------- rows ---------- */
+.soc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.soc-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+.soc-card > .soc-list > li + li,
+.soc-list--sheet > li + li {
+  border-top: 1px solid var(--line);
+}
+.soc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  /* hundreds of friends: rows off screen skip layout and paint */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 76px;
+}
+.soc-row--danger {
+  background: linear-gradient(90deg, var(--reward-bg), var(--surface) 70%);
+}
+.soc-row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+.soc-row__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.soc-row__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--text);
+}
+.soc-row__name > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.soc-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+.soc-row__ask {
+  margin-top: 4px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--reward-text);
+}
+.soc-row__more {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+/* in a danger row the button gets its own line under the name, so the row stays readable */
+.soc-row--danger {
+  flex-wrap: wrap;
+}
+.soc-row__give {
+  flex: 1 1 100%;
+  margin-left: 56px;
+}
+.soc-more {
+  padding: 14px;
+  text-align: center;
+}
+
+.soc-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.soc-pick .grow {
+  display: flex;
+  flex-direction: column;
+}
+.soc-pick[aria-current='true'] {
+  font-weight: 800;
+}
+.soc-pick[aria-current='true']::after {
+  content: 'acum';
+  font-size: var(--fs-xs);
+  color: var(--struct-ink);
+  font-weight: 700;
+}
+.soc-check {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  border: 2px solid var(--line-strong);
+  color: #fff;
+}
+.soc-check.is-on {
+  background: var(--struct);
+  border-color: var(--struct);
+}
+.soc-list--sheet {
+  margin: 8px 0 16px;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.soc-quietrow {
+  color: var(--text-2);
+}
+
+/* ---------- banners and cards ---------- */
+.soc-help {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: var(--r-xl);
+  background: var(--reward-bg);
+  color: var(--text);
+}
+.soc-help img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  flex: none;
+}
+.soc-help p {
+  font-size: var(--fs-sm);
+  color: var(--reward-text);
+}
+.soc-help h2 {
+  font-size: var(--fs-lg);
+}
+
+.soc-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  justify-content: space-between;
+}
+.soc-head h1 {
+  font-size: var(--fs-xl);
+}
+.soc-head__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.soc-actas-btn {
+  white-space: nowrap;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  border: 1.5px dashed var(--line-strong);
+  background: var(--surface);
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.soc-actas {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 8px;
+  border-radius: var(--r-pill);
+  background: var(--text);
+  color: #fff;
+  font-size: var(--fs-sm);
+}
+.soc-actas__back {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.soc-warning {
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  background: var(--reward-bg);
+  color: var(--reward-text);
+  font-weight: 700;
+}
+
+.soc-cheers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.soc-cheer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--line-strong);
+}
+.soc-cheer:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.soc-cheer__ice {
+  width: 18px;
+  height: 18px;
+}
+
+.soc-sheetnote {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+  text-align: center;
+}
+
+/* a person's profile, a colony's head */
+.soc-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: var(--s-2) 0;
+}
+.soc-hero h1 {
+  font-size: var(--fs-2xl);
+}
+.soc-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+.soc-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.soc-stat {
+  padding: 14px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.soc-stat b {
+  display: block;
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--text);
+}
+.soc-stat span {
+  font-size: var(--fs-sm);
+  color: var(--text-2);
+}
+
+/* the colony's streak, in the streak card's orange */
+.soc-colonyhero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #ff9a2e, #f26b0f);
+  color: #fff;
+}
+.soc-colonyhero img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  flex: none;
+}
+.soc-colonyhero b {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.soc-colonyhero p {
+  font-weight: 700;
+}
+.soc-colonyhero__risk {
+  margin-top: 4px;
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--reward-text);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+}
+
+/* progress bars: green, only for progress */
+.soc-bar {
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface-3);
+  overflow: hidden;
+}
+.soc-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--progress);
+  transition: width 700ms var(--ease-spring);
+}
+.soc-bar--lg {
+  height: 14px;
+}
+
+.soc-goalcard {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: inherit;
+}
+.soc-goalpic {
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--goal-fill, #8fd0f7);
+  color: var(--text);
+}
+.soc-goalpic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.soc-goalhero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.soc-goalhero__pct {
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--progress);
+  font-variant-numeric: tabular-nums;
+}
+.soc-moneyrow {
+  display: flex;
+  gap: 10px;
+}
+.soc-moneyrow > * {
+  flex: 1;
+}
+
+.soc-challenge {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.soc-reward {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  background: var(--reward-bg);
+  color: var(--reward-text);
+  font-weight: 700;
+}
+
+/* ---------- Kip's moments ---------- */
+.soc-moment {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(40px, env(safe-area-inset-top)) 20px calc(env(safe-area-inset-bottom) + 24px);
+  background: radial-gradient(120% 70% at 50% 30%, #fff 0%, var(--bg) 60%);
+}
+.soc-moment__inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.soc-moment__kip {
+  position: relative;
+}
+.soc-moment__badge {
+  position: absolute;
+  right: -18px;
+  top: -8px;
+  width: 72px;
+  height: 72px;
+  z-index: 2;
+  filter: drop-shadow(0 6px 10px rgba(15, 37, 64, 0.18));
+}
+.soc-moment__big {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--progress);
+}
+.soc-moment__title {
+  font-size: var(--fs-2xl);
+  line-height: 1.15;
+  color: var(--text);
+}
+.soc-moment__sub {
+  font-size: var(--fs-md);
+  color: var(--text-2);
+  max-width: 32ch;
+}
+.soc-moment__go {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* onboarding's contacts step: the people found */
+.soc-found {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-bottom-width: 4px;
+  background: #fff;
+}
+.soc-found .grow {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.soc-found__add {
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 0;
+  background: var(--accent);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  box-shadow: 0 3px 0 var(--accent-edge);
+  cursor: pointer;
+}
+.soc-found__add:disabled {
+  background: var(--struct-soft);
+  color: var(--struct-ink);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* the people icon on home: something waiting */
+.top7__icon {
+  position: relative;
+}
+.soc-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--accent-edge);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .soc-bar > i {
+    transition: none;
+  }
+}
+:root[data-reduce-motion='true'] .soc-bar > i {
+  transition: none;
+}

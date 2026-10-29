@@ -1,0 +1,9 @@
+node_modules
+dist
+*.tsbuildinfo
+
+# local env (Supabase URL + publishable key)
+.env.local
+.env*.local
+.vercel
+.env*
