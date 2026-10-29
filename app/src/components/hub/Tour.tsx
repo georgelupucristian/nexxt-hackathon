@@ -1,6 +1,7 @@
 import {
   ArrowCounterClockwise,
   ArrowRight,
+  BellRinging,
   CalendarCheck,
   CaretLeft,
   CreditCard,
@@ -11,8 +12,10 @@ import {
   Plus,
   Receipt,
   Shapes,
+  Question,
   Target,
   User,
+  UsersThree,
   type Icon,
 } from '@phosphor-icons/react';
 import { animate, motion, useMotionValue, useReducedMotion, useTransform, type MotionValue } from 'motion/react';
@@ -28,7 +31,7 @@ import { useData, useStore } from '../../data/store';
  * from the "?" in the header, waits for anything that covers home, and can be skipped at any point.
  */
 
-type Kind = 'week' | 'vault' | 'goal' | 'new' | 'save' | 'activity' | 'sleep' | 'dial';
+type Kind = 'friends' | 'reminders' | 'help' | 'week' | 'vault' | 'goal' | 'new' | 'save' | 'activity' | 'sleep' | 'dial';
 type Side = 'top' | 'bottom' | 'left' | 'right';
 type Box = { x: number; y: number; w: number; h: number };
 type Pt = { x: number; y: number };
@@ -62,6 +65,31 @@ const DIAL_R = (wide: boolean) => (wide ? 150 : 128);
 const CHIP_ROOM = 64; // above a goal row, for the three things inside it
 
 const STOPS: Stop[] = [
+  // the header first: these three are small and easy to miss, and Friends lives only up here
+  {
+    kind: 'friends',
+    target: '[data-testid="friends-link"]',
+    pose: 'pose-wave',
+    ratio: 0.98,
+    title: 'Your friends',
+    line: () => 'Find friends by their number, cheer them on, or give them your freeze.',
+  },
+  {
+    kind: 'reminders',
+    target: '.top7__icon[aria-label="Reminders"]',
+    pose: 'pose-point',
+    ratio: 1,
+    title: 'Reminders',
+    line: () => 'Pick when Kip nudges you to save.',
+  },
+  {
+    kind: 'help',
+    target: '.top7__icon[aria-label="How it works"]',
+    pose: 'pose-guide',
+    ratio: 0.92,
+    title: 'Lost?',
+    line: () => 'Tap here anytime to see this tour again.',
+  },
   {
     kind: 'week',
     target: '[data-tour="streak"] .streakd__week',
@@ -687,6 +715,12 @@ interface DemoProps {
 
 function Demo(p: DemoProps) {
   switch (p.kind) {
+    case 'friends':
+      return <TapDemo {...p} icon={UsersThree} />;
+    case 'reminders':
+      return <TapDemo {...p} icon={BellRinging} />;
+    case 'help':
+      return <TapDemo {...p} icon={Question} />;
     case 'week':
       return <WeekDemo {...p} />;
     case 'vault':
@@ -883,6 +917,20 @@ function GoalDemo({ el, reduce }: DemoProps) {
 }
 
 /** Stop 5: tap "New goal" and a new goal pops. */
+/** The header buttons: a finger taps it and what it opens pops out underneath. */
+function TapDemo({ el, reduce, icon }: DemoProps & { icon: Icon }) {
+  const b = own(el);
+  const at: Pt = { x: b.w / 2, y: b.h / 2 };
+  return (
+    <>
+      <Pop at={at} d={{ x: 0, y: b.h / 2 + 30 }} reduce={reduce}>
+        <Chip icon={icon} tone="blue" />
+      </Pop>
+      <Finger at={at} reduce={reduce} />
+    </>
+  );
+}
+
 function NewDemo({ el, reduce }: DemoProps) {
   const b = own(el);
   const at: Pt = { x: b.w / 2, y: b.h / 2 };

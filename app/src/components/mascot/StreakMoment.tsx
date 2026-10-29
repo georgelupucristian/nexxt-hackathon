@@ -43,7 +43,8 @@ export function StreakMoment() {
   const joined = joinedKey(account, data.actions);
 
   useEffect(() => {
-    if (streak > prev.current) {
+    // one more day, not a jump: a jump means the data just loaded (sign-in, refetch), not a day saved now
+    if (streak === prev.current + 1) {
       const from = prev.current;
       // let the "+X saved" moment finish first if one is showing. A payment confirmed by Stripe
       // grows the streak in the same render that asks for the celebration, so look again a beat

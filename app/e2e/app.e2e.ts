@@ -63,6 +63,9 @@ test.describe('first-run tour', () => {
   // "New goal", the money button, the activity list, "Sleep on it", then Kip's dial. A stop
   // whose target isn't on the page is left out; the demo home has all eight.
   const STOPS = [
+    '[data-testid="friends-link"]',
+    '.top7__icon[aria-label="Reminders"]',
+    '.top7__icon[aria-label="How it works"]',
     '[data-tour="streak"] .streakd__week',
     '[data-tour="vault"]',
     '.cop__goal',
@@ -84,7 +87,7 @@ test.describe('first-run tour', () => {
       return cx > hole.left && cx < hole.right && cy > hole.top && cy < hole.bottom;
     }, selector);
 
-  test('walks through all eight stops and stays done after a reload', async ({ page }) => {
+  test('walks through every stop and stays done after a reload', async ({ page }) => {
     await enterDemo(page);
     const tour = page.locator('.tour');
     await expect(tour).toBeVisible({ timeout: 6_000 });
