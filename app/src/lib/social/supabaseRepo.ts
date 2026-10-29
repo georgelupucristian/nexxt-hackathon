@@ -614,8 +614,9 @@ export class SupabaseSocialRepo implements SocialRepo {
     return { crossed: [] };
   }
 
-  async withdrawShared(goalId: string, amount: Bani) {
-    await this.pay({ action: 'shared_withdraw', amount_bani: amount, shared_goal_id: goalId });
+  /** goalId null: the money that came back from goals you left (shared_return rows) */
+  async withdrawShared(goalId: string | null, amount: Bani) {
+    await this.pay({ action: 'shared_withdraw', amount_bani: amount, ...(goalId ? { shared_goal_id: goalId } : {}) });
     await this.refresh();
   }
 

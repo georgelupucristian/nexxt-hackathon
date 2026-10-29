@@ -8,6 +8,7 @@ import { useToast } from '../ui';
 import { PlanSimulator } from './Playful';
 import { SleepTile } from './SleepOnIt';
 import { GoalsCard, SaveButton } from './GoalsCard';
+import { SharedGoalsHomeCard } from '../social/SharedGoalLinks';
 import { KipTransactionList } from '../watermelon/transaction-list';
 import { HomeHeader, StreakDuo } from './HomeTop';
 import { ClubsHomeRow } from '../../screens/Clubs';
@@ -58,7 +59,10 @@ export function Hub({ onAdd }: HubProps) {
                   <SaveButton />
                 </>
               ) : (
-                <NextStep action={action} onAdd={onAdd} />
+                <>
+                  <NextStep action={action} onAdd={onAdd} />
+                  <SharedGoalsHomeCard />
+                </>
               )}
             </motion.div>
             <motion.div {...enter(2)}>

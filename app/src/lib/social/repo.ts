@@ -80,7 +80,8 @@ export interface SocialRepo {
   joinSharedGoal(goalId: string): Maybe<void>;
   declineSharedGoal(goalId: string): Maybe<void>;
   depositShared(goalId: string, amount: Bani): Maybe<{ crossed: number[] }>;
-  withdrawShared(goalId: string, amount: Bani): Maybe<void>;
+  /** goalId null: what came back from goals you left (the pocket) */
+  withdrawShared(goalId: string | null, amount: Bani): Maybe<void>;
   leaveSharedGoal(goalId: string): Maybe<{ returned: Bani }>;
   setSharedShare(goalId: string, share: Bani): Maybe<void>;
   adjustSharedTarget(goalId: string, target: Bani): Maybe<void>;
@@ -558,7 +559,15 @@ export class MockSocialRepo implements SocialRepo {
     return { crossed };
   }
 
-  withdrawShared(goalId: string, amount: Bani) {
+  withdrawShared(goalId: string | null, amount: Bani) {
+    if (goalId === null) {
+      this.update((w, actor) => {
+        const have = w.pockets[actor] ?? 0;
+        if (amount <= 0 || amount > have) throw new R.RuleError('amount', `You can withdraw up to ${have / 100} lei.`);
+        return { ...w, pockets: { ...w.pockets, [actor]: have - amount } };
+      });
+      return;
+    }
     this.update((w, actor, now) => {
       const g = R.withdrawOwn(this.goal(w, goalId), actor, amount, now, uid('sc_'));
       // the others hear a neutral line: no name, no blame

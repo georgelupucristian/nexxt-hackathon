@@ -1,10 +1,13 @@
 // Shared goals sit in the same goals lists as personal ones (home and Goals), marked with the
 // members' avatars and "With Ana, Mihai". Only the total % shows here, never anyone's amount.
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight } from '@/lib/icons';
+import { ChevronRight, Withdraw } from '@/lib/icons';
 import { Avatar } from './parts';
 import { useSocial } from './SocialProvider';
-import { firstNameOf, isParticipant, sharedPct } from '../../lib/social/rules';
+import { Button, useToast } from '../ui';
+import { formatLei } from '../../lib/money';
+import { firstNameOf, isParticipant, RuleError, sharedPct } from '../../lib/social/rules';
 import type { SharedGoal, SocialUser } from '../../lib/social/types';
 import { GoalPic } from '../../screens/social/ColonyDetail';
 
@@ -93,5 +96,60 @@ export function SharedGoalCards() {
         );
       })}
     </>
+  );
+}
+
+/** How many shared goals the viewer is in (they show even with no personal goal). */
+export function useSharedGoalCount() {
+  return useMyShared()?.goals.length ?? 0;
+}
+
+/** Home with no personal goal: the shared goals still get their own small card. */
+export function SharedGoalsHomeCard() {
+  if (!useSharedGoalCount()) return null;
+  return (
+    <section className="cop" aria-label="Shared goals">
+      <ul className="cop__list">
+        <SharedGoalRows />
+      </ul>
+    </section>
+  );
+}
+
+/**
+ * Leaving a shared goal gives your own money back, but it sits apart from your savings. One line
+ * says how much, and one button pays it out (payments shared_withdraw without a goal).
+ */
+export function ReturnedMoney() {
+  const s = useSocial();
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const amount = s ? (s.world.pockets[s.viewer] ?? 0) : 0;
+  if (!s || amount <= 0) return null;
+  return (
+    <div className="card row row--between" data-testid="returned-money" style={{ gap: 'var(--s-4)', flexWrap: 'wrap' }}>
+      <span className="stack" style={{ gap: 2, minWidth: 0 }}>
+        <span className="strong">{formatLei(amount)} back from a shared goal</span>
+        <span className="xs subtle">Your own money from a goal you left, ready to withdraw.</span>
+      </span>
+      <Button
+        size="sm"
+        icon={Withdraw}
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await s.repo.withdrawShared(null, amount);
+            toast(`You withdrew ${formatLei(amount)}.`);
+          } catch (e) {
+            toast(e instanceof RuleError ? e.message : "Couldn't withdraw. Try again.", 'error');
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        Withdraw
+      </Button>
+    </div>
   );
 }

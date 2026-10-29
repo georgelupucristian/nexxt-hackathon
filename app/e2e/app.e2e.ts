@@ -11,7 +11,7 @@ test.describe('getting in and out', () => {
     await expect(page).toHaveURL(/\/home$/);
 
     // the demo home, top to bottom: the streak card, the goals card (this month, the ring, one row
-    // per goal with its plan, "Obiectiv nou"), the one money button, recent activity, "Dorm pe idee"
+    // per goal with its plan, "New goal"), the one money button, recent activity, "Sleep on it"
     await expect(page.locator('.streakd[data-tour="streak"]')).toBeVisible();
     const goals = page.locator('.cop');
     await expect(goals.locator('[data-tour="vault"]')).toBeVisible();
@@ -60,7 +60,7 @@ test.describe('getting in and out', () => {
 
 test.describe('first-run tour', () => {
   // The tour points at what's on home, top to bottom: the week, the goals card, a goal row,
-  // "Obiectiv nou", the money button, the activity list, "Dorm pe idee", then Kip's dial. A stop
+  // "New goal", the money button, the activity list, "Sleep on it", then Kip's dial. A stop
   // whose target isn't on the page is left out; the demo home has all eight.
   const STOPS = [
     '[data-tour="streak"] .streakd__week',

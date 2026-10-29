@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
 import { accountId, closeMoments, continueButton, demoHome, expect, flowValue, goalRow, goNext, lei, progress, savingMoment, stepRuler, test, typeAmount } from './fixtures';
 
-// "Obiectiv nou" is four questions, one per screen, like signup: what for, how much, by when, and
-// the plan Kip works out. Then the goal page, where everything you can do with a goal is in plain view.
+// "New goal" is five questions, one per screen, like signup: who it's for, what for, how much, by
+// when, and the plan Kip works out. Then the goal page, where everything you can do with a goal is in plain view.
 
 const step = (page: Page) => page.locator('main.start__step');
 const preset = (page: Page, id: string) => page.locator(`.preset[data-preset="${id}"]`);
@@ -29,9 +29,9 @@ async function storedGoal(page: Page, name: string) {
 }
 
 test.describe('New goal', () => {
-  test('from home in four questions and a handful of taps; it lands on the goal and shows on home with its plan', async ({ page }) => {
+  test('from home in five questions and a handful of taps; it lands on the goal and shows on home with its plan', async ({ page }) => {
     await demoHome(page);
-    // every tap from home to the new goal is counted; two of them (a price chip, 6 luni) are optional
+    // every tap from home to the new goal is counted; two of them (a price chip, 6 months) are optional
     let taps = 0;
     const tap = async (target: ReturnType<Page['locator']>) => {
       taps++;
@@ -45,9 +45,16 @@ test.describe('New goal', () => {
     await tap(page.locator('.cop a.cop__new'));
     await expect(page).toHaveURL(NEW_GOAL_URL);
 
-    // 1. what for: Continue waits for a choice; a preset brings its name, which you can change
+    // 0. who it's for: Continue waits for a choice
     await expect(progress(page)).toHaveAttribute('aria-valuenow', '1');
-    await expect(progress(page)).toHaveAttribute('aria-valuemax', '4');
+    await expect(progress(page)).toHaveAttribute('aria-valuemax', '5');
+    await expect(step(page)).toHaveAttribute('data-step', 'who');
+    await expect(continueButton(page)).toBeDisabled();
+    await tap(page.getByRole('button', { name: /^Just me/ }));
+    await next();
+
+    // 1. what for: Continue waits for a choice; a preset brings its name, which you can change
+    await expect(progress(page)).toHaveAttribute('aria-valuenow', '2');
     await expect(step(page)).toHaveAttribute('data-step', 'what');
     await expect(page.locator('.preset')).toHaveCount(8);
     await expect(continueButton(page)).toBeDisabled();
@@ -58,7 +65,7 @@ test.describe('New goal', () => {
     await next();
 
     // 2. how much: the preset's price is already there; a quick chip sets another
-    await expect(progress(page)).toHaveAttribute('aria-valuenow', '2');
+    await expect(progress(page)).toHaveAttribute('aria-valuenow', '3');
     await expect(step(page)).toHaveAttribute('data-step', 'cost');
     await expect(stepRuler(page)).toHaveAttribute('aria-valuenow', '400');
     const chip500 = step(page).locator('.chip-row--even .chip', { hasText: /^500\s*lei$/ });
@@ -68,7 +75,7 @@ test.describe('New goal', () => {
     await next();
 
     // 3. by when: the preset's deadline is picked; 6 months is one tap
-    await expect(progress(page)).toHaveAttribute('aria-valuenow', '3');
+    await expect(progress(page)).toHaveAttribute('aria-valuenow', '4');
     await expect(step(page)).toHaveAttribute('data-step', 'when');
     await expect(page.locator('.when[data-when="3m"]')).toHaveAttribute('aria-checked', 'true');
     await tap(page.locator('.when[data-when="6m"]'));
@@ -77,7 +84,7 @@ test.describe('New goal', () => {
     await next();
 
     // 4. the plan, worked out: one number, one line why, one button
-    await expect(progress(page)).toHaveAttribute('aria-valuenow', '4');
+    await expect(progress(page)).toHaveAttribute('aria-valuenow', '5');
     await expect(step(page)).toHaveAttribute('data-step', 'plan');
     const plan = page.locator('.planpv');
     await expect(plan.locator('.planpv__goaltext strong')).toHaveText('Concert');
@@ -99,7 +106,7 @@ test.describe('New goal', () => {
     await expect(done.locator('.newgoal-done__title')).toHaveText('Done! Concert is on its way.');
     await expect(done.locator('.newgoal-done__sub')).toContainText(new RegExp(`${perWeek}\\s*lei a week`));
     await expect(page).toHaveURL(GOAL_URL, { timeout: 8_000 });
-    expect(taps, 'taps from home to the new goal').toBeLessThanOrEqual(8);
+    expect(taps, 'taps from home to the new goal').toBeLessThanOrEqual(10);
 
     await expect(page.locator('#goal-name')).toHaveText('Concert');
     await expect(page.locator('.goal-plan')).toContainText(new RegExp(`${perWeek}\\s*lei every`));
@@ -117,13 +124,15 @@ test.describe('New goal', () => {
     await expect(row.locator('.cop__amt')).toContainText(/0\s*lei\s*\/\s*500\s*lei/);
   });
 
-  test('from Goals: "Altceva" asks for a name, answers survive a refresh, Back keeps them, X forgets them', async ({ page }) => {
+  test('from Goals: "Something else" asks for a name, answers survive a refresh, Back keeps them, X forgets them', async ({ page }) => {
     await demoHome(page);
     await page.goto('/goals');
     await page.locator('.page-head .btn--primary', { hasText: 'New goal' }).click();
     await expect(page).toHaveURL(NEW_GOAL_URL);
 
-    // "Altceva" has no name to bring, so Continue waits for one
+    await page.getByRole('button', { name: /^Just me/ }).click();
+    await goNext(page);
+    // "Something else" has no name to bring, so Continue waits for one
     await preset(page, 'other').click();
     await expect(nameField(page)).toBeFocused();
     await expect(nameField(page)).toHaveValue('');
@@ -140,7 +149,7 @@ test.describe('New goal', () => {
     // a refresh doesn't lose the answers
     await page.reload();
     await expect(step(page)).toHaveAttribute('data-step', 'cost');
-    await expect(progress(page)).toHaveAttribute('aria-valuenow', '2');
+    await expect(progress(page)).toHaveAttribute('aria-valuenow', '3');
     await expect(stepRuler(page)).toHaveAttribute('aria-valuenow', '4000');
 
     // Back goes one question back with everything still filled in
@@ -157,7 +166,7 @@ test.describe('New goal', () => {
     await expect(stepRuler(page)).toHaveAttribute('aria-valuenow', '1234');
     await goNext(page);
 
-    // "Alege o dată" opens a date field; a day in the past can't be the deadline
+    // "Pick a date" opens a date field; a day in the past can't be the deadline
     await page.locator('.when[data-when="date"]').click();
     const date = step(page).locator('input[type="date"]');
     await expect(date).toBeVisible();
@@ -186,13 +195,14 @@ test.describe('New goal', () => {
     await plan.locator('.planpv__edit', { hasText: 'Done' }).click();
     await expect(plan.locator('.planpv__big')).toBeVisible();
 
-    // X: back to Goals, nothing created, and the next "Obiectiv nou" starts from scratch
+    // X: back to Goals, nothing created, and the next "New goal" starts from scratch
     await page.locator('.start__bar button[aria-label="Cancel the new goal"]').click();
     await expect(page).toHaveURL(/\/goals$/);
     expect(await storedGoal(page, 'Bike')).toBeNull();
     await page.locator('.page-head .btn--primary', { hasText: 'New goal' }).click();
     await expect(progress(page)).toHaveAttribute('aria-valuenow', '1');
-    await expect(page.locator('.preset[aria-checked="true"]')).toHaveCount(0);
+    await expect(step(page)).toHaveAttribute('data-step', 'who');
+    await expect(page.locator('.who-choice[aria-pressed="true"]')).toHaveCount(0);
   });
 });
 
@@ -205,7 +215,7 @@ test.describe('goal page', () => {
     await expect(page).toHaveURL(GOAL_URL);
     await expect(page.locator('#goal-name')).toHaveText(name);
 
-    // Depune: the sheet opens on this goal, first and picked
+    // Save: the sheet opens on this goal, first and picked
     const actions = page.locator('.goal-hero__actions');
     await expect(actions.locator('.btn--primary')).toHaveText(/Deposit/);
     await actions.locator('.btn--primary').click();
@@ -218,7 +228,7 @@ test.describe('goal page', () => {
     await expect(savingMoment(page)).toBeVisible();
     await closeMoments(page);
 
-    // Retrage: says where from and how much is there, won't take more than that
+    // Withdraw: says where from and how much is there, won't take more than that
     await actions.locator('.btn--secondary', { hasText: 'Withdraw' }).click();
     sheet = page.locator('.sheet-backdrop .sheet');
     await expect(sheet.locator('.saves__from')).toContainText(name);
@@ -249,7 +259,7 @@ test.describe('goal page', () => {
     await expect(banner).toHaveCount(0);
     await expect(more.locator('.list-row', { hasText: 'Pause' })).toBeVisible();
 
-    // archive asks first; "Nu, lasă-l" leaves it as it was
+    // archive asks first; "No, keep it" leaves it as it was
     await more.locator('.list-row', { hasText: 'Archive' }).click();
     let dialog = page.locator('.sheet.dialog');
     await expect(dialog.locator('h2')).toHaveText(`Archive “${name}”?`);

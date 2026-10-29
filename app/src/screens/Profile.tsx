@@ -1,3 +1,4 @@
+import { InstallApp } from '../components/InstallApp';
 import {
   Accessibility,
   Bell,
@@ -103,6 +104,8 @@ export function Profile() {
           <p className="small muted truncate">{account?.isDemo ? 'Demo account · demo data' : account?.phone ? formatNational(account.phone) : ''}</p>
         </div>
       </header>
+
+      <InstallApp />
 
       {/* the two freezes, and (privately) how often friends saved each other: no leaderboards */}
       <FreezeCards streak={currentStreak(data)} compact />

@@ -4,7 +4,6 @@ import { demoHome, expect, test } from './fixtures';
 // Friends, colonies and freezes: the spec's demo script, steps 1 to 7, from a fresh phone sign-up on
 // a server without a backend. Such an account is local, so its social layer is the simulated mock
 // (lib/social/repo.ts), seeded per account; the demo account gets the same story (second test).
-// The onboarding steps match both languages while their translation lands.
 
 const main = (page: Page) => page.getByRole('contentinfo').getByRole('button').first();
 const expectTitle = (page: Page, name: string) => expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
@@ -13,57 +12,56 @@ const moment = (page: Page) => page.locator('.soc-moment');
 /** Welcome → a new account by phone, up to the contacts screen. */
 async function signUpToContacts(page: Page) {
   await page.goto('/welcome');
-  await page.getByRole('button', { name: 'Hai să începem' }).click();
-  await expect(page.locator('.sr-only', { hasText: 'Salut! Eu sunt Kip.' })).toHaveCount(0, { timeout: 6_000 });
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await expect(page.locator('.sr-only', { hasText: "Hi! I'm Kip." })).toHaveCount(0, { timeout: 6_000 });
   await page.getByRole('radio', { name: /21-25/ }).click();
   await main(page).click();
-  await page.getByRole('checkbox', { name: /Vacanță cu prietenii/ }).click();
+  await page.getByRole('checkbox', { name: /A trip with friends/ }).click();
   await main(page).click();
-  await page.getByRole('radio', { name: /^10 lei/ }).click({ timeout: 8_000 });
+  await page.getByRole('radio', { name: /10 lei \/ day/ }).click({ timeout: 8_000 });
   await main(page).click();
-  await page.getByRole('button', { name: 'Continuă' }).last().click();
-  await expectTitle(page, 'Uite ce poți realiza în 3 luni!');
+  await page.getByRole('button', { name: 'Continue' }).last().click();
+  await expectTitle(page, "Here's what you can do in 3 months");
   await main(page).click();
-  await expectTitle(page, 'Cât ai deja pus deoparte?');
+  await expectTitle(page, 'How much do you already have saved?');
   await main(page).click();
-  await expect(page.getByRole('heading', { name: /Pornești din ziua 1/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /You start on day 1/ })).toBeVisible();
   await main(page).click();
-  const phone = page.getByLabel('Numărul tău de telefon');
+  const phone = page.getByLabel('Your phone number');
   await phone.click();
   await phone.pressSequentially('0712345678');
   await main(page).click();
-  await page.getByLabel('Codul de 6 cifre').fill('123456');
-  await expectTitle(page, 'Cum să-ți spunem?');
-  await page.getByLabel('Prenume').fill('Alex');
+  await page.getByLabel('6-digit code').fill('123456');
+  await expectTitle(page, 'What should we call you?');
+  await page.getByLabel('First name').fill('Alex');
   await main(page).click();
-  await expectTitle(page, 'Ca să-ți găsești prietenii care economisesc deja');
+  await expectTitle(page, 'Find your friends who already save');
 }
 
 test('demo script, steps 1 to 7: contacts, a friend in danger, a freeze, a rescue, the shared goal, the profile', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'phone', 'one run is enough');
   test.setTimeout(150_000);
 
-  // 1. onboarding: "Permite accesul" finds the 5 people from the contacts who use Kip
+  // 1. onboarding: "Allow access" finds the 5 people from the contacts who use Kip
   await signUpToContacts(page);
-  await expect(page.getByRole('button', { name: 'Mai târziu' })).toBeVisible();
-  await page.getByRole('button', { name: 'Permite accesul' }).click();
+  await expect(page.getByRole('button', { name: 'Later' })).toBeVisible();
+  await page.getByRole('button', { name: 'Allow access' }).click();
   const found = page.getByTestId('found-row');
   await expect(found).toHaveCount(5);
   await expect(found).toContainText(['Ana Popescu', 'Mihai Ionescu', 'Ioana Marin', 'Radu Stan', 'Elena Dobre']);
-  // adding sends a request; Mihai had already asked, so that one is a friendship straight away
   // adding sends a request; Ana and Mihai had already asked, so both are friendships straight away
   await page.getByRole('button', { name: 'Add Ana Popescu' }).click();
   await expect(found.filter({ hasText: 'Ana Popescu' })).toContainText("You're friends");
   await page.getByRole('button', { name: 'Add Mihai Ionescu' }).click();
   await expect(found.filter({ hasText: 'Mihai Ionescu' })).toContainText("You're friends");
   await main(page).click();
-  await expectTitle(page, 'Te pot găsi prietenii după număr?');
-  await page.getByRole('radio', { name: /Prietenii mă pot găsi după număr/ }).click();
+  await expectTitle(page, 'Can friends find you by your number?');
+  await page.getByRole('radio', { name: /Friends can find me by my number/ }).click();
   await main(page).click();
-  await page.getByRole('button', { name: 'Completez mai târziu' }).click();
-  await page.getByRole('button', { name: 'Nu acum' }).click();
-  await page.getByRole('button', { name: 'Nu acum' }).click();
-  await page.getByRole('button', { name: 'Hai', exact: true }).click();
+  await page.getByRole('button', { name: 'Fill this in later' }).click();
+  await page.getByRole('button', { name: 'Not now' }).click();
+  await page.getByRole('button', { name: 'Not now' }).click();
+  await page.getByRole('button', { name: "Let's go", exact: true }).click();
   await expect(page).toHaveURL(/\/home$/);
   await expect(page.locator('.tour')).toBeVisible({ timeout: 6_000 });
   await page.locator('.tour__skip').click();
@@ -73,11 +71,11 @@ test('demo script, steps 1 to 7: contacts, a friend in danger, a freeze, a rescu
   await expect(page).toHaveURL(/\/friends$/);
   await expect(page.getByRole('button', { name: 'View as…' })).toHaveCount(0);
 
-  // 2. all 30 friends; Ana pinned on top as "At risk"; search by name
+  // 2. all 30 friends; Ana pinned on top as "In danger"; search by name
   await expect(page.getByTestId('friend-count')).toHaveText('30 friends');
   const rows = page.getByTestId('friend-row');
   await expect(rows.first()).toContainText('Ana Popescu');
-  await expect(rows.first()).toContainText('At risk');
+  await expect(rows.first()).toContainText('In danger');
   await expect(rows.nth(1)).toHaveAttribute('data-danger', 'true');
   await page.getByRole('button', { name: 'Name A-Z' }).click();
   await expect(rows.first()).toContainText('Ana Popescu');
@@ -145,9 +143,9 @@ test('the demo account finds the same friends from Friends → Invite; no emojis
   const text = await page.locator('body').innerText();
   expect(text).not.toMatch(/[\u2013\u2014]/);
   expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
-  // the streak rules: the two freezes instead of "Îngheață ziua de azi"
+  // the streak rules: the two freezes instead of "Freeze today"
   await page.goto('/profile/streaks');
   await expect(page.getByRole('heading', { name: /1-day Freeze/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: /1-week Freeze/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Freeze today|Îngheață ziua de azi/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Freeze today/ })).toHaveCount(0);
 });

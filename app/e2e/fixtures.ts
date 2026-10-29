@@ -101,8 +101,8 @@ export { expect };
 /** Welcome screen → "Explore with sample data" → home. Leaves the first-run tour alone. */
 export async function enterDemo(page: Page) {
   await page.goto('/welcome');
-  // Welcome has Hai să începem, an "Am deja cont" link
-  // and a small "Încearcă cu date demo" link.
+  // Welcome has "Get started", an "I already have an account" link
+  // and a small link to explore with sample data.
   await page.locator('.onb__demo').click();
   await expect(page).toHaveURL(/\/home$/);
   await expect(page.locator('[data-tour="vault"]')).toBeVisible();
@@ -232,7 +232,7 @@ export async function closeMoments(page: Page) {
   await expect(page.locator('.party, .streak-moment')).toHaveCount(0);
 }
 
-// ---------- one question per screen (signup and Obiectiv nou) ----------
+// ---------- one question per screen (signup and New goal) ----------
 
 export const continueButton = (page: Page) => page.locator('.start__foot .btn--primary');
 export const progress = (page: Page) => page.locator('.start__progress[role="progressbar"]');

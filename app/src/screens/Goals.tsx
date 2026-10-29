@@ -2,7 +2,7 @@ import { ChevronDown, Plus, Target } from '@/lib/icons';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoalCard } from '../components/domain';
-import { SharedGoalCards } from '../components/social/SharedGoalLinks';
+import { ReturnedMoney, SharedGoalCards, useSharedGoalCount } from '../components/social/SharedGoalLinks';
 import { Button, EmptyState } from '../components/ui';
 import { breakdown } from '../data/selectors';
 import { useData } from '../data/store';
@@ -17,6 +17,7 @@ export function Goals() {
   const active = sorted.filter((g) => g.status === 'active');
   const paused = sorted.filter((g) => g.status === 'paused');
   const archived = sorted.filter((g) => g.status === 'archived');
+  const shared = useSharedGoalCount();
 
   return (
     <div className="screen screen--wide">
@@ -27,7 +28,9 @@ export function Goals() {
         </Button>
       </header>
 
-      {data.goals.length === 0 ? (
+      <ReturnedMoney />
+
+      {data.goals.length === 0 && !shared ? (
         <div className="card">
           <EmptyState
             icon={Target}
@@ -57,9 +60,9 @@ export function Goals() {
             </div>
           </div>
 
-          {active.length > 0 && (
+          {(active.length > 0 || shared > 0) && (
             <section className="section" aria-label="Active goals">
-              <h2 className="group-label">Active · {active.length}</h2>
+              <h2 className="group-label">Active · {active.length + shared}</h2>
               <div className="goals-grid">
                 {active.map((g) => (
                   <GoalCard key={g.id} goal={g} />
@@ -68,7 +71,7 @@ export function Goals() {
               </div>
             </section>
           )}
-          {active.length === 0 && (
+          {active.length === 0 && !shared && (
             <p className="muted">No active goals. Resume a paused one or create a new one.</p>
           )}
           {paused.length > 0 && (
